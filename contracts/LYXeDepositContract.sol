@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
 pragma solidity 0.6.11;
+pragma experimental ABIEncoderV2;
 
 import {DepositContract} from "./DepositContract.sol";
 //import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
@@ -33,7 +34,7 @@ contract LUKSOGenesisDepositContract is DepositContract {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor() {
+    constructor() public {
         owner = msg.sender;
     }
 
