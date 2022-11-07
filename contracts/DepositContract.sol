@@ -101,8 +101,7 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes calldata pubkey,
         bytes calldata withdrawal_credentials,
         bytes calldata signature,
-        bytes32 deposit_data_root,
-        uint256 LYXeAmount
+        bytes32 deposit_data_root
     ) internal {
         // Emit `DepositEvent` log
         bytes memory amount = to_little_endian_64(uint64(deposit_amount));

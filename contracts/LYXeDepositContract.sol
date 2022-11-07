@@ -4,6 +4,7 @@ pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
 import {DepositContract} from "./DepositContract.sol";
+
 //import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
 
 contract LUKSOGenesisDepositContract is DepositContract {
@@ -61,15 +62,20 @@ contract LUKSOGenesisDepositContract is DepositContract {
     ) external {
         require(!contractFrozen, "Contract is frozen");
         require(msg.sender == LYXeAddress, "Not called on LYXe transfer");
-        require(amount == 32 ether, "Cannot send an amount different from 32 LYXe");
-        require(userData.length == (48 + 32 + 96 + 32), "Data not encoded properly");
+        require(
+            amount == 32 ether,
+            "Cannot send an amount different from 32 LYXe"
+        );
+        require(
+            userData.length == (48 + 32 + 96 + 32),
+            "Data not encoded properly"
+        );
 
         deposit(
             userData[:48],
             userData[48:80],
             userData[80:176],
-            bytes32(userData[176:208]),
-            amount
+            bytes32(userData[176:208])
         );
 
         deposit_data[deposit_count] = userData;
@@ -79,15 +85,24 @@ contract LUKSOGenesisDepositContract is DepositContract {
      * Maybe plit in packs of 1000 elements ??
      * @dev Get an array of all excoded deposit data
      */
-    function getDepositData() public view returns (bytes[] memory returnedArray) {
+    function getDepositData()
+        public
+        view
+        returns (bytes[] memory returnedArray)
+    {
         returnedArray = new bytes[](deposit_count);
-        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
+        for (uint256 i = 0; i < deposit_count; i++)
+            returnedArray[i] = deposit_data[i];
     }
 
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function getDepositDataByIndex(uint256 index) public view returns (bytes memory) {
+    function getDepositDataByIndex(uint256 index)
+        public
+        view
+        returns (bytes memory)
+    {
         return deposit_data[index];
     }
 
