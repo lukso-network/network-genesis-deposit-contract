@@ -88,7 +88,7 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes calldata signature,
         bytes32 deposit_data_root,
         uint256 LYXeAmount
-    ) internal override {
+    ) internal {
         // Extended ABI length checks since dynamic types are used.
         require(pubkey.length == 48, "DepositContract: invalid pubkey length");
         require(

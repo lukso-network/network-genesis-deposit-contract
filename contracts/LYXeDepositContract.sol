@@ -3,9 +3,9 @@
 pragma solidity 0.6.11;
 
 import {DepositContract} from "./DepositContract.sol";
-import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
+//import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
 
-contract LUKSOGenesisDepositContract is DepositContract, IERC777Recipient {
+contract LUKSOGenesisDepositContract is DepositContract {
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
     /**
@@ -68,7 +68,7 @@ contract LUKSOGenesisDepositContract is DepositContract, IERC777Recipient {
             userData[48:80],
             userData[80:176],
             bytes32(userData[176:208]),
-            LYXeAmount
+            amount
         );
 
         deposit_data[deposit_count] = userData;
@@ -80,7 +80,7 @@ contract LUKSOGenesisDepositContract is DepositContract, IERC777Recipient {
      */
     function getDepositData() public view returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
-        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = depositData[i];
+        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
 
     /**
