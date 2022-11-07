@@ -60,7 +60,11 @@ contract DepositContract is IDepositContract, ERC165 {
 
     constructor() public {
         // Compute hashes in empty sparse Merkle tree
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 1; height++)
+        for (
+            uint256 height = 0;
+            height < DEPOSIT_CONTRACT_TREE_DEPTH - 1;
+            height++
+        )
             zero_hashes[height + 1] = sha256(
                 abi.encodePacked(zero_hashes[height], zero_hashes[height])
             );
@@ -69,13 +73,24 @@ contract DepositContract is IDepositContract, ERC165 {
     function get_deposit_root() external view override returns (bytes32) {
         bytes32 node;
         uint256 size = deposit_count;
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
-            if ((size & 1) == 1) node = sha256(abi.encodePacked(branch[height], node));
+        for (
+            uint256 height = 0;
+            height < DEPOSIT_CONTRACT_TREE_DEPTH;
+            height++
+        ) {
+            if ((size & 1) == 1)
+                node = sha256(abi.encodePacked(branch[height], node));
             else node = sha256(abi.encodePacked(node, zero_hashes[height]));
             size /= 2;
         }
         return
-            sha256(abi.encodePacked(node, to_little_endian_64(uint64(deposit_count)), bytes24(0)));
+            sha256(
+                abi.encodePacked(
+                    node,
+                    to_little_endian_64(uint64(deposit_count)),
+                    bytes24(0)
+                )
+            );
     }
 
     function get_deposit_count() external view override returns (bytes memory) {
@@ -95,13 +110,10 @@ contract DepositContract is IDepositContract, ERC165 {
             withdrawal_credentials.length == 32,
             "DepositContract: invalid withdrawal_credentials length"
         );
-        require(signature.length == 96, "DepositContract: invalid signature length");
-
-        // Check deposit amount
-        require(LYXeAmount >= 1 ether, "DepositContract: deposit value too low");
-        require(LYXeAmount % 1 gwei == 0, "DepositContract: deposit value not multiple of gwei");
-        uint256 deposit_amount = LYXeAmount / 1 gwei;
-        require(deposit_amount <= type(uint64).max, "DepositContract: deposit value too high");
+        require(
+            signature.length == 96,
+            "DepositContract: invalid signature length"
+        );
 
         // Emit `DepositEvent` log
         bytes memory amount = to_little_endian_64(uint64(deposit_amount));
@@ -135,12 +147,19 @@ contract DepositContract is IDepositContract, ERC165 {
         );
 
         // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(deposit_count < MAX_DEPOSIT_COUNT, "DepositContract: merkle tree full");
+        require(
+            deposit_count < MAX_DEPOSIT_COUNT,
+            "DepositContract: merkle tree full"
+        );
 
         // Add deposit data root to Merkle tree (update a single `branch` node)
         deposit_count += 1;
         uint256 size = deposit_count;
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
+        for (
+            uint256 height = 0;
+            height < DEPOSIT_CONTRACT_TREE_DEPTH;
+            height++
+        ) {
             if ((size & 1) == 1) {
                 branch[height] = node;
                 return;
@@ -153,13 +172,22 @@ contract DepositContract is IDepositContract, ERC165 {
         assert(false);
     }
 
-    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        external
+        pure
+        override
+        returns (bool)
+    {
         return
             interfaceId == type(ERC165).interfaceId ||
             interfaceId == type(IDepositContract).interfaceId;
     }
 
-    function to_little_endian_64(uint64 value) internal pure returns (bytes memory ret) {
+    function to_little_endian_64(uint64 value)
+        internal
+        pure
+        returns (bytes memory ret)
+    {
         ret = new bytes(8);
         bytes8 bytesValue = bytes8(value);
         // Byteswapping during copying to bytes.
