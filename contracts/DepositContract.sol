@@ -104,17 +104,6 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes32 deposit_data_root,
         uint256 LYXeAmount
     ) internal {
-        // Extended ABI length checks since dynamic types are used.
-        require(pubkey.length == 48, "DepositContract: invalid pubkey length");
-        require(
-            withdrawal_credentials.length == 32,
-            "DepositContract: invalid withdrawal_credentials length"
-        );
-        require(
-            signature.length == 96,
-            "DepositContract: invalid signature length"
-        );
-
         // Emit `DepositEvent` log
         bytes memory amount = to_little_endian_64(uint64(deposit_amount));
         emit DepositEvent(
