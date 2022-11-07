@@ -58,6 +58,9 @@ contract DepositContract is IDepositContract, ERC165 {
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
+    // to_little_endian_64(uint64(32 ether))
+    bytes constant amount_to_little_endian_64 = hex"000080ec74d616bc";
+
     constructor() public {
         // Compute hashes in empty sparse Merkle tree
         for (
@@ -104,11 +107,10 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes32 deposit_data_root
     ) internal {
         // Emit `DepositEvent` log
-        bytes memory amount = to_little_endian_64(uint64(deposit_amount));
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            amount,
+            amount_to_little_endian_64,
             signature,
             to_little_endian_64(uint64(deposit_count))
         );
@@ -124,7 +126,13 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes32 node = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                sha256(abi.encodePacked(amount, bytes24(0), signature_root))
+                sha256(
+                    abi.encodePacked(
+                        amount_to_little_endian_64,
+                        bytes24(0),
+                        signature_root
+                    )
+                )
             )
         );
 
