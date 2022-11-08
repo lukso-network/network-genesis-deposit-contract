@@ -75,7 +75,7 @@ contract LUKSOGenesisDepositContract is DepositContract {
             userData[:48],
             userData[48:80],
             userData[80:176],
-            bytes32(userData[176:208])
+            convertBytesToBytes32(userData[176:208])
         );
 
         deposit_data[deposit_count] = userData;
@@ -112,5 +112,19 @@ contract LUKSOGenesisDepositContract is DepositContract {
     function freezeContract() external {
         require(msg.sender == owner, "Caller not owner");
         contractFrozen = true;
+    }
+
+    function convertBytesToBytes32(bytes calldata inBytes)
+        internal
+        pure
+        returns (bytes32 outBytes32)
+    {
+        if (inBytes.length == 0) {
+            return 0x0;
+        }
+        bytes memory tempEmptyBytesTest = inBytes;
+        assembly {
+            outBytes32 := mload(add(tempEmptyBytesTest, 32))
+        }
     }
 }
