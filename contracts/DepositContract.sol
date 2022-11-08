@@ -58,8 +58,8 @@ contract DepositContract is IDepositContract, ERC165 {
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
-    // to_little_endian_64(uint64(32 ether))
-    bytes constant amount_to_little_endian_64 = hex"000080ec74d616bc";
+    // to_little_endian_64(uint64(32 ether / 1 gwei))
+    bytes constant amount_to_little_endian_64 = hex"0040597307000000";
 
     constructor() public {
         // Compute hashes in empty sparse Merkle tree
