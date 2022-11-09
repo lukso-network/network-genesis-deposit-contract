@@ -114,6 +114,9 @@ contract LUKSOGenesisDepositContract is DepositContract {
         contractFrozen = true;
     }
 
+    /**
+     * @dev convert sliced bytes to bytes32
+     */
     function convertBytesToBytes32(bytes calldata inBytes)
         internal
         pure
@@ -122,9 +125,9 @@ contract LUKSOGenesisDepositContract is DepositContract {
         if (inBytes.length == 0) {
             return 0x0;
         }
-        bytes memory tempEmptyBytesTest = inBytes;
+        bytes memory memoryInBytes = inBytes;
         assembly {
-            outBytes32 := mload(add(tempEmptyBytesTest, 32))
+            outBytes32 := mload(add(memoryInBytes, 32))
         }
     }
 }
