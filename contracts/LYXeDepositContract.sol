@@ -71,14 +71,14 @@ contract LUKSOGenesisDepositContract is DepositContract {
             "Data not encoded properly"
         );
 
+        deposit_data[deposit_count] = userData;
+
         deposit(
             userData[:48],
             userData[48:80],
             userData[80:176],
             convertBytesToBytes32(userData[176:208])
         );
-
-        deposit_data[deposit_count] = userData;
     }
 
     /**
