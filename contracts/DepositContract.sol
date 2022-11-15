@@ -54,7 +54,7 @@ contract DepositContract is IDepositContract, ERC165 {
     uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] branch;
-    uint256 deposit_count;
+    uint256 public deposit_count;
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
