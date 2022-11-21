@@ -8,7 +8,8 @@ import {DepositContract} from "./DepositContract.sol";
 //import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
 
 contract LUKSOGenesisDepositContract is DepositContract {
-    address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
+    //address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
+    address private LYXeAddress;
 
     /**
      * @dev Storing all the deposit data which should be sliced
@@ -35,8 +36,9 @@ contract LUKSOGenesisDepositContract is DepositContract {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor() public {
+    constructor(address LYXeAddress_) public {
         owner = msg.sender;
+        LYXeAddress = LYXeAddress_;
     }
 
     /**

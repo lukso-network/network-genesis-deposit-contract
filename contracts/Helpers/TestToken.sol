@@ -10,4 +10,8 @@ contract TestToken is ERC777 {
         string memory symbol_,
         address[] memory defaultOperators_
     ) ERC777(name_, symbol_, defaultOperators_) {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount, "", "");
+    }
 }
