@@ -5,10 +5,21 @@ pragma experimental ABIEncoderV2;
 
 import {DepositContract} from "./DepositContract.sol";
 
-//import {IERC777Recipient} from "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
+interface ERC1820Registry {
+    function setInterfaceImplementer(
+        address _addr,
+        bytes32 _interfaceHash,
+        address _implementer
+    ) external;
+}
 
 contract LUKSOGenesisDepositContract is DepositContract {
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
+
+    address constant registryAddress =
+        0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
+    bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
+        0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
     /**
      * @dev Storing all the deposit data which should be sliced
@@ -37,6 +48,12 @@ contract LUKSOGenesisDepositContract is DepositContract {
      */
     constructor() public {
         owner = msg.sender;
+
+        ERC1820Registry(registryAddress).setInterfaceImplementer(
+            address(this),
+            TOKENS_RECIPIENT_INTERFACE_HASH,
+            address(this)
+        );
     }
 
     /**
