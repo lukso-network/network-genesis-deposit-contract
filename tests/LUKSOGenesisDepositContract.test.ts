@@ -8,7 +8,7 @@ import {
   TestToken,
   LUKSOGenesisDepositContract__factory,
   LUKSOGenesisDepositContract
-} from '../typechain-types';
+} from '../types';
 
 export type LUKSOGenesisDepositContractContext = {
   accounts: SignerWithAddress[];
@@ -20,9 +20,9 @@ export type LUKSOGenesisDepositContractContext = {
 
 const buildContext = async () => {
   const accounts = await ethers.getSigners();
-  const testTokenOwner = accounts[1];
-  const testToken = await new TestToken__factory(testTokenOwner).deploy("TestToken", "TT", [testTokenOwner.address]);
-  const depositContractOwner = accounts[0];
+  const testTokenOwner = accounts[0];
+  const testToken = await new TestToken__factory(testTokenOwner).deploy("TestToken", "TT", []);
+  const depositContractOwner = accounts[1];
   const depositContract = await new LUKSOGenesisDepositContract__factory(depositContractOwner).deploy(testToken.address);
 
   return {
@@ -32,14 +32,29 @@ const buildContext = async () => {
   
 describe("Testing LUKSOGenesisDepositContract", () => {
   let context: LUKSOGenesisDepositContractContext;
+  let validators: SignerWithAddress[];
   before(async () => {
     context = await buildContext();
+    validators = [
+      context.accounts[2],
+      context.accounts[3],
+      context.accounts[4],
+      context.accounts[5],
+    ];
   });
 
-  describe("when using `tokensReceived(..)`", () => {
+  describe.only("when using `tokensReceived(..)`", () => {
+    before(async () => {
+      await context.testToken.connect(context.testTokenOwner).mint(validators[0].address, ethers.utils.parseEther("100"));
+      await context.testToken.connect(context.testTokenOwner).mint(validators[1].address, ethers.utils.parseEther("100"));
+      await context.testToken.connect(context.testTokenOwner).mint(validators[2].address, ethers.utils.parseEther("100"));
+      await context.testToken.connect(context.testTokenOwner).mint(validators[3].address, ethers.utils.parseEther("100"));
+    });
+
     it("a", async () => {
-      console.log(context.depositContract.address);
-      expect(1).to.equal(1);
+      await context.testToken
+        .connect(validators[0])
+        .send(context.depositContract.address, ethers.utils.parseEther("100"), "0x");
     });
   });
 
