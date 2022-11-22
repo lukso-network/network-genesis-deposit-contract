@@ -79,15 +79,15 @@ contract LUKSOGenesisDepositContract is DepositContract {
         bytes calldata userData,
         bytes calldata operatorData
     ) external {
-        require(!contractFrozen, "Contract is frozen");
-        require(msg.sender == LYXeAddress, "Not called on LYXe transfer");
+        require(!contractFrozen, "LUKSOGenesisDepositContract: Contract is frozen");
+        require(msg.sender == LYXeAddress, "LUKSOGenesisDepositContract: Not called on LYXe transfer");
         require(
             amount == 32 ether,
-            "Cannot send an amount different from 32 LYXe"
+            "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
         );
         require(
             userData.length == (48 + 32 + 96 + 32),
-            "Data not encoded properly"
+            "LUKSOGenesisDepositContract: Data not encoded properly"
         );
 
         deposit_data[deposit_count] = userData;
