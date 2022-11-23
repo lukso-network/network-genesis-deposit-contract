@@ -14,7 +14,6 @@ interface ERC1820Registry {
 }
 
 contract LUKSOGenesisDepositContract is DepositContract {
-    //address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
     address private LYXeAddress;
 
     address constant registryAddress =
