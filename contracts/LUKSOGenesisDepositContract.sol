@@ -101,7 +101,6 @@ contract LUKSOGenesisDepositContract is DepositContract {
     }
 
     /**
-     * Maybe plit in packs of 1000 elements ??
      * @dev Get an array of all excoded deposit data
      */
     function getDepositData()
