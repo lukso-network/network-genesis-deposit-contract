@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { expect } from "chai";
 
 // types
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   TestToken__factory,
   TestToken,
@@ -82,17 +82,6 @@ describe("Testing LUKSOGenesisDepositContract", () => {
   });
 
   describe("when using `tokensReceived(..)`", () => {
-    const pubkey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
-    const withdrawal_credentials = ethers.utils.hexlify(
-      ethers.utils.randomBytes(32)
-    );
-    const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-    const deposit_data_root = generateDepositDataRoot(
-      pubkey,
-      withdrawal_credentials,
-      signature
-    );
-
     it("should revert when passing random data", async () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
 
@@ -109,7 +98,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       );
     });
 
-    it("should revent when data's length is bigger than 208", async () => {
+    it("should revert when data's length is bigger than 208", async () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(209));
 
       await expect(
@@ -125,7 +114,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       );
     });
 
-    it("should revent when data's length is smaller than 208", async () => {
+    it("should revert when data's length is smaller than 208", async () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(207));
 
       await expect(
@@ -141,56 +130,35 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       );
     });
 
-    it("should revent when sending more than 32 LYXe", async () => {
-      const data = ethers.utils.concat([
-        pubkey,
-        withdrawal_credentials,
-        signature,
-        deposit_data_root,
-      ]);
-
+    it("should revert when sending more than 32 LYXe", async () => {
       await expect(
         context.testToken
           .connect(validators[0])
           .send(
             context.depositContract.address,
             ethers.utils.parseEther("33"),
-            data
+            validatorsData[0]
           )
       ).to.be.revertedWith(
         "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
-    it("should revent when sending less than 32 LYXe", async () => {
-      const data = ethers.utils.concat([
-        pubkey,
-        withdrawal_credentials,
-        signature,
-        deposit_data_root,
-      ]);
-
+    it("should revert when sending less than 32 LYXe", async () => {
       await expect(
         context.testToken
           .connect(validators[0])
           .send(
             context.depositContract.address,
             ethers.utils.parseEther("31"),
-            data
+            validatorsData[0]
           )
       ).to.be.revertedWith(
         "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
-    it("should revent when `tokensReceived(..)` is called by any other address but the LYXe address", async () => {
-      const data = ethers.utils.concat([
-        pubkey,
-        withdrawal_credentials,
-        signature,
-        deposit_data_root,
-      ]);
-
+    it("should revert when `tokensReceived(..)` is called by any other address but the LYXe address", async () => {
       await expect(
         context.depositContract
           .connect(validators[0])
@@ -199,7 +167,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             validators[0].address,
             context.depositContract.address,
             ethers.utils.parseEther("32"),
-            data,
+            validatorsData[0],
             "0x"
           )
       ).to.be.revertedWith(
@@ -208,36 +176,22 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     });
 
     it("should pass if the setup is correct: called by LYXe contract, during a 32 LYXe transfer with properly encoded data", async () => {
-      const data = ethers.utils.concat([
-        pubkey,
-        withdrawal_credentials,
-        signature,
-        deposit_data_root,
-      ]);
-
       await context.testToken
         .connect(validators[0])
         .send(
           context.depositContract.address,
           ethers.utils.parseEther("32"),
-          data
+          validatorsData[0]
         );
     });
 
     it("should pass if called two times with the same correct setup", async () => {
-      const data = ethers.utils.concat([
-        pubkey,
-        withdrawal_credentials,
-        signature,
-        deposit_data_root,
-      ]);
-
       await context.testToken
         .connect(validators[0])
         .send(
           context.depositContract.address,
           ethers.utils.parseEther("32"),
-          data
+          validatorsData[0]
         );
 
       await context.testToken
@@ -245,7 +199,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
         .send(
           context.depositContract.address,
           ethers.utils.parseEther("32"),
-          data
+          validatorsData[0]
         );
     });
   });
