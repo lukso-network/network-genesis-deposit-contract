@@ -14,7 +14,7 @@ interface ERC1820Registry {
 }
 
 contract LUKSOGenesisDepositContract is DepositContract {
-    address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
+    address private immutable LYXeAddress;
 
     address constant registryAddress =
         0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
@@ -46,8 +46,9 @@ contract LUKSOGenesisDepositContract is DepositContract {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor() public {
+    constructor(address LYXeAddress_) public {
         owner = msg.sender;
+        LYXeAddress = LYXeAddress_;
 
         ERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
@@ -77,15 +78,15 @@ contract LUKSOGenesisDepositContract is DepositContract {
         bytes calldata userData,
         bytes calldata operatorData
     ) external {
-        require(!contractFrozen, "Contract is frozen");
-        require(msg.sender == LYXeAddress, "Not called on LYXe transfer");
+        require(!contractFrozen, "LGDC: Contract is frozen");
+        require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
         require(
             amount == 32 ether,
-            "Cannot send an amount different from 32 LYXe"
+            "LGDC: Cannot send an amount different from 32 LYXe"
         );
         require(
             userData.length == (48 + 32 + 96 + 32),
-            "Data not encoded properly"
+            "LGDC: Data not encoded properly"
         );
 
         deposit_data[deposit_count] = userData;
@@ -99,7 +100,6 @@ contract LUKSOGenesisDepositContract is DepositContract {
     }
 
     /**
-     * Maybe plit in packs of 1000 elements ??
      * @dev Get an array of all excoded deposit data
      */
     function getDepositData()
