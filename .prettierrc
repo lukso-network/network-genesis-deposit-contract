@@ -14,8 +14,7 @@
       "files": "*.sol",
       "options": {
         "tabWidth": 4,
-        "printWidth": 100,
-        "compiler": "0.8.7"
+        "printWidth": 100
       }
     }
   ]
