@@ -3,28 +3,30 @@ import { ethers } from "hardhat";
 import { LUKSOGenesisDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import { generateDepositData } from "./helpers";
-import { LYXeHolders } from "./constants";
+import {
+  LYXeHolders,
+  LYXE_ADDRESS,
+  ETH_HOLDER_WITHOUT_LYXE,
+} from "./constants";
 
 describe("Testing on Mainnet Fork", async function () {
-  const LYXeContractAddress = "0xA8b919680258d369114910511cc87595aec0be6D";
   let LYXeContract: ReversibleICOToken;
   let depositContract: LUKSOGenesisDepositContract;
   let depositAddress: string;
+  beforeEach(async () => {
+    // LYXe contract
+    LYXeContract = await ethers.getContractAt(
+      "ReversibleICOToken",
+      LYXE_ADDRESS
+    );
+    const DepositFactory = await ethers.getContractFactory(
+      "LUKSOGenesisDepositContract"
+    );
+    depositContract = await DepositFactory.deploy();
+    await depositContract.deployed();
+    depositAddress = depositContract.address;
+  });
   describe("when depositor has LYXe and ETH to pay for tx", () => {
-    beforeEach(async () => {
-      // LYXe contract
-      LYXeContract = await ethers.getContractAt(
-        "ReversibleICOToken",
-        LYXeContractAddress
-      );
-      const DepositFactory = await ethers.getContractFactory(
-        "LUKSOGenesisDepositContract"
-      );
-      depositContract = await DepositFactory.deploy();
-      await depositContract.deployed();
-      depositAddress = depositContract.address;
-    });
-
     it("should deploy, mint and deposit for 1 depositor", async function () {
       // address with LYXe
       const LYXeHolder = LYXeHolders[0];
@@ -104,25 +106,9 @@ describe("Testing on Mainnet Fork", async function () {
     });
   });
   describe("when depositor has no LYXe", () => {
-    beforeEach(async () => {
-      // LYXe contract
-      LYXeContract = await ethers.getContractAt(
-        "ReversibleICOToken",
-        LYXeContractAddress
-      );
-      const DepositFactory = await ethers.getContractFactory(
-        "LUKSOGenesisDepositContract"
-      );
-      depositContract = await DepositFactory.deploy();
-      await depositContract.deployed();
-      depositAddress = depositContract.address;
-      depositAddress = depositContract.address;
-    });
-
     it("should revert when depositor has no LYXe", async function () {
-      const LYXelessAddress = "0x0037825fD75af7EEaCe28889665e3FAC8fdb6300";
       const LYXelessSigner = await ethers.getImpersonatedSigner(
-        LYXelessAddress
+        ETH_HOLDER_WITHOUT_LYXE
       );
 
       // get eth balance of depositor before deposit

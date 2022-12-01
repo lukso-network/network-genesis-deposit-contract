@@ -6,3 +6,9 @@ export const LYXeHolders = [
   "0x5a94809ed5e3d4f5c632141100b76ce04f94380f",
   "0xf35a6bd6e0459a4b53a27862c51a2a7292b383d1",
 ];
+
+export const LYXE_ADDRESS = "0xA8b919680258d369114910511cc87595aec0be6D";
+
+// used to deploy deposit contract
+export const ETH_HOLDER_WITHOUT_LYXE =
+  "0x0037825fD75af7EEaCe28889665e3FAC8fdb6300";
