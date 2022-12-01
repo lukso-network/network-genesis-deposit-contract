@@ -27,7 +27,7 @@ describe("Testing on Mainnet Fork", async function () {
     depositAddress = depositContract.address;
   });
   describe("when depositor has LYXe and ETH to pay for tx", () => {
-    it("should deploy, mint and deposit for 1 depositor", async function () {
+    it("should deposit for 1 depositor", async function () {
       // address with LYXe
       const LYXeHolder = LYXeHolders[0];
 
@@ -60,7 +60,7 @@ describe("Testing on Mainnet Fork", async function () {
       );
     });
 
-    it("should deploy, mint and deposit for multiple depositors", async function () {
+    it("should deposit for multiple depositors", async function () {
       // LYXeHolders with ETH to pay for transaction fees
       const LYXeHolders = [
         "0xde8531C4FDf2cE3014527bAF57F8f788E240746e",
