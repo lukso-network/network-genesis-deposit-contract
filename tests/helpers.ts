@@ -152,3 +152,33 @@ export const getMerkleTreeRoot = (orderedDataArray: string[]) => {
     )
   );
 };
+
+export const generateDepositData = () => {
+  const pubkey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
+  const withdrawal_credentials = ethers.utils.hexlify(
+    ethers.utils.randomBytes(32)
+  );
+  const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
+  const depositDataRoot = generateDepositDataRoot(
+    pubkey,
+    withdrawal_credentials,
+    signature
+  );
+  // append pubkey + withdrawal_credentials + signature + depositDataRoot to depositData
+  const depositData = ethers.utils.concat([
+    pubkey,
+    withdrawal_credentials,
+    signature,
+    depositDataRoot,
+  ]);
+
+  // hexlify depositData
+  const depositDataHex = ethers.utils.hexlify(depositData);
+  return {
+    pubkey,
+    withdrawal_credentials,
+    signature,
+    depositDataRoot,
+    depositDataHex,
+  };
+};

@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { LUKSOGenesisDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
-import { generateDepositDataRoot } from "./helpers";
+import { generateDepositData } from "./helpers";
 
 describe("Testing on Mainnet Fork", async function () {
   const LYXeContractAddress = "0xA8b919680258d369114910511cc87595aec0be6D";
@@ -30,34 +30,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       const LYXeHolderSigner = await ethers.getImpersonatedSigner(LYXeHolder);
 
-      // create random 48 bytes pubkey
-      const pubKey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
-
-      // create random 32 bytes withdrawal_credentials
-      const withdrawal_credentials = ethers.utils.hexlify(
-        ethers.utils.randomBytes(32)
-      );
-
-      // create random 96 bytes signature
-      const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-
-      // generate deposit data root
-      const depositDataRoot = generateDepositDataRoot(
-        pubKey,
-        withdrawal_credentials,
-        signature
-      );
-
-      // append pubkey + withdrawal_credentials + signature + depositDataRoot to depositData
-      const depositData = ethers.utils.concat([
-        pubKey,
-        withdrawal_credentials,
-        signature,
-        depositDataRoot,
-      ]);
-
-      // hexlify depositData
-      const depositDataHex = ethers.utils.hexlify(depositData);
+      const { depositDataHex } = generateDepositData();
 
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
@@ -65,9 +38,11 @@ describe("Testing on Mainnet Fork", async function () {
       expect(depositBalanceBefore).to.equal(0);
 
       // deposit LYXe to Deposit contract
-      await LYXeContract.connect(LYXeHolderSigner).functions[
-        "send(address,uint256,bytes)"
-      ](depositAddress, ethers.utils.parseEther("32"), depositDataHex);
+      await LYXeContract.connect(LYXeHolderSigner).send(
+        depositAddress,
+        ethers.utils.parseEther("32"),
+        depositDataHex
+      );
 
       // get balance of Deposit contract after deposit
       const depositBalanceAfter = await LYXeContract.balanceOf(depositAddress);
@@ -93,34 +68,7 @@ describe("Testing on Mainnet Fork", async function () {
         "0xf35a6bd6e0459a4b53a27862c51a2a7292b383d1",
       ];
 
-      // create random 48 bytes pubkey
-      const pubKey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
-
-      // create random 32 bytes withdrawal_credentials
-      const withdrawal_credentials = ethers.utils.hexlify(
-        ethers.utils.randomBytes(32)
-      );
-
-      // create random 96 bytes signature
-      const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-
-      // generate deposit data root
-      const depositDataRoot = generateDepositDataRoot(
-        pubKey,
-        withdrawal_credentials,
-        signature
-      );
-
-      // append pubkey + withdrawal_credentials + signature + depositDataRoot to depositData
-      const depositData = ethers.utils.concat([
-        pubKey,
-        withdrawal_credentials,
-        signature,
-        depositDataRoot,
-      ]);
-
-      // hexlify depositData
-      const depositDataHex = ethers.utils.hexlify(depositData);
+      const { depositDataHex } = generateDepositData();
 
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
@@ -130,9 +78,11 @@ describe("Testing on Mainnet Fork", async function () {
       for (let i = 0; i < LYXeHolders.length; i++) {
         const LYXeHolder = LYXeHolders[i];
         const signer = await ethers.getImpersonatedSigner(LYXeHolder);
-        await LYXeContract.connect(signer).functions[
-          "send(address,uint256,bytes)"
-        ](depositAddress, ethers.utils.parseEther("32"), depositData);
+        await LYXeContract.connect(signer).send(
+          depositAddress,
+          ethers.utils.parseEther("32"),
+          depositDataHex
+        );
       }
 
       // get balance of Deposit contract after deposit
@@ -150,6 +100,52 @@ describe("Testing on Mainnet Fork", async function () {
       }
 
       expect(await depositContract.getDepositDataByIndex(10)).to.equal("0x");
+    });
+  });
+  describe("when depositor has no LYXe", () => {
+    beforeEach(async () => {
+      // LYXe contract
+      LYXeContract = await ethers.getContractAt(
+        "ReversibleICOToken",
+        LYXeContractAddress
+      );
+      const DepositFactory = await ethers.getContractFactory(
+        "LUKSOGenesisDepositContract"
+      );
+      depositContract = await DepositFactory.deploy(LYXeContractAddress);
+      await depositContract.deployed();
+      depositAddress = depositContract.address;
+      depositAddress = depositContract.address;
+    });
+
+    it("should revert when depositor has no LYXe", async function () {
+      const LYXelessAddress = "0x0037825fD75af7EEaCe28889665e3FAC8fdb6300";
+      const LYXelessSigner = await ethers.getImpersonatedSigner(
+        LYXelessAddress
+      );
+
+      // get eth balance of depositor before deposit
+      const balance = await LYXelessSigner.getBalance();
+
+      // convert eth balance to ethers
+      const balanceInETH = parseInt(balance) / 10 ** 18;
+
+      // expect balance to be greater than 1 eth to pay for tx
+      expect(balanceInETH).to.be.greaterThan(1);
+
+      const { depositDataHex } = generateDepositData();
+
+      await expect(
+        LYXeContract.connect(LYXelessSigner).send(
+          depositAddress,
+          ethers.utils.parseEther("32"),
+          depositDataHex
+        )
+      ).to.be.revertedWith("Sending failed: Insufficient funds");
+
+      expect(await depositContract.getDepositDataByIndex(0)).to.equal("0x");
+
+      expect(await depositContract.getDepositDataByIndex(1)).to.equal("0x");
     });
   });
 });
