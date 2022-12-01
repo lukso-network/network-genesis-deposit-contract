@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const generateDepositDataRoot = (
+const generateDepositDataRoot = (
   pubkey: string,
   withdrawal_credentials: string,
   signature: string
@@ -159,7 +159,7 @@ export const generateDepositData = () => {
     ethers.utils.randomBytes(32)
   );
   const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-  const depositDataRoot = generateDepositDataRoot(
+  const deposit_data_root = generateDepositDataRoot(
     pubkey,
     withdrawal_credentials,
     signature
@@ -169,7 +169,7 @@ export const generateDepositData = () => {
     pubkey,
     withdrawal_credentials,
     signature,
-    depositDataRoot,
+    deposit_data_root,
   ]);
 
   // hexlify depositData
@@ -178,7 +178,7 @@ export const generateDepositData = () => {
     pubkey,
     withdrawal_credentials,
     signature,
-    depositDataRoot,
+    deposit_data_root,
     depositDataHex,
   };
 };

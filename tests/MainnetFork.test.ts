@@ -3,6 +3,7 @@ import { ethers } from "hardhat";
 import { LUKSOGenesisDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import { generateDepositData } from "./helpers";
+import { LYXeHolders } from "./constants";
 
 describe("Testing on Mainnet Fork", async function () {
   const LYXeContractAddress = "0xA8b919680258d369114910511cc87595aec0be6D";
@@ -19,14 +20,14 @@ describe("Testing on Mainnet Fork", async function () {
       const DepositFactory = await ethers.getContractFactory(
         "LUKSOGenesisDepositContract"
       );
-      depositContract = await DepositFactory.deploy(LYXeContractAddress);
+      depositContract = await DepositFactory.deploy();
       await depositContract.deployed();
       depositAddress = depositContract.address;
     });
 
     it("should deploy, mint and deposit for 1 depositor", async function () {
       // address with LYXe
-      const LYXeHolder = "0xde8531C4FDf2cE3014527bAF57F8f788E240746e";
+      const LYXeHolder = LYXeHolders[0];
 
       const LYXeHolderSigner = await ethers.getImpersonatedSigner(LYXeHolder);
 
@@ -48,7 +49,7 @@ describe("Testing on Mainnet Fork", async function () {
       const depositBalanceAfter = await LYXeContract.balanceOf(depositAddress);
 
       const depositBalanceAfterInLYXe =
-        parseInt(depositBalanceAfter) / 10 ** 18;
+        parseInt(depositBalanceAfter.toString()) / 10 ** 18;
 
       expect(depositBalanceAfterInLYXe).to.equal(32);
 
@@ -89,7 +90,7 @@ describe("Testing on Mainnet Fork", async function () {
       const depositBalanceAfter = await LYXeContract.balanceOf(depositAddress);
 
       const depositBalanceAfterInLYXe =
-        parseInt(depositBalanceAfter) / 10 ** 18;
+        parseInt(depositBalanceAfter.toString()) / 10 ** 18;
 
       expect(depositBalanceAfterInLYXe).to.equal(LYXeHolders.length * 32);
 
@@ -112,7 +113,7 @@ describe("Testing on Mainnet Fork", async function () {
       const DepositFactory = await ethers.getContractFactory(
         "LUKSOGenesisDepositContract"
       );
-      depositContract = await DepositFactory.deploy(LYXeContractAddress);
+      depositContract = await DepositFactory.deploy();
       await depositContract.deployed();
       depositAddress = depositContract.address;
       depositAddress = depositContract.address;
@@ -128,7 +129,7 @@ describe("Testing on Mainnet Fork", async function () {
       const balance = await LYXelessSigner.getBalance();
 
       // convert eth balance to ethers
-      const balanceInETH = parseInt(balance) / 10 ** 18;
+      const balanceInETH = parseInt(balance.toString()) / 10 ** 18;
 
       // expect balance to be greater than 1 eth to pay for tx
       expect(balanceInETH).to.be.greaterThan(1);

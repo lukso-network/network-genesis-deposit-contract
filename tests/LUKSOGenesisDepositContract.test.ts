@@ -4,39 +4,48 @@ import { expect } from "chai";
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  TestToken__factory,
-  TestToken,
   LUKSOGenesisDepositContract__factory,
   LUKSOGenesisDepositContract,
+  ReversibleICOToken,
 } from "../types";
 
 // helpers
-import { generateDepositDataRoot, getMerkleTreeRoot } from "./helpers";
+import { generateDepositData, getMerkleTreeRoot } from "./helpers";
+import { LYXeHolders } from "./constants";
 
 export type LUKSOGenesisDepositContractContext = {
   accounts: SignerWithAddress[];
-  lyxTokenOwner: SignerWithAddress;
-  lyxToken: TestToken;
+  lyxToken: ReversibleICOToken;
   depositContractOwner: SignerWithAddress;
   depositContract: LUKSOGenesisDepositContract;
 };
 
 const buildContext = async () => {
-  const accounts = await ethers.getSigners();
-  const lyxTokenOwner = accounts[0];
-  const lyxToken = await new TestToken__factory(lyxTokenOwner).deploy(
-    "lyxToken",
-    "TT",
-    []
+  const accounts = [];
+  for (const holder of LYXeHolders) {
+    const signer = await ethers.getImpersonatedSigner(holder);
+    accounts.push(signer);
+  }
+
+  const LYXeContractAddress = "0xA8b919680258d369114910511cc87595aec0be6D";
+  const lyxToken = await ethers.getContractAt(
+    "ReversibleICOToken",
+    LYXeContractAddress
   );
-  const depositContractOwner = accounts[1];
+
+  // ETHHolder has ETH to deploy genesis deposit contract
+  const depositContractOwnerAddress =
+    "0x0037825fD75af7EEaCe28889665e3FAC8fdb6300";
+
+  const depositContractOwner = await ethers.getImpersonatedSigner(
+    depositContractOwnerAddress
+  );
   const depositContract = await new LUKSOGenesisDepositContract__factory(
     depositContractOwner
-  ).deploy(lyxToken.address);
+  ).deploy();
 
   return {
     accounts,
-    lyxTokenOwner,
     lyxToken,
     depositContractOwner,
     depositContract,
@@ -51,33 +60,10 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     context = await buildContext();
 
     for (let i = 0; i < 4; i++) {
-      const pubkey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
-      const withdrawal_credentials = ethers.utils.hexlify(
-        ethers.utils.randomBytes(32)
-      );
-      const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-      const deposit_data_root = generateDepositDataRoot(
-        pubkey,
-        withdrawal_credentials,
-        signature
-      );
-
-      validatorsData.push(
-        ethers.utils.hexlify(
-          ethers.utils.concat([
-            pubkey,
-            withdrawal_credentials,
-            signature,
-            deposit_data_root,
-          ])
-        )
-      );
+      const { depositDataHex } = generateDepositData();
+      validatorsData.push(depositDataHex);
 
       validators.push(context.accounts[i + 2]);
-
-      await context.lyxToken
-        .connect(context.lyxTokenOwner)
-        .mint(validators[i].address, ethers.utils.parseEther("1000"));
     }
   });
 
@@ -109,9 +95,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             ethers.utils.parseEther("32"),
             data
           )
-      ).to.be.revertedWith(
-        "LGDC: Data not encoded properly"
-      );
+      ).to.be.revertedWith("LGDC: Data not encoded properly");
     });
 
     it("should revert when data's length is smaller than 208", async () => {
@@ -125,9 +109,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             ethers.utils.parseEther("32"),
             data
           )
-      ).to.be.revertedWith(
-        "LGDC: Data not encoded properly"
-      );
+      ).to.be.revertedWith("LGDC: Data not encoded properly");
     });
 
     it("should revert when sending more than 32 LYXe", async () => {
@@ -170,9 +152,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             validatorsData[0],
             "0x"
           )
-      ).to.be.revertedWith(
-        "LGDC: Not called on LYXe transfer"
-      );
+      ).to.be.revertedWith("LGDC: Not called on LYXe transfer");
     });
 
     it("should pass if the setup is correct: called by LYXe contract, during a 32 LYXe transfer with properly encoded data", async () => {
