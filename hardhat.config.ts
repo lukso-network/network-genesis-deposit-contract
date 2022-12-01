@@ -35,6 +35,11 @@ const config: HardhatUserConfig = {
     outDir: "types",
     target: "ethers-v5",
   },
+  gasReporter: {
+    enabled: true,
+    currency: "EUR",
+    coinmarketcap: "132e4fb4-1b3d-43b3-920a-65777cf1830b",
+  },
 };
 
 export default config;

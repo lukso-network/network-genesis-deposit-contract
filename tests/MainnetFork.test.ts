@@ -14,6 +14,9 @@ describe("Testing on Mainnet Fork", async function () {
   let depositContract: LUKSOGenesisDepositContract;
   let depositAddress: string;
   beforeEach(async () => {
+    const depositContractDeployer = await ethers.getImpersonatedSigner(
+      ETH_HOLDER_WITHOUT_LYXE
+    );
     // LYXe contract
     LYXeContract = await ethers.getContractAt(
       "ReversibleICOToken",
@@ -22,7 +25,9 @@ describe("Testing on Mainnet Fork", async function () {
     const DepositFactory = await ethers.getContractFactory(
       "LUKSOGenesisDepositContract"
     );
-    depositContract = await DepositFactory.deploy();
+    depositContract = await DepositFactory.connect(
+      depositContractDeployer
+    ).deploy();
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });
