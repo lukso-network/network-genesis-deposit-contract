@@ -1,3 +1,5 @@
+import { ethers } from "hardhat";
+
 export const LYXeHolders = [
   "0xde8531C4FDf2cE3014527bAF57F8f788E240746e",
   "0x09363887A4096b142f3F6b58A7eeD2F1A0FF7343",
@@ -12,3 +14,5 @@ export const LYXE_ADDRESS = "0xA8b919680258d369114910511cc87595aec0be6D";
 // used to deploy deposit contract
 export const ETH_HOLDER_WITHOUT_LYXE =
   "0x189b9cbd4aff470af2c0102f365fc1823d857965";
+
+export const DEPOSIT_AMOUNT = ethers.utils.parseEther("32").toString();

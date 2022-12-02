@@ -7,6 +7,7 @@ import {
   LYXeHolders,
   LYXE_ADDRESS,
   ETH_HOLDER_WITHOUT_LYXE,
+  DEPOSIT_AMOUNT,
 } from "./constants";
 
 describe("Testing on Mainnet Fork", async function () {
@@ -48,17 +49,16 @@ describe("Testing on Mainnet Fork", async function () {
       // deposit LYXe to Deposit contract
       await LYXeContract.connect(LYXeHolderSigner).send(
         depositAddress,
-        ethers.utils.parseEther("32"),
+        DEPOSIT_AMOUNT,
         depositDataHex
       );
 
-      // get balance of Deposit contract after deposit
+      // // get balance of Deposit contract after deposit
       const depositBalanceAfter = await LYXeContract.balanceOf(depositAddress);
 
-      const depositBalanceAfterInLYXe =
-        parseInt(depositBalanceAfter.toString()) / 10 ** 18;
+      const depositBalanceAfterInLYXe = depositBalanceAfter.toString();
 
-      expect(depositBalanceAfterInLYXe).to.equal(32);
+      expect(depositBalanceAfterInLYXe).to.equal(DEPOSIT_AMOUNT);
 
       expect(await depositContract.getDepositDataByIndex(0)).to.equal(
         depositDataHex
@@ -78,7 +78,7 @@ describe("Testing on Mainnet Fork", async function () {
         const signer = await ethers.getImpersonatedSigner(LYXeHolder);
         await LYXeContract.connect(signer).send(
           depositAddress,
-          ethers.utils.parseEther("32"),
+          DEPOSIT_AMOUNT,
           depositDataHex
         );
       }
@@ -86,10 +86,9 @@ describe("Testing on Mainnet Fork", async function () {
       // get balance of Deposit contract after deposit
       const depositBalanceAfter = await LYXeContract.balanceOf(depositAddress);
 
-      const depositBalanceAfterInLYXe =
-        parseInt(depositBalanceAfter.toString()) / 10 ** 18;
-
-      expect(depositBalanceAfterInLYXe).to.equal(LYXeHolders.length * 32);
+      const expectedBalance =
+        BigInt(LYXeHolders.length) * BigInt(DEPOSIT_AMOUNT);
+      expect(depositBalanceAfter).to.equal(expectedBalance);
 
       for (let i = 0; i < LYXeHolders.length; i++) {
         expect(await depositContract.getDepositDataByIndex(i)).to.equal(
@@ -100,8 +99,9 @@ describe("Testing on Mainnet Fork", async function () {
       expect(await depositContract.getDepositDataByIndex(10)).to.equal("0x");
     });
   });
+
   describe("when depositor has no LYXe", () => {
-    it("should revert when depositor has no LYXe", async function () {
+    it("should revert", async function () {
       const LYXelessSigner = await ethers.getImpersonatedSigner(
         ETH_HOLDER_WITHOUT_LYXE
       );
@@ -110,7 +110,7 @@ describe("Testing on Mainnet Fork", async function () {
       const balance = await LYXelessSigner.getBalance();
 
       // convert eth balance to ethers
-      const balanceInETH = parseInt(balance.toString()) / 10 ** 18;
+      const balanceInETH = parseInt(ethers.utils.formatEther(balance));
 
       // expect balance to be greater than 1 eth to pay for tx
       expect(balanceInETH).to.be.greaterThan(1);
@@ -120,7 +120,7 @@ describe("Testing on Mainnet Fork", async function () {
       await expect(
         LYXeContract.connect(LYXelessSigner).send(
           depositAddress,
-          ethers.utils.parseEther("32"),
+          DEPOSIT_AMOUNT,
           depositDataHex
         )
       ).to.be.revertedWith("Sending failed: Insufficient funds");

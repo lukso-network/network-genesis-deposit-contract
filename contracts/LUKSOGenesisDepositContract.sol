@@ -79,7 +79,8 @@ contract LUKSOGenesisDepositContract is DepositContract {
         require(!contractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
         require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
-        require(userData.length == (48 + 32 + 96 + 32), "LGDC: Data not encoded properly");
+        // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
+        require(userData.length == (208), "LGDC: Data not encoded properly");
 
         deposit_data[deposit_count] = userData;
 
