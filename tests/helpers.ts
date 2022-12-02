@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const generateDepositDataRoot = (
+const generateDepositDataRoot = (
   pubkey: string,
   withdrawal_credentials: string,
   signature: string
@@ -151,4 +151,34 @@ export const getMerkleTreeRoot = (orderedDataArray: string[]) => {
       ]
     )
   );
+};
+
+export const generateDepositData = () => {
+  const pubkey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
+  const withdrawal_credentials = ethers.utils.hexlify(
+    ethers.utils.randomBytes(32)
+  );
+  const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
+  const deposit_data_root = generateDepositDataRoot(
+    pubkey,
+    withdrawal_credentials,
+    signature
+  );
+  // append pubkey + withdrawal_credentials + signature + depositDataRoot to depositData
+  const depositData = ethers.utils.concat([
+    pubkey,
+    withdrawal_credentials,
+    signature,
+    deposit_data_root,
+  ]);
+
+  // hexlify depositData
+  const depositDataHex = ethers.utils.hexlify(depositData);
+  return {
+    pubkey,
+    withdrawal_credentials,
+    signature,
+    deposit_data_root,
+    depositDataHex,
+  };
 };

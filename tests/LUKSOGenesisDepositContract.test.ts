@@ -4,40 +4,51 @@ import { expect } from "chai";
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  TestToken__factory,
-  TestToken,
   LUKSOGenesisDepositContract__factory,
   LUKSOGenesisDepositContract,
+  ReversibleICOToken,
 } from "../types";
 
 // helpers
-import { generateDepositDataRoot, getMerkleTreeRoot } from "./helpers";
+import { generateDepositData, getMerkleTreeRoot } from "./helpers";
+import {
+  LYXeHolders,
+  LYXE_ADDRESS,
+  ETH_HOLDER_WITHOUT_LYXE,
+  DEPOSIT_AMOUNT,
+} from "./constants";
 
 export type LUKSOGenesisDepositContractContext = {
   accounts: SignerWithAddress[];
-  lyxTokenOwner: SignerWithAddress;
-  lyxToken: TestToken;
+  LYXeContract: ReversibleICOToken;
   depositContractOwner: SignerWithAddress;
   depositContract: LUKSOGenesisDepositContract;
 };
 
 const buildContext = async () => {
-  const accounts = await ethers.getSigners();
-  const lyxTokenOwner = accounts[0];
-  const lyxToken = await new TestToken__factory(lyxTokenOwner).deploy(
-    "lyxToken",
-    "TT",
-    []
+  const accounts = [];
+  for (const holder of LYXeHolders) {
+    const signer = await ethers.getImpersonatedSigner(holder);
+    accounts.push(signer);
+  }
+
+  const LYXeContract = await ethers.getContractAt(
+    "ReversibleICOToken",
+    LYXE_ADDRESS
   );
-  const depositContractOwner = accounts[1];
+
+  const depositContractOwnerAddress = ETH_HOLDER_WITHOUT_LYXE;
+
+  const depositContractOwner = await ethers.getImpersonatedSigner(
+    depositContractOwnerAddress
+  );
   const depositContract = await new LUKSOGenesisDepositContract__factory(
     depositContractOwner
-  ).deploy(lyxToken.address);
+  ).deploy();
 
   return {
     accounts,
-    lyxTokenOwner,
-    lyxToken,
+    LYXeContract,
     depositContractOwner,
     depositContract,
   };
@@ -51,33 +62,10 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     context = await buildContext();
 
     for (let i = 0; i < 4; i++) {
-      const pubkey = ethers.utils.hexlify(ethers.utils.randomBytes(48));
-      const withdrawal_credentials = ethers.utils.hexlify(
-        ethers.utils.randomBytes(32)
-      );
-      const signature = ethers.utils.hexlify(ethers.utils.randomBytes(96));
-      const deposit_data_root = generateDepositDataRoot(
-        pubkey,
-        withdrawal_credentials,
-        signature
-      );
-
-      validatorsData.push(
-        ethers.utils.hexlify(
-          ethers.utils.concat([
-            pubkey,
-            withdrawal_credentials,
-            signature,
-            deposit_data_root,
-          ])
-        )
-      );
+      const { depositDataHex } = generateDepositData();
+      validatorsData.push(depositDataHex);
 
       validators.push(context.accounts[i + 2]);
-
-      await context.lyxToken
-        .connect(context.lyxTokenOwner)
-        .mint(validators[i].address, ethers.utils.parseEther("1000"));
     }
   });
 
@@ -86,13 +74,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
 
       await expect(
-        context.lyxToken
-          .connect(validators[0])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            data
-          )
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          data
+        )
       ).to.be.revertedWith(
         "DepositContract: reconstructed DepositData does not match supplied deposit_data_root"
       );
@@ -102,43 +88,33 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(209));
 
       await expect(
-        context.lyxToken
-          .connect(validators[0])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            data
-          )
-      ).to.be.revertedWith(
-        "LGDC: Data not encoded properly"
-      );
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          data
+        )
+      ).to.be.revertedWith("LGDC: Data not encoded properly");
     });
 
     it("should revert when data's length is smaller than 208", async () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(207));
 
       await expect(
-        context.lyxToken
-          .connect(validators[0])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            data
-          )
-      ).to.be.revertedWith(
-        "LGDC: Data not encoded properly"
-      );
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          data
+        )
+      ).to.be.revertedWith("LGDC: Data not encoded properly");
     });
 
     it("should revert when sending more than 32 LYXe", async () => {
       await expect(
-        context.lyxToken
-          .connect(validators[0])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("33"),
-            validatorsData[0]
-          )
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          ethers.utils.parseEther("33"),
+          validatorsData[0]
+        )
       ).to.be.revertedWith(
         "LGDC: Cannot send an amount different from 32 LYXe"
       );
@@ -146,13 +122,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("should revert when sending less than 32 LYXe", async () => {
       await expect(
-        context.lyxToken
-          .connect(validators[0])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("31"),
-            validatorsData[0]
-          )
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          ethers.utils.parseEther("31"),
+          validatorsData[0]
+        )
       ).to.be.revertedWith(
         "LGDC: Cannot send an amount different from 32 LYXe"
       );
@@ -166,53 +140,43 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             validators[0].address,
             validators[0].address,
             context.depositContract.address,
-            ethers.utils.parseEther("32"),
+            DEPOSIT_AMOUNT,
             validatorsData[0],
             "0x"
           )
-      ).to.be.revertedWith(
-        "LGDC: Not called on LYXe transfer"
-      );
+      ).to.be.revertedWith("LGDC: Not called on LYXe transfer");
     });
 
     it("should pass if the setup is correct: called by LYXe contract, during a 32 LYXe transfer with properly encoded data", async () => {
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
     });
 
     it("should pass if called two times with the same correct setup", async () => {
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
 
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
     });
   });
 
   describe("when using `get_deposit_root(..)`", () => {
     it("Should properly update the Merkle Tree Branch on first deposit", async () => {
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
 
       const dataDeposited = [validatorsData[0]];
 
@@ -223,13 +187,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on second deposit", async () => {
       for (let i = 0; i < 2; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       const dataDeposited = [validatorsData[0], validatorsData[1]];
@@ -241,13 +203,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on third deposit", async () => {
       for (let i = 0; i < 3; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       const dataDeposited = [
@@ -263,13 +223,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on fourth deposit", async () => {
       for (let i = 0; i < 4; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       const dataDeposited = [
@@ -287,13 +245,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
   describe("when using `getDepositData(..)`", () => {
     it("Should properly update the Merkle Tree Branch on first deposit", async () => {
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
 
       const expectedDepositedData = [validatorsData[0]];
 
@@ -305,13 +261,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     it("Should properly update the Merkle Tree Branch on second deposit", async () => {
       const expectedDepositedData: string[] = [];
       for (let i = 0; i < 2; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
 
         expectedDepositedData.push(validatorsData[i]);
       }
@@ -324,13 +278,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     it("Should properly update the Merkle Tree Branch on third deposit", async () => {
       const expectedDepositedData: string[] = [];
       for (let i = 0; i < 3; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
 
         expectedDepositedData.push(validatorsData[i]);
       }
@@ -343,13 +295,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     it("Should properly update the Merkle Tree Branch on fourth deposit", async () => {
       const expectedDepositedData: string[] = [];
       for (let i = 0; i < 4; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
 
         expectedDepositedData.push(validatorsData[i]);
       }
@@ -362,13 +312,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
   describe("when using `getDepositDataByIndex(..)`", () => {
     it("Should properly update the Merkle Tree Branch on first deposit", async () => {
-      await context.lyxToken
-        .connect(validators[0])
-        .send(
-          context.depositContract.address,
-          ethers.utils.parseEther("32"),
-          validatorsData[0]
-        );
+      await context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorsData[0]
+      );
 
       expect(
         await context.depositContract.getDepositDataByIndex(0)
@@ -377,13 +325,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on second deposit", async () => {
       for (let i = 0; i < 2; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       expect(
@@ -396,13 +342,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on third deposit", async () => {
       for (let i = 0; i < 3; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       expect(
@@ -418,13 +362,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
     it("Should properly update the Merkle Tree Branch on fourth deposit", async () => {
       for (let i = 0; i < 4; i++) {
-        await context.lyxToken
-          .connect(validators[i])
-          .send(
-            context.depositContract.address,
-            ethers.utils.parseEther("32"),
-            validatorsData[i]
-          );
+        await context.LYXeContract.connect(validators[i]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          validatorsData[i]
+        );
       }
 
       expect(
@@ -452,13 +394,11 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     it("should disallow depositing if contract is frozen", async () => {
       for (let i = 0; i < validators.length; i++) {
         await expect(
-          context.lyxToken
-            .connect(validators[i])
-            .send(
-              context.depositContract.address,
-              ethers.utils.parseEther("32"),
-              validatorsData[i]
-            )
+          context.LYXeContract.connect(validators[i]).send(
+            context.depositContract.address,
+            DEPOSIT_AMOUNT,
+            validatorsData[i]
+          )
         ).to.be.revertedWith("LGDC: Contract is frozen");
       }
     });
