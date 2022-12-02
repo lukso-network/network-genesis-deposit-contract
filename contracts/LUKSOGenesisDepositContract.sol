@@ -48,6 +48,7 @@ contract LUKSOGenesisDepositContract is DepositContract {
     constructor(address LYXeAddress_) public {
         owner = msg.sender;
         LYXeAddress = LYXeAddress_;
+        contractFrozen = false;
 
         ERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
