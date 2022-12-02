@@ -16,9 +16,8 @@ interface ERC1820Registry {
 contract LUKSOGenesisDepositContract is DepositContract {
     address private immutable LYXeAddress;
 
-    address constant registryAddress =
-        0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
-    bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
+    address constant registryAddress = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
+    bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
     /**
@@ -35,13 +34,13 @@ contract LUKSOGenesisDepositContract is DepositContract {
      * @dev Owner of the contract
      * Has access to `freezeContract()`
      */
-    address private owner;
+    address public owner;
 
     /**
      * @dev Default value is false which allows people to send 32 LYXe
      * to this contract with valid data in order to register as Genesis Validator
      */
-    bool private contractFrozen;
+    bool public contractFrozen;
 
     /**
      * @dev Save the deployer as the owner of the contract
@@ -80,14 +79,8 @@ contract LUKSOGenesisDepositContract is DepositContract {
     ) external {
         require(!contractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
-        require(
-            amount == 32 ether,
-            "LGDC: Cannot send an amount different from 32 LYXe"
-        );
-        require(
-            userData.length == (48 + 32 + 96 + 32),
-            "LGDC: Data not encoded properly"
-        );
+        require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
+        require(userData.length == (48 + 32 + 96 + 32), "LGDC: Data not encoded properly");
 
         deposit_data[deposit_count] = userData;
 
@@ -102,24 +95,15 @@ contract LUKSOGenesisDepositContract is DepositContract {
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function getDepositData()
-        public
-        view
-        returns (bytes[] memory returnedArray)
-    {
+    function getDepositData() external view returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
-        for (uint256 i = 0; i < deposit_count; i++)
-            returnedArray[i] = deposit_data[i];
+        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
 
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function getDepositDataByIndex(uint256 index)
-        public
-        view
-        returns (bytes memory)
-    {
+    function getDepositDataByIndex(uint256 index) public view returns (bytes memory) {
         return deposit_data[index];
     }
 
