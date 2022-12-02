@@ -66,16 +66,6 @@ describe("Testing on Mainnet Fork", async function () {
     });
 
     it("should deposit for multiple depositors", async function () {
-      // LYXeHolders with ETH to pay for transaction fees
-      const LYXeHolders = [
-        "0xde8531C4FDf2cE3014527bAF57F8f788E240746e",
-        "0x09363887A4096b142f3F6b58A7eeD2F1A0FF7343",
-        "0x3022eb3691fdf020f6eaf85ef28569f7b6a518ea",
-        "0xd08D3fc1fd5F82E86f71733a5B6f4731938e76F3",
-        "0x5a94809ed5e3d4f5c632141100b76ce04f94380f",
-        "0xf35a6bd6e0459a4b53a27862c51a2a7292b383d1",
-      ];
-
       const { depositDataHex } = generateDepositData();
 
       // get balance of depositAddress before deposit
