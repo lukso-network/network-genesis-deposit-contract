@@ -63,8 +63,8 @@ contract LUKSOGenesisDepositContract is DepositContract {
      *
      * Requirements:
      * - `amount` MUST be exactly 32 LYXe
-     * - `userData` MUST be encoded properly
-     * - `userData` MUST contain:
+     * - `depositData` MUST be encoded properly
+     * - `depositData` MUST contain:
      *   • pubkey - the first 48 bytes
      *   • withdrawal_credentials - the following 32 bytes
      *   • signature - the following 96 bytes
@@ -75,21 +75,21 @@ contract LUKSOGenesisDepositContract is DepositContract {
         address from,
         address to,
         uint256 amount,
-        bytes calldata userData,
+        bytes calldata depositData,
         bytes calldata operatorData
     ) external {
         require(!contractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
         require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
-        require(userData.length == (48 + 32 + 96 + 32), "LGDC: Data not encoded properly");
+        require(depositData.length == (48 + 32 + 96 + 32), "LGDC: Data not encoded properly");
 
-        deposit_data[deposit_count] = userData;
+        deposit_data[deposit_count] = depositData;
 
         deposit(
-            userData[:48],
-            userData[48:80],
-            userData[80:176],
-            convertBytesToBytes32(userData[176:208])
+            depositData[:48],
+            depositData[48:80],
+            depositData[80:176],
+            convertBytesToBytes32(depositData[176:208])
         );
     }
 
