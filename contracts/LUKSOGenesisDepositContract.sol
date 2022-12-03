@@ -71,12 +71,12 @@ contract LUKSOGenesisDepositContract is DepositContract {
      *   • deposit_data_root - last 32 bytes
      */
     function tokensReceived(
-        address operator,
-        address from,
-        address to,
+        address, /* operator */
+        address, /* from */
+        address, /* to */
         uint256 amount,
         bytes calldata depositData,
-        bytes calldata operatorData
+        bytes calldata /* userData */
     ) external {
         require(!contractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
