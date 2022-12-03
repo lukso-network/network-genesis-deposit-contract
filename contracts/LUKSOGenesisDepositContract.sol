@@ -45,14 +45,18 @@ interface ERC1820Registry {
 }
 
 contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
-    address private immutable LYXeAddress;
+    address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
     address constant registryAddress = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
-    bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
+
+    bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
+
     uint256 constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
+
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
     uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
+
     // to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant amount_to_little_endian_64 = hex"0040597307000000";
 
@@ -86,9 +90,9 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor(address LYXeAddress_) public {
+    constructor() public {
         owner = msg.sender;
-        LYXeAddress = LYXeAddress_;
+
         contractFrozen = false;
 
         ERC1820Registry(registryAddress).setInterfaceImplementer(
@@ -123,12 +127,13 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         address, /* to */
         uint256 amount,
         bytes calldata depositData,
-        bytes calldata /* userData */
+        bytes calldata /* operatorData */
     ) external {
         require(!contractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
         require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
-        require(depositData.length == (48 + 32 + 96 + 32), "LGDC: Data not encoded properly");
+        // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
+        require(depositData.length == (208), "LGDC: Data not encoded properly");
 
         deposit_data[deposit_count] = depositData;
 
