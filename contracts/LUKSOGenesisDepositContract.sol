@@ -49,10 +49,10 @@ interface IDepositContract {
     function freezeContract() external;
 
     /// @dev Get an array of all excoded deposit data
-    function getDepositData() external view returns (bytes[] memory returnedArray);
+    function get_deposit_data() external view returns (bytes[] memory returnedArray);
 
     /// @dev Get the encoded deposit data at the `index`
-    function getDepositDataByIndex(uint256 index) external view returns (bytes memory);
+    function get_deposit_data_by_index(uint256 index) external view returns (bytes memory);
 }
 
 // Based on official specification in https://eips.ethereum.org/EIPS/eip-165
@@ -203,7 +203,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function getDepositData() external view override returns (bytes[] memory returnedArray) {
+    function get_deposit_data() external view override returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
         for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
@@ -211,7 +211,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function getDepositDataByIndex(uint256 index) public view override returns (bytes memory) {
+    function get_deposit_data_by_index(uint256 index) public view override returns (bytes memory) {
         return deposit_data[index];
     }
 
