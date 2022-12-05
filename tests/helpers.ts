@@ -50,6 +50,10 @@ const generateDepositDataRoot = (
 };
 
 export const toLittleEndian64 = (bytes8Number: string) => {
+  if (bytes8Number.length < 18)
+    bytes8Number = ethers.utils.hexlify(ethers.utils.zeroPad(bytes8Number, 8));
+  else bytes8Number = bytes8Number.substring(0, 18);
+
   let newBytes8Number: string = "0x";
 
   for (let i = 0; i < 16; i += 2) {
