@@ -1,27 +1,8 @@
 # Lukso Genesis Deposit Contract
 
-## Table of contents
+## Introduction
 
-<!-- TOC -->
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-<!-- - [Introduction](#introduction)
-- [Constants](#constants)
-- [Configuration](#configuration)
-- [Staking deposit contract](#staking-deposit-contract)
-  - [`deposit` function](#deposit-function)
-    - [Deposit amount](#deposit-amount)
-    - [Withdrawal credentials](#withdrawal-credentials)
-    - [`DepositEvent` log](#depositevent-log)
-- [Solidity code](#solidity-code) -->
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-<!-- /TOC -->
-
-<!-- ## Introduction
-
-This document represents the specification for LUKSO genesis deposit contract. -->
+This document represents the specification for LUKSO genesis deposit contract.
 
 ## Constants
 
@@ -54,7 +35,7 @@ These configurations are updated for releases and may be out of sync during `dev
 ### `tokensReceived` function
 
 The LUKSO genesis deposit contract has an external `tokensReceived` function.
-This function is meant to be called by the LYXe token smart contract that implements the ERC777 interface.
+This function is meant to be called by the LYXe token smart contract which implements the ERC777 interface.
 It takes as arguments `address operator,address from, uint256 amount, bytes calldata depositData, bytes calldata operatorData.`
 `address operator`, `address from`, `address to`, `bytes calldata operatorData`are unused function parameters.`uint256 amount` is the parameter that defines the amount of tokens sent by the caller (LYXe token contract) and`bytes calldata depositData` is the parameter that is used to send all the bytes related to the deposit.
 
