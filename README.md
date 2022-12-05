@@ -54,14 +54,15 @@ These configurations are updated for releases and may be out of sync during `dev
 ### `tokensReceived` function
 
 The LUKSO genesis deposit contract has an external `tokensReceived` function.
-It takes as arguments `address operator,address from, uint256 amount, bytes calldata userData, bytes calldata operatorData.`
-`address operator`, `address from`, `address to`, `bytes calldata operatorData`are unused function parameters.`uint256 amount` is the parameter that defines the amount of tokens sent by the caller (LYXe token contract) and`bytes calldata userData` is the parameters that is used to send all the bytes related to the deposit.
+This function is meant to be called by the LYXe token smart contract that implements the ERC777 interface.
+It takes as arguments `address operator,address from, uint256 amount, bytes calldata depositData, bytes calldata operatorData.`
+`address operator`, `address from`, `address to`, `bytes calldata operatorData`are unused function parameters.`uint256 amount` is the parameter that defines the amount of tokens sent by the caller (LYXe token contract) and`bytes calldata depositData` is the parameter that is used to send all the bytes related to the deposit.
 
 #### Amount
 
-The amount of LYXe sent to the deposit contract is the deposit amount, which must be of size 32 LYXe.
+The amount of LYXe sent to the deposit contract which must be equals to 32 `ether`.
 
-#### UserData
+#### DepositData
 
 Deposit data sent by the LYXe token contract that will be sliced and pass to the internal `_deposit` function.
 
@@ -71,7 +72,7 @@ _Note_: there are a few checks that are made in order to have a successfull tran
 
 - contract should not have the `frozen` status
 - `tokensReceived` function MUST be called by the LYXe token contract
-- `amount` value MUST be equal to `32 ethers`
+- `amount` value MUST be equal to `32 ether`
 - `userData.length` MUST be equal to `208`:
   - `pubkey` of 48 bytes
   - `withdrawal_credentials` of 32 bytes
@@ -86,18 +87,21 @@ It will prevent any call to the `tokensReceived` function and will not allow any
 
 ### `_deposit` function
 
-The deposit contract has a internal `_deposit` function to make deposits. It takes as arguments `bytes calldata pubkey, bytes calldata withdrawal_credentials, bytes calldata signature, bytes32 deposit_data_root`. The first three arguments populate a [`DepositData`](./beacon-chain.md#depositdata) object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
+The deposit contract has a internal `_deposit` function to make deposits. It takes as arguments `bytes calldata pubkey, bytes calldata withdrawal_credentials, bytes calldata signature, bytes32 deposit_data_root`. The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
 
-#### Deposit amount
+#### Public key
 
-The amount of LYXe sent to the deposit contract is the deposit amount, which must be of size 32 LYXe.
+One of the `DepositData` fields is `pubkey`. It represents a `Bytes48` BLS12-381 public key.
 
 #### Withdrawal credentials
 
 One of the `DepositData` fields is `withdrawal_credentials` which constrains validator withdrawals.
 The first byte of this 32-byte field is a withdrawal prefix which defines the semantics of the remaining 31 bytes.
 The withdrawal prefixes currently supported are `BLS_WITHDRAWAL_PREFIX` and `ETH1_ADDRESS_WITHDRAWAL_PREFIX`.
-Read more in the [validator guide](./validator.md#withdrawal-credentials).
+
+#### Signature
+
+One of the `DepositData` fields is `signature`. It represents a `Bytes96` a BLS12-381 signature.
 
 _Note_: The deposit contract does not validate the `withdrawal_credentials` field.
 Support for new withdrawal prefixes can be added without modifying the deposit contract.
@@ -106,8 +110,30 @@ Support for new withdrawal prefixes can be added without modifying the deposit c
 
 Every deposit emits a `DepositEvent` log for consumption by the beacon chain. The LUKSO genesis deposit contract does little validation, pushing most of the validator onboarding logic to the beacon chain. In particular, the proof of possession (a BLS12-381 signature) is not verified by the deposit contract.
 
-## Solidity code
+### `get_deposit_count` function
 
-The deposit contract source code, written in Solidity, is available [here](../../solidity_deposit_contract/deposit_contract.sol).
+The `view` function get the current deposit count and converts it to a little endian representation of 64-bit values.
 
-_Note_: To save on gas, the deposit contract uses a progressive Merkle root calculation algorithm that requires only O(log(n)) storage. See [here](https://github.com/ethereum/research/blob/master/beacon_chain_impl/progressive_merkle_tree.py) for a Python implementation, and [here](https://github.com/runtimeverification/verified-smart-contracts/blob/master/deposit/formal-incremental-merkle-tree-algorithm.pdf) for a formal correctness proof.
+### `get_deposit_data_by_index` function
+
+The function returns the deposit data at the specified index which is then used to create a new validator in the beacon chain.
+
+### `supportsInterface` function
+
+This function implements the function supportsInterface() which is needed for the ERC165 standard. It checks if the interface ID passed in matches the interface ID for ERC165 or the interface ID for IDepositContract.
+
+### `to_little_endian_64` function
+
+This function will convert the input to 8 bytes, reverse the order of the bytes and return the reversed bytes (little endian).
+
+### `deposit_count` public state variable
+
+This state variable called 'deposit_count' is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
+
+### `owner` public immutable variable
+
+This immutable variable called `owner` is used to store the address of the smart contract's owner. Since the variable is public, it it comes with a getter that will return the owner.
+
+### `isContractFrozen` public state variable
+
+This state variable called `isContractFrozen` will store a boolean that state whether the contract is frozen. Since the variable is public, it it comes with a getter that will return the frozen's status of the contract.
