@@ -23,6 +23,36 @@ interface IDepositContract {
     /// @notice Query the current deposit count.
     /// @return The deposit count encoded as a little endian 64-bit number.
     function get_deposit_count() external view returns (bytes memory);
+
+    /// @notice Query the owner of the deposit contract.
+    /// @return The owner of the deposit contract.
+    function owner() external view returns (address);
+
+    /// @notice Querry if the deposit contract is frozen
+    /// @return True if the deposit contract is frozen, false otherwise.
+    function isContractFrozen() external view returns (bool);
+
+    // @notice function called by the LYXe token contract to deposit
+    // @params amount The amount of LYXe to deposit
+    // @parama depositData The deposit data (pubkey, withdrawal_credentials, signature, deposit_data_root)
+    function tokensReceived(
+        address, /* operator */
+        address, /* from */
+        address, /* to */
+        uint256 amount,
+        bytes calldata depositData,
+        bytes calldata /* operatorData */
+    ) external;
+
+    /// @notice change isContractFrozen to true
+    // @dev only owner can call this function
+    function freezeContract() external;
+
+    /// @dev Get an array of all excoded deposit data
+    function getDepositData() external view returns (bytes[] memory returnedArray);
+
+    /// @dev Get the encoded deposit data at the `index`
+    function getDepositDataByIndex(uint256 index) external view returns (bytes memory);
 }
 
 // Based on official specification in https://eips.ethereum.org/EIPS/eip-165
@@ -79,13 +109,13 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      * @dev Owner of the contract
      * Has access to `freezeContract()`
      */
-    address public owner;
+    address public immutable override owner;
 
     /**
      * @dev Default value is false which allows people to send 32 LYXe
      * to this contract with valid data in order to register as Genesis Validator
      */
-    bool public contractFrozen;
+    bool public override isContractFrozen;
 
     /**
      * @dev Save the deployer as the owner of the contract
@@ -93,7 +123,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     constructor() public {
         owner = msg.sender;
 
-        contractFrozen = false;
+        isContractFrozen = false;
 
         ERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
@@ -128,8 +158,8 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
-    ) external {
-        require(!contractFrozen, "LGDC: Contract is frozen");
+    ) external override {
+        require(!isContractFrozen, "LGDC: Contract is frozen");
         require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
         require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
@@ -148,9 +178,9 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Freze the LUKSO Genesis Deposit Contract
      */
-    function freezeContract() external {
+    function freezeContract() external override {
         require(msg.sender == owner, "Caller not owner");
-        contractFrozen = true;
+        isContractFrozen = true;
     }
 
     function get_deposit_root() external view override returns (bytes32) {
@@ -173,7 +203,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function getDepositData() external view returns (bytes[] memory returnedArray) {
+    function getDepositData() external view override returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
         for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
@@ -181,7 +211,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function getDepositDataByIndex(uint256 index) public view returns (bytes memory) {
+    function getDepositDataByIndex(uint256 index) public view override returns (bytes memory) {
         return deposit_data[index];
     }
 
