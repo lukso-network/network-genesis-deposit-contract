@@ -87,8 +87,8 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
     uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
-    // to_little_endian_64(uint64(32 ether / 1 gwei))
-    bytes constant amount_to_little_endian_64 = hex"0040597307000000";
+    // _to_little_endian_64(uint64(32 ether / 1 gwei))
+    bytes constant amount__to_little_endian_64 = hex"0040597307000000";
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] branch;
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
@@ -171,7 +171,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
             depositData[:48],
             depositData[48:80],
             depositData[80:176],
-            convertBytesToBytes32(depositData[176:208])
+            _convertBytesToBytes32(depositData[176:208])
         );
     }
 
@@ -193,11 +193,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         }
 
         return
-            sha256(abi.encodePacked(node, to_little_endian_64(uint64(deposit_count)), bytes24(0)));
+            sha256(abi.encodePacked(node, _to_little_endian_64(uint64(deposit_count)), bytes24(0)));
     }
 
     function get_deposit_count() external view override returns (bytes memory) {
-        return to_little_endian_64(uint64(deposit_count));
+        return _to_little_endian_64(uint64(deposit_count));
     }
 
     /**
@@ -231,9 +231,9 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            amount_to_little_endian_64,
+            amount__to_little_endian_64,
             signature,
-            to_little_endian_64(uint64(deposit_count))
+            _to_little_endian_64(uint64(deposit_count))
         );
 
         // Compute deposit data root (`DepositData` hash tree root)
@@ -247,7 +247,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         bytes32 node = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                sha256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
+                sha256(abi.encodePacked(amount__to_little_endian_64, bytes24(0), signature_root))
             )
         );
 
@@ -276,7 +276,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         assert(false);
     }
 
-    function to_little_endian_64(uint64 value) internal pure returns (bytes memory ret) {
+    function _to_little_endian_64(uint64 value) internal pure returns (bytes memory ret) {
         ret = new bytes(8);
         bytes8 bytesValue = bytes8(value);
         // Byteswapping during copying to bytes.
@@ -293,7 +293,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev convert sliced bytes to bytes32
      */
-    function convertBytesToBytes32(bytes calldata inBytes)
+    function _convertBytesToBytes32(bytes calldata inBytes)
         internal
         pure
         returns (bytes32 outBytes32)
