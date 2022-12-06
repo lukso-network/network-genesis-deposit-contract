@@ -243,7 +243,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
     });
   });
 
-  describe("when using `getDepositData(..)`", () => {
+  describe("when using `get_deposit_data(..)`", () => {
     it("Should properly update the Merkle Tree Branch on first deposit", async () => {
       await context.LYXeContract.connect(validators[0]).send(
         context.depositContract.address,
@@ -253,7 +253,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
 
       const expectedDepositedData = [validatorsData[0]];
 
-      expect(await context.depositContract.getDepositData()).to.deep.equal(
+      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -270,7 +270,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
         expectedDepositedData.push(validatorsData[i]);
       }
 
-      expect(await context.depositContract.getDepositData()).to.deep.equal(
+      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -287,7 +287,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
         expectedDepositedData.push(validatorsData[i]);
       }
 
-      expect(await context.depositContract.getDepositData()).to.deep.equal(
+      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -304,13 +304,13 @@ describe("Testing LUKSOGenesisDepositContract", () => {
         expectedDepositedData.push(validatorsData[i]);
       }
 
-      expect(await context.depositContract.getDepositData()).to.deep.equal(
+      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
         expectedDepositedData
       );
     });
   });
 
-  describe("when using `getDepositDataByIndex(..)`", () => {
+  describe("when using `get_deposit_data_by_index(..)`", () => {
     it("Should properly update the Merkle Tree Branch on first deposit", async () => {
       await context.LYXeContract.connect(validators[0]).send(
         context.depositContract.address,
@@ -319,7 +319,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       );
 
       expect(
-        await context.depositContract.getDepositDataByIndex(0)
+        await context.depositContract.get_deposit_data_by_index(0)
       ).to.deep.equal(validatorsData[0]);
     });
 
@@ -333,10 +333,10 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.getDepositDataByIndex(0)
+        await context.depositContract.get_deposit_data_by_index(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.getDepositDataByIndex(1)
+        await context.depositContract.get_deposit_data_by_index(1)
       ).to.deep.equal(validatorsData[1]);
     });
 
@@ -350,13 +350,13 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.getDepositDataByIndex(0)
+        await context.depositContract.get_deposit_data_by_index(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.getDepositDataByIndex(1)
+        await context.depositContract.get_deposit_data_by_index(1)
       ).to.deep.equal(validatorsData[1]);
       expect(
-        await context.depositContract.getDepositDataByIndex(2)
+        await context.depositContract.get_deposit_data_by_index(2)
       ).to.deep.equal(validatorsData[2]);
     });
 
@@ -370,16 +370,16 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.getDepositDataByIndex(0)
+        await context.depositContract.get_deposit_data_by_index(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.getDepositDataByIndex(1)
+        await context.depositContract.get_deposit_data_by_index(1)
       ).to.deep.equal(validatorsData[1]);
       expect(
-        await context.depositContract.getDepositDataByIndex(2)
+        await context.depositContract.get_deposit_data_by_index(2)
       ).to.deep.equal(validatorsData[2]);
       expect(
-        await context.depositContract.getDepositDataByIndex(3)
+        await context.depositContract.get_deposit_data_by_index(3)
       ).to.deep.equal(validatorsData[3]);
     });
   });
