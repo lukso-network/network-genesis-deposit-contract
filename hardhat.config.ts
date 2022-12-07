@@ -22,7 +22,8 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        url: INFURA_URL_FORK as string,
+        // url: INFURA_URL_FORK as string,
+        url: "https://mainnet.infura.io/v3/210f37242cde4685a2ba41bb109383e6",
         blockNumber: 15975554,
       },
     },
