@@ -9,6 +9,7 @@ import {
   ReversibleICOToken,
   ERC165__factory,
   IDepositContract__factory,
+  IDepositContractETH2__factory,
 } from "../types";
 
 // helpers
@@ -429,6 +430,17 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           DEPOSIT_CONTRACT_INTERFACE_ID
         )
       ).to.be.true;
+    });
+    it("should not support ETH2 IDepositContract interface", async () => {
+      const IDepositETH2 = IDepositContractETH2__factory.createInterface();
+
+      const DEPOSIT_ETH2_INTERFACE_ID = getInterfaceID(IDepositETH2);
+
+      expect(
+        await context.depositContract.supportsInterface(
+          DEPOSIT_ETH2_INTERFACE_ID
+        )
+      ).to.be.false;
     });
     it("should not support other interfaces", async () => {
       const RANDOM_INTERFACE_ID = "0x12345678";
