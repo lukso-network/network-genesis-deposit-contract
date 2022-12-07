@@ -102,7 +102,8 @@ It takes as arguments:
 - `bytes calldata withdrawal_credentials`
 - `bytes calldata signature`
 - `bytes32 deposit_data_root`
-  The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
+
+The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
 
 #### Public key
 
