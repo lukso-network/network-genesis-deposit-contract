@@ -62,7 +62,10 @@ describe("Testing LUKSOGenesisDepositContract", () => {
   let context: LUKSOGenesisDepositContractContext;
   const validators: SignerWithAddress[] = [];
   const validatorsData: string[] = [];
-  const amount_to_little_endian_64 = "0x0040597307000000";
+  const one_gwei = "1000000000";
+  const amount_to_little_endian_64 = toLittleEndian64(
+    ethers.utils.parseEther("32").div(one_gwei).toHexString()
+  );
   beforeEach(async () => {
     context = await buildContext();
 
