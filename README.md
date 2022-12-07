@@ -1,6 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-This document represents the specification for LUKSO genesis deposit contract.
+This document represents the specification for the LUKSO genesis deposit contract.
 
 ## Constants
 
@@ -43,7 +43,7 @@ These configurations are updated for releases and may be out of sync during `dev
     ) external;
 ```
 
-The `tokensReceived function is meant to be called by the LYXe token smart contract which implements the ERC777 interface.
+The `tokensReceived` function is meant to be called by the LYXe token smart contract which implements the ERC777 interface.
 
 - `address operator`, `address from`, `address to`, `bytes calldata operatorData`are unused parameters.
 - `uint256 amount` is the parameter that defines the amount of tokens sent by the caller (LYXe token contract)
@@ -57,19 +57,19 @@ The amount of LYXe sent to the deposit contract must be 32 LYXe.
 
 The LYXe token contract sends deposit data that is sliced and passed to the internal `_deposit` function.
 
-The length of `userData` MUST be `208`:
+The length of `depositData` MUST be `208`:
 
 - `pubkey` of 48 bytes
 - `withdrawal_credentials` of 32 bytes
 - `signature` of 96 bytes
 - `deposit_data_root` of 32 bytes
 
-> _Note_: The following checks are performed to ensure a successful deposit:":
+> _Note_: The following checks are performed to ensure a successful deposit:
 
 - the contract should not be _"frozen"_. [See below for more details](#freezeContract-function)
 - `tokensReceived` function MUST be called by the LYXe token contract
 - `amount` value MUST be equal to `32 ether`
-- `userData.length` MUST be equal to `208`:
+- `depositData.length` MUST be equal to `208`:
   - `pubkey` of 48 bytes
   - `withdrawal_credentials` of 32 bytes
   - `signature` of 96 bytes
@@ -95,7 +95,15 @@ function _deposit(
     ) internal
 ```
 
-The deposit contract has a internal `_deposit` function to make deposits. It takes as arguments `bytes calldata pubkey, bytes calldata withdrawal_credentials, bytes calldata signature, bytes32 deposit_data_root`. The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
+The deposit contract has a internal `_deposit` function to make deposits.
+It takes as arguments:
+
+- `bytes calldata pubkey`
+- `bytes calldata withdrawal_credentials`
+- `bytes calldata signature`
+- `bytes32 deposit_data_root`
+
+The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
 
 #### Public key
 
@@ -144,11 +152,11 @@ This function implements the function supportsInterface() which is needed for th
 
 ### `deposit_count` public state variable
 
-This state variable called 'deposit_count' is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
+This state variable called `deposit_count` is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
 
 ### `owner` public immutable variable
 
-This immutable variable called `owner` is used to store the address of the smart contract's owner. Since the variable is public, it it comes with a getter that will return the owner.
+This immutable variable called `owner` is used to store the address of the smart contract's owner. Since the variable is public, it it comes with a getter that will return the owner of the smart contract.
 
 ### `isContractFrozen` public state variable
 
