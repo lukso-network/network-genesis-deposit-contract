@@ -298,9 +298,6 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         pure
         returns (bytes32 outBytes32)
     {
-        if (inBytes.length == 0) {
-            return 0x0;
-        }
         bytes memory memoryInBytes = inBytes;
         assembly {
             outBytes32 := mload(add(memoryInBytes, 32))
