@@ -4,11 +4,6 @@
 
 name: Solidity Code coverage
 
-# on:
-#   push:
-#     branches:
-#       - "main"
-
 on: [push]
 
 jobs:
