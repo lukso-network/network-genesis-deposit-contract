@@ -7,10 +7,16 @@ import {
   LUKSOGenesisDepositContract__factory,
   LUKSOGenesisDepositContract,
   ReversibleICOToken,
+  ERC165__factory,
+  IDepositContract__factory,
 } from "../types";
 
 // helpers
-import { generateDepositData, getMerkleTreeRoot } from "./helpers";
+import {
+  generateDepositData,
+  getMerkleTreeRoot,
+  getInterfaceID,
+} from "./helpers";
 import {
   LYXeHolders,
   LYXE_ADDRESS,
@@ -401,6 +407,35 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           )
         ).to.be.revertedWith("LGDC: Contract is frozen");
       }
+    });
+  });
+  describe("supportsInterface", () => {
+    it("should support ERC165", async () => {
+      const IERC165 = ERC165__factory.createInterface();
+
+      const ERC165_INTERFACE_ID = getInterfaceID(IERC165);
+
+      expect(
+        await context.depositContract.supportsInterface(ERC165_INTERFACE_ID)
+      ).to.be.true;
+    });
+    it("should support IDepositContract", async () => {
+      const IDepositContract = IDepositContract__factory.createInterface();
+
+      const DEPOSIT_CONTRACT_INTERFACE_ID = getInterfaceID(IDepositContract);
+
+      expect(
+        await context.depositContract.supportsInterface(
+          DEPOSIT_CONTRACT_INTERFACE_ID
+        )
+      ).to.be.true;
+    });
+    it("should not support other interfaces", async () => {
+      const RANDOM_INTERFACE_ID = "0x12345678";
+
+      expect(
+        await context.depositContract.supportsInterface(RANDOM_INTERFACE_ID)
+      ).to.be.false;
     });
   });
 });
