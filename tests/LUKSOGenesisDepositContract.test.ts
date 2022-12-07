@@ -346,7 +346,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       expect(await context.depositContract.deposit_count()).to.equal(1);
     });
 
-    it("Should properly update the counter on second deposit", async () => {
+    it("Should properly update the counter on the first two deposits", async () => {
       for (let i = 0; i < 2; i++) {
         const depositTx = context.LYXeContract.connect(validators[i]).send(
           context.depositContract.address,
@@ -372,7 +372,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       }
     });
 
-    it("Should properly update the counter on third deposit", async () => {
+    it("Should properly update the counter on the first three deposits", async () => {
       for (let i = 0; i < 3; i++) {
         const depositTx = context.LYXeContract.connect(validators[i]).send(
           context.depositContract.address,
@@ -398,7 +398,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
       }
     });
 
-    it("Should properly update the counter on fourth deposit", async () => {
+    it("Should properly update the counter on the first four deposits", async () => {
       for (let i = 0; i < 4; i++) {
         const depositTx = context.LYXeContract.connect(validators[i]).send(
           context.depositContract.address,
