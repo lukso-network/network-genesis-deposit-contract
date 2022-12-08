@@ -134,6 +134,14 @@ function get_deposit_count() external view returns (bytes memory);
 
 The `view` function get the current deposit count and converts it to a little endian representation of 64-bit values.
 
+### `get_deposit_data` function
+
+```js
+function get_deposit_data() external view override returns (bytes[] memory returnedArray);
+```
+
+The `get_deposit_data` function returns the list of deposits currently stored in the contract. It takes no parameters and returns an array of bytes values, where each value represents the data for a single deposit.
+
 ### `get_deposit_data_by_index` function
 
 ```js
