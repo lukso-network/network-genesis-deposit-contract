@@ -75,24 +75,32 @@ interface ERC1820Registry {
 }
 
 contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
+    // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
+    // The address of the registry contract (ERC1820 Registry).
     address constant registryAddress = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
 
+    // The hash of the interface of the contract that receives tokens.
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
+    // The depth of the Merkle tree of deposits.
     uint256 constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
 
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
     uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
-    bytes constant amount__to_little_endian_64 = hex"0040597307000000";
+    bytes constant amount_to_little_endian_64 = hex"0040597307000000";
 
+    // The current state of the Merkle tree of deposits.
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] branch;
+
+    // A pre-computed array of zero hashes for use in computing the Merkle root.
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
+    // The current number of deposits in the contract.
     uint256 public deposit_count;
 
     /**
@@ -125,6 +133,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
 
         isContractFrozen = false;
 
+        // Set this contract as the implementer of the tokens recipient interface in the registry contract.
         ERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
             TOKENS_RECIPIENT_INTERFACE_HASH,
@@ -165,13 +174,15 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
         require(depositData.length == (208), "LGDC: Data not encoded properly");
 
+        // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
 
+        // Process the deposit and update the Merkle tree.
         _deposit(
-            depositData[:48],
-            depositData[48:80],
-            depositData[80:176],
-            _convertBytesToBytes32(depositData[176:208])
+            depositData[:48], // pubkey
+            depositData[48:80], // withdrawal_credentials
+            depositData[80:176], // signature
+            _convertBytesToBytes32(depositData[176:208]) // deposit_data_root
         );
     }
 
@@ -183,6 +194,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         isContractFrozen = true;
     }
 
+    /**
+     * @dev Returns the current root of the Merkle tree of deposits.
+     *
+     * @return The Merkle root of the deposit data.
+     */
     function get_deposit_root() external view override returns (bytes32) {
         bytes32 node;
         uint256 size = deposit_count;
@@ -196,6 +212,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
             sha256(abi.encodePacked(node, _to_little_endian_64(uint64(deposit_count)), bytes24(0)));
     }
 
+    /**
+     * @dev Returns the current number of deposits in the contract.
+     *
+     * @return The number of deposits in little-endian order.
+     */
     function get_deposit_count() external view override returns (bytes memory) {
         return _to_little_endian_64(uint64(deposit_count));
     }
@@ -215,12 +236,26 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         return deposit_data[index];
     }
 
+    /**
+     * @dev Determines whether the contract supports a given interface.
+     *
+     * @param interfaceId The interface ID to check.
+     * @return True if the contract supports the interface, false otherwise.
+     */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
             interfaceId == type(ERC165).interfaceId ||
             interfaceId == type(IDepositContract).interfaceId;
     }
 
+    /**
+     * @dev Processes a deposit and updates the Merkle tree.
+     *
+     * @param pubkey The public key of the depositor.
+     * @param withdrawal_credentials The withdrawal credentials of the depositor.
+     * @param signature The deposit signature of the depositor.
+     * @param deposit_data_root The root of the deposit data.
+     */
     function _deposit(
         bytes calldata pubkey,
         bytes calldata withdrawal_credentials,
@@ -231,23 +266,27 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            amount__to_little_endian_64,
+            amount_to_little_endian_64,
             signature,
             _to_little_endian_64(uint64(deposit_count))
         );
 
         // Compute deposit data root (`DepositData` hash tree root)
         bytes32 pubkey_root = sha256(abi.encodePacked(pubkey, bytes16(0)));
+
+        // Compute the root of the signature data.
         bytes32 signature_root = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(signature[:64])),
                 sha256(abi.encodePacked(signature[64:], bytes32(0)))
             )
         );
+
+        // Compute the root of the deposit data.
         bytes32 node = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                sha256(abi.encodePacked(amount__to_little_endian_64, bytes24(0), signature_root))
+                sha256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
             )
         );
 
@@ -276,6 +315,12 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         assert(false);
     }
 
+    /**
+     * @dev Converts a uint64 value to a byte array in little-endian order.
+     *
+     * @param value The uint64 value to convert.
+     * @return ret The byte array in little-endian order.
+     */
     function _to_little_endian_64(uint64 value) internal pure returns (bytes memory ret) {
         ret = new bytes(8);
         bytes8 bytesValue = bytes8(value);
@@ -291,7 +336,10 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     }
 
     /**
-     * @dev convert sliced bytes to bytes32
+     * @dev Converts the first 32 bytes of a byte array to a bytes32 value.
+     *
+     * @param inBytes The byte array to convert.
+     * @return outBytes32 The bytes32 value.
      */
     function _convertBytesToBytes32(bytes calldata inBytes)
         internal
