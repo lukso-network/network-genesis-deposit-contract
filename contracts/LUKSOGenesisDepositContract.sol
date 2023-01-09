@@ -168,11 +168,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external override {
-        require(!isContractFrozen, "LGDC: Contract is frozen");
-        require(msg.sender == LYXeAddress, "LGDC: Not called on LYXe transfer");
-        require(amount == 32 ether, "LGDC: Cannot send an amount different from 32 LYXe");
+        require(!isContractFrozen, "LUKSOGenesisDepositContract: Contract is frozen");
+        require(msg.sender == LYXeAddress, "LUKSOGenesisDepositContract: Not called on LYXe transfer");
+        require(amount == 32 ether, "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe");
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
-        require(depositData.length == (208), "LGDC: Data not encoded properly");
+        require(depositData.length == (208), "LUKSOGenesisDepositContract: Data not encoded properly");
 
         // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
@@ -190,7 +190,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      * @dev Freze the LUKSO Genesis Deposit Contract
      */
     function freezeContract() external override {
-        require(msg.sender == owner, "Caller not owner");
+        require(msg.sender == owner, "LUKSOGenesisDepositContract: Caller not owner");
         isContractFrozen = true;
     }
 
@@ -293,11 +293,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         // Verify computed and expected deposit data roots match
         require(
             node == deposit_data_root,
-            "DepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+            "LUKSOGenesisDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
         );
 
         // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(deposit_count < MAX_DEPOSIT_COUNT, "DepositContract: merkle tree full");
+        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisDepositContract: merkle tree full");
 
         // Add deposit data root to Merkle tree (update a single `branch` node)
         deposit_count += 1;
