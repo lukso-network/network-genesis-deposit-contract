@@ -92,7 +92,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           data
         )
       ).to.be.revertedWith(
-        "DepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+        "LUKSOGenesisDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
       );
     });
 
@@ -105,7 +105,9 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           DEPOSIT_AMOUNT,
           data
         )
-      ).to.be.revertedWith("LGDC: Data not encoded properly");
+      ).to.be.revertedWith(
+        "LUKSOGenesisDepositContract: Data not encoded properly"
+      );
     });
 
     it("should revert when data's length is smaller than 208", async () => {
@@ -117,7 +119,9 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           DEPOSIT_AMOUNT,
           data
         )
-      ).to.be.revertedWith("LGDC: Data not encoded properly");
+      ).to.be.revertedWith(
+        "LUKSOGenesisDepositContract: Data not encoded properly"
+      );
     });
 
     it("should revert when sending more than 32 LYXe", async () => {
@@ -128,7 +132,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           validatorsData[0]
         )
       ).to.be.revertedWith(
-        "LGDC: Cannot send an amount different from 32 LYXe"
+        "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
@@ -140,7 +144,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           validatorsData[0]
         )
       ).to.be.revertedWith(
-        "LGDC: Cannot send an amount different from 32 LYXe"
+        "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
@@ -156,7 +160,9 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             validatorsData[0],
             "0x"
           )
-      ).to.be.revertedWith("LGDC: Not called on LYXe transfer");
+      ).to.be.revertedWith(
+        "LUKSOGenesisDepositContract: Not called on LYXe transfer"
+      );
     });
 
     it("should pass if the setup is correct: called by LYXe contract, during a 32 LYXe transfer with properly encoded data", async () => {
@@ -665,7 +671,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             DEPOSIT_AMOUNT,
             validatorsData[i]
           )
-        ).to.be.revertedWith("LGDC: Contract is frozen");
+        ).to.be.revertedWith("LUKSOGenesisDepositContract: Contract is frozen");
       }
     });
   });
