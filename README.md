@@ -18,8 +18,6 @@ The following values are (non-configurable) constants used throughout the specif
 
 > _Note_: The default mainnet configuration values are included here for spec-design purposes.
 
-<!-- The different configurations for mainnet, testnets, and YAML-based testing can be found in the [`configs/constant_presets`](../../configs) directory. -->
-
 These configurations are updated for releases and may be out of sync during `dev` changes.
 
 | Name                       | Value |
@@ -28,7 +26,11 @@ These configurations are updated for releases and may be out of sync during `dev
 | `DEPOSIT_NETWORK_ID`       | `1`   |
 | `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
 
-## Staking LUKSO genesis deposit contract
+## LUKSO genesis deposit contract
+
+The genesis deposit contract will accept LYXe (0xA8b919680258d369114910511cc87595aec0be6D) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+
+This contract will be used to make deposit in order to become validator on LUKSO's Mainnet chain. Once enough validators have deposited, contract will be frozen and the chain will start.
 
 ### `tokensReceived` function
 
@@ -43,10 +45,10 @@ These configurations are updated for releases and may be out of sync during `dev
     ) external;
 ```
 
-The `tokensReceived` function is meant to be called by the LYXe token smart contract which implements the ERC777 interface.
+The `tokensReceived` function will be called by the LYXe token smart contract, which implements the ERC777 interface.
 
-- `address operator`, `address from`, `address to`, `bytes calldata operatorData`are unused parameters.
-- `uint256 amount` is the parameter that defines the amount of tokens sent by the caller (LYXe token contract)
+- `address operator`, `address from`, `address to`, `bytes calldata operatorData` are unused parameters.
+- `uint256 amount` The amount of LYXe sent by the sender (32 LYXe)
 - `bytes calldata depositData` is the parameter that is used to send all the bytes related to the deposit
 
 #### Amount
@@ -55,9 +57,7 @@ The amount of LYXe sent to the deposit contract must be 32 LYXe.
 
 #### DepositData
 
-The LYXe token contract sends deposit data that is sliced and passed to the internal `_deposit` function.
-
-The length of `depositData` MUST be `208`:
+The LYXe token contract is sending `depositData` which will be sliced and passed to the internal `_deposit` function. This `depositData` is made up of four pieces of information:
 
 - `pubkey` of 48 bytes
 - `withdrawal_credentials` of 32 bytes
@@ -103,7 +103,7 @@ It takes as arguments:
 - `bytes calldata signature`
 - `bytes32 deposit_data_root`
 
-The first three arguments populate a `DepositData` object, and `deposit_data_root` is the expected `DepositData` root as a protection against malformatted calldata.
+The first three arguments are used to create an object called `DepositData`. The fourth argument, `deposit_data_root`, is the expected "root" of the DepositData object and is used as a way to protect against malformatted data being passed to the function.
 
 #### Public key
 
@@ -124,7 +124,7 @@ One of the `DepositData` fields is `signature`. It represents a `Bytes96` a BLS1
 
 #### `DepositEvent` log
 
-Every deposit emits a `DepositEvent` log for consumption by the beacon chain. The LUKSO genesis deposit contract does little validation, pushing most of the validator onboarding logic to the beacon chain. In particular, the proof of possession (a BLS12-381 signature) is not verified by the deposit contract.
+Every deposit emits a `DepositEvent` log for consumption by LUKSO's mainnet chain. The LUKSO genesis deposit contract does little validation, pushing most of the validator onboarding logic to LUKSO's mainnet chain. In particular, the proof of possession (a BLS12-381 signature) is not verified by the deposit contract.
 
 ### `get_deposit_count` function
 
@@ -132,7 +132,7 @@ Every deposit emits a `DepositEvent` log for consumption by the beacon chain. Th
 function get_deposit_count() external view returns (bytes memory);
 ```
 
-The `view` function get the current deposit count and converts it to a little endian representation of 64-bit values.
+The `get_deposit_count` function get the current deposit count and converts it to a little endian representation of 64-bit values.
 
 ### `get_deposit_data` function
 
@@ -148,7 +148,7 @@ The `get_deposit_data` function returns the list of deposits currently stored in
 function get_deposit_data_by_index(uint256 index) external view returns (bytes memory);
 ```
 
-The function returns the deposit data at the specified index which is then used to create a new validator in the beacon chain.
+The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.
 
 ### `supportsInterface` function
 
@@ -156,11 +156,11 @@ The function returns the deposit data at the specified index which is then used 
 function supportsInterface(bytes4 interfaceId) external pure returns (bool);
 ```
 
-This function implements the function supportsInterface() which is needed for the ERC165 standard. It checks if the interface ID passed in matches the interface ID for ERC165 or the interface ID for IDepositContract.
+The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is either the interface ID for ERC165 or the interface ID for the IDepositContract
 
 ### `deposit_count` public state variable
 
-This state variable called `deposit_count` is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
+The `deposit_count` state variable is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
 
 ### `owner` public immutable variable
 
