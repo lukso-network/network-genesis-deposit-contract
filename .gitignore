@@ -9,3 +9,7 @@ typechain-types
 cache
 artifacts
 types
+
+# folders generated for foundry builds
+out/
+forge-cache/
