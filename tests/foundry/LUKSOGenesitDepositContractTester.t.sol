@@ -15,7 +15,7 @@ contract LUKSOGenesitDepositContractTester is Test {
     function testConvertBytesToBytes32(uint256 randomNumber) public {
         bytes memory randomBytes = _getRandom208Bytes(randomNumber);
         bytes32 outBytes32 = contractMock.convertBytesToBytes32(randomBytes);
-        assertEq(uint256(outBytes32), uint256(bytes32(randomBytes)));
+        assertEq(outBytes32, bytes32(randomBytes));
         
     }
 
