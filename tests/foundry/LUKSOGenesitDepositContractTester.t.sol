@@ -16,7 +16,7 @@ contract LUKSOGenesitDepositContractTester is Test {
         bytes memory randomBytes = _getRandom208Bytes(randomNumber);
         bytes32 outBytes32 = contractMock.convertBytesToBytes32(randomBytes);
         assertEq(outBytes32, bytes32(randomBytes));
-        
+
     }
 
     function testToLittleEndianValue(uint64 value) public {
@@ -31,7 +31,7 @@ contract LUKSOGenesitDepositContractTester is Test {
     function _getRandom208Bytes(uint256 randomNumber) internal  returns (bytes memory) {
         bytes memory randomBytes = new bytes(208);
         for (uint i = 0; i < 208; i++) {
-            randomBytes[i] = bytes1(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, i, randomNumber)))) & 0xff);
+            randomBytes[i] = bytes1(uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, i, randomNumber)))));
         }
         return randomBytes;
     }

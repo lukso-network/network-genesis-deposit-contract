@@ -2,8 +2,6 @@
 pragma solidity 0.8.15;
 
 
-
-
 contract LUKSOGenesisDepositContractMock {
     function convertBytesToBytes32(bytes memory inBytes)
         public
