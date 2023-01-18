@@ -17,8 +17,9 @@ jobs:
         with:
           node-version: "16.x"
           cache: "npm"
-      - name: Set up INFURA_API environment variable
+      - name: Set up INFURA_API and COINMARKETCAP_KEY to environment variable
         run: echo "INFURA_KEY=${{ secrets.INFURA_KEY }}" >> $GITHUB_ENV
+        run: echo "COINMARKETCAP_KEY=${{ secrets.COINMARKETCAP_KEY}}" >> $GITHUB_ENV
       - name: Install dependencies
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: npm ci

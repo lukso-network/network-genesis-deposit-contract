@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-erc1820";
 import "dotenv/config";
 
-const { INFURA_KEY } = process.env;
+const { INFURA_KEY, COINMARKETCAP_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,
     currency: "EUR",
-    coinmarketcap: "132e4fb4-1b3d-43b3-920a-65777cf1830b",
+    coinmarketcap: COINMARKETCAP_KEY,
   },
 };
 
