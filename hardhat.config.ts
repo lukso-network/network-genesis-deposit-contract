@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-erc1820";
 import "dotenv/config";
 
-const { INFURA_URL_FORK } = process.env;
+const { INFURA_KEY, COINMARKETCAP_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -22,8 +22,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       forking: {
-        // url: INFURA_URL_FORK as string,
-        url: "https://mainnet.infura.io/v3/210f37242cde4685a2ba41bb109383e6",
+        url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
         blockNumber: 15975554,
       },
     },
@@ -39,7 +38,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     enabled: true,
     currency: "EUR",
-    coinmarketcap: "132e4fb4-1b3d-43b3-920a-65777cf1830b",
+    coinmarketcap: COINMARKETCAP_KEY,
   },
 };
 

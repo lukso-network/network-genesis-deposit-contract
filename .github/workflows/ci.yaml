@@ -1,18 +1,18 @@
-# create a workflow for tests
 name: Run build + tests
-
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 16.15.1
         uses: actions/setup-node@v1
         with:
           node-version: "16.15.1"
+      - name: Set up INFURA_API and COINMARKETCAP_KEY to environment variable
+        run: echo "INFURA_KEY=${{ secrets.INFURA_KEY }}" >> $GITHUB_ENV
+        run: echo "COINMARKETCAP_KEY=${{ secrets.COINMARKETCAP_KEY}}" >> $GITHUB_ENV
       - run: npm ci
       - run: npm run build
       - run: npm test
