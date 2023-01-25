@@ -2,7 +2,10 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
-import { generateDepositData } from "./helpers";
+import {
+  generateDepositData,
+  generateHexBetweenOneAndOneHundred,
+} from "./helpers";
 import {
   LYXeHolders,
   LYXE_ADDRESS,
@@ -41,6 +44,11 @@ describe("Testing on Mainnet Fork", async function () {
 
       const { depositDataHex } = generateDepositData();
 
+      const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
+
+      // append supplyVoteBytes to depositData
+      const depositDataWithVote = depositDataHex + supplyVoteBytes;
+
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
 
@@ -50,7 +58,7 @@ describe("Testing on Mainnet Fork", async function () {
       await LYXeContract.connect(LYXeHolderSigner).send(
         depositAddress,
         DEPOSIT_AMOUNT,
-        depositDataHex
+        depositDataWithVote
       );
 
       // // get balance of Deposit contract after deposit
@@ -61,13 +69,14 @@ describe("Testing on Mainnet Fork", async function () {
       expect(depositBalanceAfterInLYXe).to.equal(DEPOSIT_AMOUNT);
 
       expect(await depositContract.getDepositDataByIndex(0)).to.equal(
-        depositDataHex
+        depositDataWithVote
       );
     });
 
     it("should deposit for multiple depositors", async function () {
       const { depositDataHex } = generateDepositData();
-
+      const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
+      const depositDataWithVote = depositDataHex + supplyVoteBytes;
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
 
@@ -79,7 +88,7 @@ describe("Testing on Mainnet Fork", async function () {
         await LYXeContract.connect(signer).send(
           depositAddress,
           DEPOSIT_AMOUNT,
-          depositDataHex
+          depositDataWithVote
         );
       }
 
@@ -92,7 +101,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       for (let i = 0; i < LYXeHolders.length; i++) {
         expect(await depositContract.getDepositDataByIndex(i)).to.equal(
-          depositDataHex
+          depositDataWithVote
         );
       }
 

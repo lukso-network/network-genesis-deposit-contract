@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -18,6 +19,7 @@ import {
   getMerkleTreeRoot,
   getInterfaceID,
   toLittleEndian64,
+  generateHexBetweenOneAndOneHundred,
 } from "./helpers";
 import {
   LYXeHolders,
@@ -76,38 +78,44 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
 
     for (let i = 0; i < 4; i++) {
       const { depositDataHex } = generateDepositData();
-      validatorsData.push(depositDataHex);
+      const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+      const dataWithSupplyVoteByte = depositDataHex + supplyVoteByte;
+      validatorsData.push(dataWithSupplyVoteByte);
 
       validators.push(context.accounts[i + 2]);
     }
   });
 
   describe("when using `tokensReceived(..)`", () => {
-    it("should revert when passing random data", async () => {
+    it("should revert with wrong deposit_data_root when passing random data", async () => {
       const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
+      const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+      const dataWithSupplyVoteByte = data + supplyVoteByte;
 
       await expect(
         context.LYXeContract.connect(validators[0]).send(
           context.depositContract.address,
           DEPOSIT_AMOUNT,
-          data
+          dataWithSupplyVoteByte
         )
       ).to.be.revertedWith(
         "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
       );
     });
 
-    it("should revert when data's length is bigger than 208", async () => {
-      const data = ethers.utils.hexlify(ethers.utils.randomBytes(209));
+    it("should revert when data's length is bigger than 209", async () => {
+      const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
+      const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+      const dataWithSupplyVoteByte = data + supplyVoteByte + "00";
 
       await expect(
         context.LYXeContract.connect(validators[0]).send(
           context.depositContract.address,
           DEPOSIT_AMOUNT,
-          data
+          dataWithSupplyVoteByte
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisValidatorsDepositContract: Data not encoded properly"
+        "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
       );
     });
 
@@ -121,7 +129,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           data
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisValidatorsDepositContract: Data not encoded properly"
+        "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
       );
     });
 
@@ -237,7 +245,9 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           toLittleEndian64(ethers.utils.hexlify(0))
         );
 
-      const dataDeposited = [validatorsData[0]];
+      const dataDeposited = [
+        validatorsData[0].substring(0, validatorsData[0].length - 2),
+      ];
 
       expect(await context.depositContract.get_deposit_root()).to.equal(
         getMerkleTreeRoot(dataDeposited)
@@ -263,7 +273,10 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           );
       }
 
-      const dataDeposited = [validatorsData[0], validatorsData[1]];
+      const dataDeposited = [
+        validatorsData[0].substring(0, validatorsData[0].length - 2),
+        validatorsData[1].substring(0, validatorsData[1].length - 2),
+      ];
 
       expect(await context.depositContract.get_deposit_root()).to.equal(
         getMerkleTreeRoot(dataDeposited)
@@ -290,9 +303,9 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       }
 
       const dataDeposited = [
-        validatorsData[0],
-        validatorsData[1],
-        validatorsData[2],
+        validatorsData[0].substring(0, validatorsData[0].length - 2),
+        validatorsData[1].substring(0, validatorsData[1].length - 2),
+        validatorsData[2].substring(0, validatorsData[2].length - 2),
       ];
 
       expect(await context.depositContract.get_deposit_root()).to.equal(
@@ -320,10 +333,10 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       }
 
       const dataDeposited = [
-        validatorsData[0],
-        validatorsData[1],
-        validatorsData[2],
-        validatorsData[3],
+        validatorsData[0].substring(0, validatorsData[0].length - 2),
+        validatorsData[1].substring(0, validatorsData[1].length - 2),
+        validatorsData[2].substring(0, validatorsData[2].length - 2),
+        validatorsData[3].substring(0, validatorsData[3].length - 2),
       ];
 
       expect(await context.depositContract.get_deposit_root()).to.equal(
@@ -354,7 +367,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         toLittleEndian64(ethers.utils.hexlify(1))
       );
 
-      expect(await context.depositContract.deposit_count()).to.equal(1);
+      expect(await context.depositContract.depositCount()).to.equal(1);
     });
 
     it("Should properly update the counter on the first two deposits", async () => {
@@ -379,7 +392,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           toLittleEndian64(ethers.utils.hexlify(i + 1))
         );
 
-        expect(await context.depositContract.deposit_count()).to.equal(i + 1);
+        expect(await context.depositContract.depositCount()).to.equal(i + 1);
       }
     });
 
@@ -405,7 +418,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           toLittleEndian64(ethers.utils.hexlify(i + 1))
         );
 
-        expect(await context.depositContract.deposit_count()).to.equal(i + 1);
+        expect(await context.depositContract.depositCount()).to.equal(i + 1);
       }
     });
 
@@ -431,7 +444,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           toLittleEndian64(ethers.utils.hexlify(i + 1))
         );
 
-        expect(await context.depositContract.deposit_count()).to.equal(i + 1);
+        expect(await context.depositContract.depositCount()).to.equal(i + 1);
       }
     });
   });
@@ -699,7 +712,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         )
       ).to.be.true;
     });
-    it("should not support ETH2 IDepositContract interface", async () => {
+    it("should support ETH2 IDepositContract interface", async () => {
       const IDepositETH2 = IDepositContractETH2__factory.createInterface();
 
       const DEPOSIT_ETH2_INTERFACE_ID = getInterfaceID(IDepositETH2);
@@ -708,7 +721,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         await context.depositContract.supportsInterface(
           DEPOSIT_ETH2_INTERFACE_ID
         )
-      ).to.be.false;
+      ).to.be.true;
     });
     it("should not support other interfaces", async () => {
       const RANDOM_INTERFACE_ID = "0x12345678";
@@ -716,6 +729,62 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       expect(
         await context.depositContract.supportsInterface(RANDOM_INTERFACE_ID)
       ).to.be.false;
+    });
+  });
+  describe("supplyVote", () => {
+    it("should not let you depsosit with vote with value 0", async () => {
+      const { depositDataHex } = generateDepositData();
+      const supplyVoteByte = "00";
+      const depositDataWithVote = depositDataHex + supplyVoteByte;
+
+      await expect(
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          depositDataWithVote
+        )
+      ).to.be.revertedWith(
+        "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
+      );
+    });
+    it("should not let you deposit with vote with value 100", async () => {
+      const { depositDataHex } = generateDepositData();
+      const supplyVoteByte = "ff";
+      const depositDataWithVote = depositDataHex + supplyVoteByte;
+
+      await expect(
+        context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          depositDataWithVote
+        )
+      ).to.be.revertedWith(
+        "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
+      );
+    });
+    it("should return all supply vote for 100 deposits", async () => {
+      let supplyVotes = Array(100).fill(BigNumber.from(0));
+
+      for (let i = 0; i < 100; i++) {
+        const { depositDataHex } = generateDepositData();
+        const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+
+        // removing 1 to index because we start firt accepted supply value is 1 in the smart contract (and not 0)
+        supplyVotes[parseInt(supplyVoteByte, 16) - 1] =
+          supplyVotes[parseInt(supplyVoteByte, 16) - 1].add(1);
+        const depositDataWithVote = depositDataHex + supplyVoteByte;
+
+        await context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          depositDataWithVote
+        );
+      }
+
+      const fetchedSupplyVotes =
+        await context.depositContract.getsVotesPerSupply();
+
+      expect(fetchedSupplyVotes).to.deep.equal(supplyVotes);
     });
   });
 });
