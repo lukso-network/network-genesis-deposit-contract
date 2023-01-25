@@ -60,7 +60,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       expect(depositBalanceAfterInLYXe).to.equal(DEPOSIT_AMOUNT);
 
-      expect(await depositContract.get_deposit_data_by_index(0)).to.equal(
+      expect(await depositContract.getDepositDataByIndex(0)).to.equal(
         depositDataHex
       );
     });
@@ -91,14 +91,12 @@ describe("Testing on Mainnet Fork", async function () {
       expect(depositBalanceAfter).to.equal(expectedBalance);
 
       for (let i = 0; i < LYXeHolders.length; i++) {
-        expect(await depositContract.get_deposit_data_by_index(i)).to.equal(
+        expect(await depositContract.getDepositDataByIndex(i)).to.equal(
           depositDataHex
         );
       }
 
-      expect(await depositContract.get_deposit_data_by_index(10)).to.equal(
-        "0x"
-      );
+      expect(await depositContract.getDepositDataByIndex(10)).to.equal("0x");
     });
   });
 
@@ -127,9 +125,9 @@ describe("Testing on Mainnet Fork", async function () {
         )
       ).to.be.revertedWith("Sending failed: Insufficient funds");
 
-      expect(await depositContract.get_deposit_data_by_index(0)).to.equal("0x");
+      expect(await depositContract.getDepositDataByIndex(0)).to.equal("0x");
 
-      expect(await depositContract.get_deposit_data_by_index(1)).to.equal("0x");
+      expect(await depositContract.getDepositDataByIndex(1)).to.equal("0x");
     });
   });
 });

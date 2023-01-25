@@ -456,7 +456,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
 
       const expectedDepositedData = [validatorsData[0]];
 
-      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
+      expect(await context.depositContract.getDepositData()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -483,7 +483,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           );
       }
 
-      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
+      expect(await context.depositContract.getDepositData()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -510,7 +510,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           );
       }
 
-      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
+      expect(await context.depositContract.getDepositData()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -537,7 +537,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           );
       }
 
-      expect(await context.depositContract.get_deposit_data()).to.deep.equal(
+      expect(await context.depositContract.getDepositData()).to.deep.equal(
         expectedDepositedData
       );
     });
@@ -562,7 +562,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         );
 
       expect(
-        await context.depositContract.get_deposit_data_by_index(0)
+        await context.depositContract.getDepositDataByIndex(0)
       ).to.deep.equal(validatorsData[0]);
     });
 
@@ -586,10 +586,10 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.get_deposit_data_by_index(0)
+        await context.depositContract.getDepositDataByIndex(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(1)
+        await context.depositContract.getDepositDataByIndex(1)
       ).to.deep.equal(validatorsData[1]);
     });
 
@@ -613,13 +613,13 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.get_deposit_data_by_index(0)
+        await context.depositContract.getDepositDataByIndex(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(1)
+        await context.depositContract.getDepositDataByIndex(1)
       ).to.deep.equal(validatorsData[1]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(2)
+        await context.depositContract.getDepositDataByIndex(2)
       ).to.deep.equal(validatorsData[2]);
     });
 
@@ -643,16 +643,16 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       }
 
       expect(
-        await context.depositContract.get_deposit_data_by_index(0)
+        await context.depositContract.getDepositDataByIndex(0)
       ).to.deep.equal(validatorsData[0]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(1)
+        await context.depositContract.getDepositDataByIndex(1)
       ).to.deep.equal(validatorsData[1]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(2)
+        await context.depositContract.getDepositDataByIndex(2)
       ).to.deep.equal(validatorsData[2]);
       expect(
-        await context.depositContract.get_deposit_data_by_index(3)
+        await context.depositContract.getDepositDataByIndex(3)
       ).to.deep.equal(validatorsData[3]);
     });
   });

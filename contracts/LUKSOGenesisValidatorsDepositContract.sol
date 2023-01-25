@@ -85,7 +85,7 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
     // The current number of deposits in the contract.
-    uint256 public deposit_count;
+    uint256 internal deposit_count;
 
 
     event DepositEvent(
@@ -188,6 +188,15 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
     }
 
     /**
+     * @dev Returns the current number of deposits.
+     *
+     * @return The number of deposits.
+     */
+    function depositCount() external view returns (uint256) {
+        return deposit_count;
+    }
+
+    /**
      * @dev Returns the current root of the Merkle tree of deposits.
      *
      * @return The Merkle root of the deposit data.
@@ -217,7 +226,7 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function get_deposit_data() external view  returns (bytes[] memory returnedArray) {
+    function getDepositData() external view  returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
         for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
@@ -225,7 +234,7 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function get_deposit_data_by_index(uint256 index) public view  returns (bytes memory) {
+    function getDepositDataByIndex(uint256 index) external view  returns (bytes memory) {
         return deposit_data[index];
     }
 
