@@ -74,7 +74,7 @@ interface ERC1820Registry {
     ) external;
 }
 
-contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
+contract LUKSOGenesisValidatorsDepositContract is IDepositContract, ERC165 {
     // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
@@ -168,11 +168,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external override {
-        require(!isContractFrozen, "LUKSOGenesisDepositContract: Contract is frozen");
-        require(msg.sender == LYXeAddress, "LUKSOGenesisDepositContract: Not called on LYXe transfer");
-        require(amount == 32 ether, "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe");
+        require(!isContractFrozen, "LUKSOGenesisValidatorsDepositContract: Contract is frozen");
+        require(msg.sender == LYXeAddress, "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer");
+        require(amount == 32 ether, "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe");
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
-        require(depositData.length == (208), "LUKSOGenesisDepositContract: Data not encoded properly");
+        require(depositData.length == (208), "LUKSOGenesisValidatorsDepositContract: Data not encoded properly");
 
         // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
@@ -190,7 +190,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      * @dev Freze the LUKSO Genesis Deposit Contract
      */
     function freezeContract() external override {
-        require(msg.sender == owner, "LUKSOGenesisDepositContract: Caller not owner");
+        require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
         isContractFrozen = true;
     }
 
@@ -293,11 +293,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         // Verify computed and expected deposit data roots match
         require(
             node == deposit_data_root,
-            "LUKSOGenesisDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+            "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
         );
 
         // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisDepositContract: merkle tree full");
+        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisValidatorsDepositContract: merkle tree full");
 
         // Add deposit data root to Merkle tree (update a single `branch` node)
         deposit_count += 1;

@@ -4,8 +4,8 @@ import { expect } from "chai";
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  LUKSOGenesisDepositContract__factory,
-  LUKSOGenesisDepositContract,
+  LUKSOGenesisValidatorsDepositContract__factory,
+  LUKSOGenesisValidatorsDepositContract,
   ReversibleICOToken,
   ERC165__factory,
   IDepositContract__factory,
@@ -26,11 +26,11 @@ import {
   DEPOSIT_AMOUNT,
 } from "./constants";
 
-export type LUKSOGenesisDepositContractContext = {
+export type LUKSOGenesisValidatorsDepositContractContext = {
   accounts: SignerWithAddress[];
   LYXeContract: ReversibleICOToken;
   depositContractOwner: SignerWithAddress;
-  depositContract: LUKSOGenesisDepositContract;
+  depositContract: LUKSOGenesisValidatorsDepositContract;
 };
 
 const buildContext = async () => {
@@ -50,9 +50,10 @@ const buildContext = async () => {
   const depositContractOwner = await ethers.getImpersonatedSigner(
     depositContractOwnerAddress
   );
-  const depositContract = await new LUKSOGenesisDepositContract__factory(
-    depositContractOwner
-  ).deploy();
+  const depositContract =
+    await new LUKSOGenesisValidatorsDepositContract__factory(
+      depositContractOwner
+    ).deploy();
 
   return {
     accounts,
@@ -62,8 +63,8 @@ const buildContext = async () => {
   };
 };
 
-describe("Testing LUKSOGenesisDepositContract", () => {
-  let context: LUKSOGenesisDepositContractContext;
+describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
+  let context: LUKSOGenesisValidatorsDepositContractContext;
   const validators: SignerWithAddress[] = [];
   const validatorsData: string[] = [];
   const one_gwei = "1000000000";
@@ -92,7 +93,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           data
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+        "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
       );
     });
 
@@ -106,7 +107,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           data
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: Data not encoded properly"
+        "LUKSOGenesisValidatorsDepositContract: Data not encoded properly"
       );
     });
 
@@ -120,7 +121,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           data
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: Data not encoded properly"
+        "LUKSOGenesisValidatorsDepositContract: Data not encoded properly"
       );
     });
 
@@ -132,7 +133,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           validatorsData[0]
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
+        "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
@@ -144,7 +145,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
           validatorsData[0]
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe"
+        "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
       );
     });
 
@@ -161,7 +162,7 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             "0x"
           )
       ).to.be.revertedWith(
-        "LUKSOGenesisDepositContract: Not called on LYXe transfer"
+        "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
       );
     });
 
@@ -671,7 +672,9 @@ describe("Testing LUKSOGenesisDepositContract", () => {
             DEPOSIT_AMOUNT,
             validatorsData[i]
           )
-        ).to.be.revertedWith("LUKSOGenesisDepositContract: Contract is frozen");
+        ).to.be.revertedWith(
+          "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
+        );
       }
     });
   });

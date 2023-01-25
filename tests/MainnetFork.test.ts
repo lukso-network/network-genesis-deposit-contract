@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { LUKSOGenesisDepositContract } from "../typechain-types";
+import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import { generateDepositData } from "./helpers";
 import {
@@ -12,7 +12,7 @@ import {
 
 describe("Testing on Mainnet Fork", async function () {
   let LYXeContract: ReversibleICOToken;
-  let depositContract: LUKSOGenesisDepositContract;
+  let depositContract: LUKSOGenesisValidatorsDepositContract;
   let depositAddress: string;
   beforeEach(async () => {
     const depositContractDeployer = await ethers.getImpersonatedSigner(
@@ -24,7 +24,7 @@ describe("Testing on Mainnet Fork", async function () {
       LYXE_ADDRESS
     );
     const DepositFactory = await ethers.getContractFactory(
-      "LUKSOGenesisDepositContract"
+      "LUKSOGenesisValidatorsDepositContract"
     );
     depositContract = await DepositFactory.connect(
       depositContractDeployer

@@ -2,14 +2,14 @@
 pragma solidity 0.8.15;
 
 import "forge-std/Test.sol";
-import './Mocks/LUKSOGenesisDepositContract.sol';
+import './Mocks/LUKSOGenesisValidatorsDepositContract.sol';
 
 
 contract LUKSOGenesitDepositContractTester is Test {
-    LUKSOGenesisDepositContractMock contractMock;
+    LUKSOGenesisValidatorsDepositContractMock contractMock;
 
     function setUp() public {
-        contractMock = new LUKSOGenesisDepositContractMock();
+        contractMock = new LUKSOGenesisValidatorsDepositContractMock();
     }
 
     function testConvertBytesToBytes32(uint256 randomNumber) public {
