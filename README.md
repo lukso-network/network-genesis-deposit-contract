@@ -134,18 +134,18 @@ function get_deposit_count() external view returns (bytes memory);
 
 The `get_deposit_count` function get the current deposit count and converts it to a little endian representation of 64-bit values.
 
-### `get_deposit_data` function
+### `getDepositData` function
 
 ```js
-function get_deposit_data() external view override returns (bytes[] memory returnedArray);
+function getDepositData() external view override returns (bytes[] memory returnedArray);
 ```
 
-The `get_deposit_data` function returns the list of deposits currently stored in the contract. It takes no parameters and returns an array of bytes values, where each value represents the data for a single deposit.
+The `getDepositData` function returns the list of deposits currently stored in the contract. It takes no parameters and returns an array of bytes values, where each value represents the data for a single deposit.
 
-### `get_deposit_data_by_index` function
+### `getDepositDataByIndex` function
 
 ```js
-function get_deposit_data_by_index(uint256 index) external view returns (bytes memory);
+function getDepositDataByIndex(uint256 index) external view returns (bytes memory);
 ```
 
 The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.

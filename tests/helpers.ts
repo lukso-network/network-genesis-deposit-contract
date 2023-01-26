@@ -196,3 +196,8 @@ export function getInterfaceID(contractInterface: ethers.utils.Interface) {
 
   return interfaceID.toHexString();
 }
+
+export function generateHexBetweenOneAndOneHundred(): string {
+  const value = Math.floor(Math.random() * 100) + 1;
+  return value.toString(16).padStart(2, "0");
+}

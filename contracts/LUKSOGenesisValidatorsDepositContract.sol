@@ -1,80 +1,25 @@
+
+
+// ╔╗   ╔╗ ╔╗╔╗╔═╗╔═══╗╔═══╗    ╔═══╗                          ╔╗  ╔╗     ╔╗     ╔╗      ╔╗                ╔═══╗                   ╔╗
+// ║║   ║║ ║║║║║╔╝║╔═╗║║╔═╗║    ║╔═╗║                          ║╚╗╔╝║     ║║     ║║     ╔╝╚╗               ╚╗╔╗║                  ╔╝╚╗
+// ║║   ║║ ║║║╚╝╝ ║╚══╗║║ ║║    ║║ ╚╝╔══╗╔═╗ ╔══╗╔══╗╔╗╔══╗    ╚╗║║╔╝╔══╗ ║║ ╔╗╔═╝║╔══╗ ╚╗╔╝╔══╗╔═╗╔══╗     ║║║║╔══╗╔══╗╔══╗╔══╗╔╗╚╗╔╝
+// ║║ ╔╗║║ ║║║╔╗║ ╚══╗║║║ ║║    ║║╔═╗║╔╗║║╔╗╗║╔╗║║══╣╠╣║══╣     ║╚╝║ ╚ ╗║ ║║ ╠╣║╔╗║╚ ╗║  ║║ ║╔╗║║╔╝║══╣     ║║║║║╔╗║║╔╗║║╔╗║║══╣╠╣ ║║
+// ║╚═╝║║╚═╝║║║║╚╗║╚═╝║║╚═╝║    ║╚╩═║║║═╣║║║║║║═╣╠══║║║╠══║     ╚╗╔╝ ║╚╝╚╗║╚╗║║║╚╝║║╚╝╚╗ ║╚╗║╚╝║║║ ╠══║    ╔╝╚╝║║║═╣║╚╝║║╚╝║╠══║║║ ║╚╗
+// ╚═══╝╚═══╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚══╝╚╝╚╝╚══╝╚══╝╚╝╚══╝      ╚╝  ╚═══╝╚═╝╚╝╚══╝╚═══╝ ╚═╝╚══╝╚╝ ╚══╝    ╚═══╝╚══╝║╔═╝╚══╝╚══╝╚╝ ╚═╝
+
+
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.15;
 
-// This interface is designed to be compatible with the Vyper version.
-/// @notice This is the Ethereum 2.0 deposit contract interface.
-/// For more information see the Phase 0 specification under https://github.com/ethereum/eth2.0-specs
-interface IDepositContract {
-    /// @notice A processed deposit event.
-    event DepositEvent(
-        bytes pubkey,
-        bytes withdrawal_credentials,
-        bytes amount,
-        bytes signature,
-        bytes index
-    );
 
-    /// @notice Query the current deposit root hash.
-    /// @return The deposit root hash.
-    function get_deposit_root() external view returns (bytes32);
+import {IERC165} from "./interfaces/IERC165.sol";
+import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
+import {IDepositContract} from "./interfaces/IDepositContract.sol";
 
-    /// @notice Query the current deposit count.
-    /// @return The deposit count encoded as a little endian 64-bit number.
-    function get_deposit_count() external view returns (bytes memory);
 
-    /// @notice Query the owner of the deposit contract.
-    /// @return The owner of the deposit contract.
-    function owner() external view returns (address);
 
-    /// @notice Querry if the deposit contract is frozen
-    /// @return True if the deposit contract is frozen, false otherwise.
-    function isContractFrozen() external view returns (bool);
-
-    // @notice function called by the LYXe token contract to deposit
-    // @params amount The amount of LYXe to deposit
-    // @parama depositData The deposit data (pubkey, withdrawal_credentials, signature, deposit_data_root)
-    function tokensReceived(
-        address, /* operator */
-        address, /* from */
-        address, /* to */
-        uint256 amount,
-        bytes calldata depositData,
-        bytes calldata /* operatorData */
-    ) external;
-
-    /// @notice change isContractFrozen to true
-    // @dev only owner can call this function
-    function freezeContract() external;
-
-    /// @dev Get an array of all excoded deposit data
-    function get_deposit_data() external view returns (bytes[] memory returnedArray);
-
-    /// @dev Get the encoded deposit data at the `index`
-    function get_deposit_data_by_index(uint256 index) external view returns (bytes memory);
-}
-
-// Based on official specification in https://eips.ethereum.org/EIPS/eip-165
-interface ERC165 {
-    /// @notice Query if a contract implements an interface
-    /// @param interfaceId The interface identifier, as specified in ERC-165
-    /// @dev Interface identification is specified in ERC-165. This function
-    ///  uses less than 30,000 gas.
-    /// @return `true` if the contract implements `interfaceId` and
-    ///  `interfaceId` is not 0xffffffff, `false` otherwise
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool);
-}
-
-interface ERC1820Registry {
-    function setInterfaceImplementer(
-        address _addr,
-        bytes32 _interfaceHash,
-        address _implementer
-    ) external;
-}
-
-contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
+contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
@@ -101,7 +46,16 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
     // The current number of deposits in the contract.
-    uint256 public deposit_count;
+    uint256 internal deposit_count;
+
+
+    event DepositEvent(
+      bytes pubkey,
+      bytes withdrawal_credentials,
+      bytes amount,
+      bytes signature,
+      bytes index
+    );
 
     /**
      * @dev Storing all the deposit data which should be sliced
@@ -114,27 +68,33 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     mapping(uint256 => bytes) deposit_data;
 
     /**
+     * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
+     */
+    mapping(uint8 => uint256) public supplyVoteCounter;
+
+    /**
      * @dev Owner of the contract
      * Has access to `freezeContract()`
      */
-    address public immutable override owner;
+    address public immutable  owner;
 
     /**
      * @dev Default value is false which allows people to send 32 LYXe
      * to this contract with valid data in order to register as Genesis Validator
      */
-    bool public override isContractFrozen;
+    bool public  isContractFrozen;
+
 
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor() public {
-        owner = msg.sender;
+    constructor(address owner_) {
+        owner = owner_;
 
         isContractFrozen = false;
 
         // Set this contract as the implementer of the tokens recipient interface in the registry contract.
-        ERC1820Registry(registryAddress).setInterfaceImplementer(
+        IERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
             TOKENS_RECIPIENT_INTERFACE_HASH,
             address(this)
@@ -167,12 +127,17 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
-    ) external override {
-        require(!isContractFrozen, "LUKSOGenesisDepositContract: Contract is frozen");
-        require(msg.sender == LYXeAddress, "LUKSOGenesisDepositContract: Not called on LYXe transfer");
-        require(amount == 32 ether, "LUKSOGenesisDepositContract: Cannot send an amount different from 32 LYXe");
+    ) external  {
+        require(!isContractFrozen, "LUKSOGenesisValidatorsDepositContract: Contract is frozen");
+        require(msg.sender == LYXeAddress, "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer");
+        require(amount == 32 ether, "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe");
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
-        require(depositData.length == (208), "LUKSOGenesisDepositContract: Data not encoded properly");
+        require(depositData.length == (209), "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly");
+
+        uint8 supply = uint8(depositData[208]);
+        require(supply >= 1 && supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
+        supplyVoteCounter[supply]++;
+
 
         // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
@@ -189,9 +154,26 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Freze the LUKSO Genesis Deposit Contract
      */
-    function freezeContract() external override {
-        require(msg.sender == owner, "LUKSOGenesisDepositContract: Caller not owner");
+    function freezeContract() external  {
+        require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
         isContractFrozen = true;
+    }
+
+    /**
+     * @dev Returns the current number of deposits.
+     *
+     * @return The number of deposits.
+     */
+    function depositCount() external view returns (uint256) {
+        return deposit_count;
+    }
+
+    function getsVotesPerSupply() external view returns (uint256[100] memory, uint256 totalVotes) {
+        uint256[100] memory votesPerSupply;
+        for (uint8 i = 0; i < 100; i++) {
+            votesPerSupply[i] = supplyVoteCounter[i + 1];
+        }
+        return (votesPerSupply, deposit_count);
     }
 
     /**
@@ -199,7 +181,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      *
      * @return The Merkle root of the deposit data.
      */
-    function get_deposit_root() external view override returns (bytes32) {
+    function get_deposit_root()  external view  returns (bytes32) {
         bytes32 node;
         uint256 size = deposit_count;
         for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
@@ -217,14 +199,14 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      *
      * @return The number of deposits in little-endian order.
      */
-    function get_deposit_count() external view override returns (bytes memory) {
+    function get_deposit_count() external view returns (bytes memory) {
         return _to_little_endian_64(uint64(deposit_count));
     }
 
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function get_deposit_data() external view override returns (bytes[] memory returnedArray) {
+    function getDepositData() external view  returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
         for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
@@ -232,7 +214,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function get_deposit_data_by_index(uint256 index) public view override returns (bytes memory) {
+    function getDepositDataByIndex(uint256 index) external view  returns (bytes memory) {
         return deposit_data[index];
     }
 
@@ -244,7 +226,7 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
      */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            interfaceId == type(ERC165).interfaceId ||
+            interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IDepositContract).interfaceId;
     }
 
@@ -293,11 +275,11 @@ contract LUKSOGenesisDepositContract is IDepositContract, ERC165 {
         // Verify computed and expected deposit data roots match
         require(
             node == deposit_data_root,
-            "LUKSOGenesisDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+            "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
         );
 
         // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisDepositContract: merkle tree full");
+        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisValidatorsDepositContract: merkle tree full");
 
         // Add deposit data root to Merkle tree (update a single `branch` node)
         deposit_count += 1;

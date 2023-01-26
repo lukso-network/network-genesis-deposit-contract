@@ -1,8 +1,11 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { LUKSOGenesisDepositContract } from "../typechain-types";
+import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
-import { generateDepositData } from "./helpers";
+import {
+  generateDepositData,
+  generateHexBetweenOneAndOneHundred,
+} from "./helpers";
 import {
   LYXeHolders,
   LYXE_ADDRESS,
@@ -12,7 +15,7 @@ import {
 
 describe("Testing on Mainnet Fork", async function () {
   let LYXeContract: ReversibleICOToken;
-  let depositContract: LUKSOGenesisDepositContract;
+  let depositContract: LUKSOGenesisValidatorsDepositContract;
   let depositAddress: string;
   beforeEach(async () => {
     const depositContractDeployer = await ethers.getImpersonatedSigner(
@@ -24,11 +27,11 @@ describe("Testing on Mainnet Fork", async function () {
       LYXE_ADDRESS
     );
     const DepositFactory = await ethers.getContractFactory(
-      "LUKSOGenesisDepositContract"
+      "LUKSOGenesisValidatorsDepositContract"
     );
     depositContract = await DepositFactory.connect(
       depositContractDeployer
-    ).deploy();
+    ).deploy(ETH_HOLDER_WITHOUT_LYXE);
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });
@@ -41,6 +44,11 @@ describe("Testing on Mainnet Fork", async function () {
 
       const { depositDataHex } = generateDepositData();
 
+      const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
+
+      // append supplyVoteBytes to depositData
+      const depositDataWithVote = depositDataHex + supplyVoteBytes;
+
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
 
@@ -50,7 +58,7 @@ describe("Testing on Mainnet Fork", async function () {
       await LYXeContract.connect(LYXeHolderSigner).send(
         depositAddress,
         DEPOSIT_AMOUNT,
-        depositDataHex
+        depositDataWithVote
       );
 
       // // get balance of Deposit contract after deposit
@@ -60,14 +68,15 @@ describe("Testing on Mainnet Fork", async function () {
 
       expect(depositBalanceAfterInLYXe).to.equal(DEPOSIT_AMOUNT);
 
-      expect(await depositContract.get_deposit_data_by_index(0)).to.equal(
-        depositDataHex
+      expect(await depositContract.getDepositDataByIndex(0)).to.equal(
+        depositDataWithVote
       );
     });
 
     it("should deposit for multiple depositors", async function () {
       const { depositDataHex } = generateDepositData();
-
+      const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
+      const depositDataWithVote = depositDataHex + supplyVoteBytes;
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
 
@@ -79,7 +88,7 @@ describe("Testing on Mainnet Fork", async function () {
         await LYXeContract.connect(signer).send(
           depositAddress,
           DEPOSIT_AMOUNT,
-          depositDataHex
+          depositDataWithVote
         );
       }
 
@@ -91,14 +100,12 @@ describe("Testing on Mainnet Fork", async function () {
       expect(depositBalanceAfter).to.equal(expectedBalance);
 
       for (let i = 0; i < LYXeHolders.length; i++) {
-        expect(await depositContract.get_deposit_data_by_index(i)).to.equal(
-          depositDataHex
+        expect(await depositContract.getDepositDataByIndex(i)).to.equal(
+          depositDataWithVote
         );
       }
 
-      expect(await depositContract.get_deposit_data_by_index(10)).to.equal(
-        "0x"
-      );
+      expect(await depositContract.getDepositDataByIndex(10)).to.equal("0x");
     });
   });
 
@@ -127,9 +134,9 @@ describe("Testing on Mainnet Fork", async function () {
         )
       ).to.be.revertedWith("Sending failed: Insufficient funds");
 
-      expect(await depositContract.get_deposit_data_by_index(0)).to.equal("0x");
+      expect(await depositContract.getDepositDataByIndex(0)).to.equal("0x");
 
-      expect(await depositContract.get_deposit_data_by_index(1)).to.equal("0x");
+      expect(await depositContract.getDepositDataByIndex(1)).to.equal("0x");
     });
   });
 });
