@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity 0.6.11;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.8.15;
+
 
 import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
@@ -79,7 +79,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor(address owner_) public {
+    constructor(address owner_) {
         owner = owner_;
 
         isContractFrozen = false;

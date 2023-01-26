@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity 0.6.11;
+pragma solidity 0.8.15;
 
 // Based on official specification in https://eips.ethereum.org/EIPS/eip-165
 interface IERC165 {
