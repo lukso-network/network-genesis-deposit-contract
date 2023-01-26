@@ -8,9 +8,8 @@ import {
   LUKSOGenesisValidatorsDepositContract__factory,
   LUKSOGenesisValidatorsDepositContract,
   ReversibleICOToken,
-  ERC165__factory,
+  IERC165__factory,
   IDepositContract__factory,
-  IDepositContractETH2__factory,
 } from "../types";
 
 // helpers
@@ -693,7 +692,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
   });
   describe("supportsInterface", () => {
     it("should support ERC165", async () => {
-      const IERC165 = ERC165__factory.createInterface();
+      const IERC165 = IERC165__factory.createInterface();
 
       const ERC165_INTERFACE_ID = getInterfaceID(IERC165);
 
@@ -713,7 +712,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       ).to.be.true;
     });
     it("should support ETH2 IDepositContract interface", async () => {
-      const IDepositETH2 = IDepositContractETH2__factory.createInterface();
+      const IDepositETH2 = IDepositContract__factory.createInterface();
 
       const DEPOSIT_ETH2_INTERFACE_ID = getInterfaceID(IDepositETH2);
 

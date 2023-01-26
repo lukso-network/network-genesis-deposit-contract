@@ -3,62 +3,14 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-// This interface is designed to be compatible with the Vyper version.
-/// @notice This is the Ethereum 2.0 deposit contract interface.
-/// For more information see the Phase 0 specification under https://github.com/ethereum/eth2.0-specs
-interface IDepositContract {
-    /// @notice A processed deposit event.
-    event DepositEvent(
-        bytes pubkey,
-        bytes withdrawal_credentials,
-        bytes amount,
-        bytes signature,
-        bytes index
-    );
+import {IERC165} from "./interfaces/IERC165.sol";
+import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
+import {IDepositContract} from "./interfaces/IDepositContract.sol";
 
-    /// @notice This Deposit function is actually internal in our implementation.
-    /// @param pubkey A BLS12-381 public key.
-    /// @param withdrawal_credentials Commitment to a public key for withdrawals.
-    /// @param signature A BLS12-381 signature.
-    /// @param deposit_data_root The SHA-256 hash of the SSZ-encoded DepositData object.
-    /// Used as a protection against malformed input.
-    function deposit(
-        bytes calldata pubkey,
-        bytes calldata withdrawal_credentials,
-        bytes calldata signature,
-        bytes32 deposit_data_root
-    ) external payable;
 
-    /// @notice Query the current deposit root hash.
-    /// @return The deposit root hash.
-    function get_deposit_root() external view returns (bytes32);
 
-    /// @notice Query the current deposit count.
-    /// @return The deposit count encoded as a little endian 64-bit number.
-    function get_deposit_count() external view returns (bytes memory);
 
-}
-
-// Based on official specification in https://eips.ethereum.org/EIPS/eip-165
-interface ERC165 {
-    /// @notice Query if a contract implements an interface
-    /// @param interfaceId The interface identifier, as specified in ERC-165
-    /// @dev Interface identification is specified in ERC-165. This function
-    ///  uses less than 30,000 gas.
-    /// @return `true` if the contract implements `interfaceId` and
-    ///  `interfaceId` is not 0xffffffff, `false` otherwise
-    function supportsInterface(bytes4 interfaceId) external pure returns (bool);
-}
-
-interface ERC1820Registry {
-    function setInterfaceImplementer(
-        address _addr,
-        bytes32 _interfaceHash,
-        address _implementer
-    ) external;
-}
-
-contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
+contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
@@ -133,7 +85,7 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
         isContractFrozen = false;
 
         // Set this contract as the implementer of the tokens recipient interface in the registry contract.
-        ERC1820Registry(registryAddress).setInterfaceImplementer(
+        IERC1820Registry(registryAddress).setInterfaceImplementer(
             address(this),
             TOKENS_RECIPIENT_INTERFACE_HASH,
             address(this)
@@ -265,7 +217,7 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
      */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            interfaceId == type(ERC165).interfaceId ||
+            interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IDepositContract).interfaceId;
     }
 
