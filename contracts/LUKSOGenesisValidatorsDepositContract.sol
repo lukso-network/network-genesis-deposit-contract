@@ -127,8 +127,8 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor() public {
-        owner = msg.sender;
+    constructor(address owner_) public {
+        owner = owner_;
 
         isContractFrozen = false;
 
@@ -173,7 +173,6 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
         require(depositData.length == (209), "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly");
 
-        // check that byte = vote for supply and increment the counter
         uint8 supply = uint8(depositData[208]);
         require(supply >= 1 && supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
         supplyVoteCounter[supply]++;
@@ -208,12 +207,12 @@ contract LUKSOGenesisValidatorsDepositContract is  ERC165 {
         return deposit_count;
     }
 
-    function getsVotesPerSupply() external view returns (uint256[100] memory) {
+    function getsVotesPerSupply() external view returns (uint256[100] memory, uint256 totalVotes) {
         uint256[100] memory votesPerSupply;
         for (uint8 i = 0; i < 100; i++) {
             votesPerSupply[i] = supplyVoteCounter[i + 1];
         }
-        return votesPerSupply;
+        return (votesPerSupply, deposit_count);
     }
 
     /**

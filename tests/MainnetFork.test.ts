@@ -31,7 +31,7 @@ describe("Testing on Mainnet Fork", async function () {
     );
     depositContract = await DepositFactory.connect(
       depositContractDeployer
-    ).deploy();
+    ).deploy(ETH_HOLDER_WITHOUT_LYXE);
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });

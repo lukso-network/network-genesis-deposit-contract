@@ -55,7 +55,7 @@ const buildContext = async () => {
   const depositContract =
     await new LUKSOGenesisValidatorsDepositContract__factory(
       depositContractOwner
-    ).deploy();
+    ).deploy(ETH_HOLDER_WITHOUT_LYXE);
 
   return {
     accounts,
@@ -763,9 +763,10 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       );
     });
     it("should return all supply vote for 100 deposits", async () => {
-      let supplyVotes = Array(100).fill(BigNumber.from(0));
+      const numberOfDeposits = 100;
+      let supplyVotes = Array(numberOfDeposits).fill(BigNumber.from(0));
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < numberOfDeposits; i++) {
         const { depositDataHex } = generateDepositData();
         const supplyVoteByte = generateHexBetweenOneAndOneHundred();
 
@@ -784,7 +785,8 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       const fetchedSupplyVotes =
         await context.depositContract.getsVotesPerSupply();
 
-      expect(fetchedSupplyVotes).to.deep.equal(supplyVotes);
+      expect(fetchedSupplyVotes[0]).to.deep.equal(supplyVotes);
+      expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
     });
   });
 });
