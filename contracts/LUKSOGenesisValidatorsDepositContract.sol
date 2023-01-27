@@ -177,6 +177,33 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     }
 
     /**
+     * @dev Get an array of all excoded deposit data
+     */
+    function getDepositData() external view  returns (bytes[] memory returnedArray) {
+        returnedArray = new bytes[](deposit_count);
+        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
+    }
+
+    /**
+     * @dev Get the encoded deposit data at the `index`
+     */
+    function getDepositDataByIndex(uint256 index) external view  returns (bytes memory) {
+        return deposit_data[index];
+    }
+
+    /**
+     * @dev Determines whether the contract supports a given interface.
+     *
+     * @param interfaceId The interface ID to check.
+     * @return True if the contract supports the interface, false otherwise.
+     */
+    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
+        return
+            interfaceId == type(IERC165).interfaceId ||
+            interfaceId == type(IDepositContract).interfaceId;
+    }
+
+    /**
      * @dev Returns the current root of the Merkle tree of deposits.
      *
      * @return The Merkle root of the deposit data.
@@ -203,32 +230,6 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
         return _to_little_endian_64(uint64(deposit_count));
     }
 
-    /**
-     * @dev Get an array of all excoded deposit data
-     */
-    function getDepositData() external view  returns (bytes[] memory returnedArray) {
-        returnedArray = new bytes[](deposit_count);
-        for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
-    }
-
-    /**
-     * @dev Get the encoded deposit data at the `index`
-     */
-    function getDepositDataByIndex(uint256 index) external view  returns (bytes memory) {
-        return deposit_data[index];
-    }
-
-    /**
-     * @dev Determines whether the contract supports a given interface.
-     *
-     * @param interfaceId The interface ID to check.
-     * @return True if the contract supports the interface, false otherwise.
-     */
-    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
-        return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IDepositContract).interfaceId;
-    }
 
     /**
      * @dev Processes a deposit and updates the Merkle tree.
