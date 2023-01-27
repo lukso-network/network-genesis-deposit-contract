@@ -168,6 +168,10 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
         return deposit_count;
     }
 
+    /**
+     * @dev Retrieves an array of votes per supply and the total number of votes
+     */
+
     function getsVotesPerSupply() external view returns (uint256[100] memory, uint256 totalVotes) {
         uint256[100] memory votesPerSupply;
         for (uint8 i = 0; i < 100; i++) {
