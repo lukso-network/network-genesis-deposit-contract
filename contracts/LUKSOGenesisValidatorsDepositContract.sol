@@ -63,7 +63,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     /**
      * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
      */
-    mapping(uint8 => uint256) public supplyVoteCounter;
+    mapping(uint256 => uint256) public supplyVoteCounter;
 
     /**
      * @dev Owner of the contract
