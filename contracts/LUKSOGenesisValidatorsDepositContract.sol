@@ -1,5 +1,3 @@
-
-
 // ╔╗   ╔╗ ╔╗╔╗╔═╗╔═══╗╔═══╗    ╔═══╗                          ╔╗  ╔╗     ╔╗     ╔╗      ╔╗                ╔═══╗                   ╔╗
 // ║║   ║║ ║║║║║╔╝║╔═╗║║╔═╗║    ║╔═╗║                          ║╚╗╔╝║     ║║     ║║     ╔╝╚╗               ╚╗╔╗║                  ╔╝╚╗
 // ║║   ║║ ║║║╚╝╝ ║╚══╗║║ ║║    ║║ ╚╝╔══╗╔═╗ ╔══╗╔══╗╔╗╔══╗    ╚╗║║╔╝╔══╗ ║║ ╔╗╔═╝║╔══╗ ╚╗╔╝╔══╗╔═╗╔══╗     ║║║║╔══╗╔══╗╔══╗╔══╗╔╗╚╗╔╝
@@ -7,19 +5,15 @@
 // ║╚═╝║║╚═╝║║║║╚╗║╚═╝║║╚═╝║    ║╚╩═║║║═╣║║║║║║═╣╠══║║║╠══║     ╚╗╔╝ ║╚╝╚╗║╚╗║║║╚╝║║╚╝╚╗ ║╚╗║╚╝║║║ ╠══║    ╔╝╚╝║║║═╣║╚╝║║╚╝║╠══║║║ ║╚╗
 // ╚═══╝╚═══╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚══╝╚╝╚╝╚══╝╚══╝╚╝╚══╝      ╚╝  ╚═══╝╚═╝╚╝╚══╝╚═══╝ ╚═╝╚══╝╚╝ ╚══╝    ╚═══╝╚══╝║╔═╝╚══╝╚══╝╚╝ ╚═╝
 
-
 // SPDX-License-Identifier: CC0-1.0
 
 pragma solidity 0.8.15;
-
 
 import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 import {IDepositContract} from "./interfaces/IDepositContract.sol";
 
-
-
-contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
+contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
@@ -48,13 +42,12 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     // The current number of deposits in the contract.
     uint256 internal deposit_count;
 
-
     event DepositEvent(
-      bytes pubkey,
-      bytes withdrawal_credentials,
-      bytes amount,
-      bytes signature,
-      bytes index
+        bytes pubkey,
+        bytes withdrawal_credentials,
+        bytes amount,
+        bytes signature,
+        bytes index
     );
 
     /**
@@ -70,20 +63,19 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     /**
      * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
      */
-    mapping(uint8 => uint256) public supplyVoteCounter;
+    mapping(uint256 => uint256) public supplyVoteCounter;
 
     /**
      * @dev Owner of the contract
      * Has access to `freezeContract()`
      */
-    address public immutable  owner;
+    address public immutable owner;
 
     /**
      * @dev Default value is false which allows people to send 32 LYXe
      * to this contract with valid data in order to register as Genesis Validator
      */
-    bool public  isContractFrozen;
-
+    bool public isContractFrozen;
 
     /**
      * @dev Save the deployer as the owner of the contract
@@ -127,17 +119,28 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
-    ) external  {
+    ) external {
         require(!isContractFrozen, "LUKSOGenesisValidatorsDepositContract: Contract is frozen");
-        require(msg.sender == LYXeAddress, "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer");
-        require(amount == 32 ether, "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe");
+        require(
+            msg.sender == LYXeAddress,
+            "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
+        );
+        require(
+            amount == 32 ether,
+            "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
+        );
         // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
-        require(depositData.length == (209), "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly");
+        require(
+            depositData.length == (209),
+            "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
+        );
 
         uint8 supply = uint8(depositData[208]);
-        require(supply >= 1 && supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
+        require(
+            supply >= 1 && supply <= 100,
+            "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
+        );
         supplyVoteCounter[supply]++;
-
 
         // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
@@ -154,7 +157,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     /**
      * @dev Freze the LUKSO Genesis Deposit Contract
      */
-    function freezeContract() external  {
+    function freezeContract() external {
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
         isContractFrozen = true;
     }
@@ -174,7 +177,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
 
     function getsVotesPerSupply() external view returns (uint256[100] memory, uint256 totalVotes) {
         uint256[100] memory votesPerSupply;
-        for (uint8 i = 0; i < 100; i++) {
+        for (uint256 i = 0; i < 100; i++) {
             votesPerSupply[i] = supplyVoteCounter[i + 1];
         }
         return (votesPerSupply, deposit_count);
@@ -183,7 +186,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     /**
      * @dev Get an array of all excoded deposit data
      */
-    function getDepositData() external view  returns (bytes[] memory returnedArray) {
+    function getDepositData() external view returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
         for (uint256 i = 0; i < deposit_count; i++) returnedArray[i] = deposit_data[i];
     }
@@ -191,7 +194,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     /**
      * @dev Get the encoded deposit data at the `index`
      */
-    function getDepositDataByIndex(uint256 index) external view  returns (bytes memory) {
+    function getDepositDataByIndex(uint256 index) external view returns (bytes memory) {
         return deposit_data[index];
     }
 
@@ -212,7 +215,7 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
      *
      * @return The Merkle root of the deposit data.
      */
-    function get_deposit_root()  external view  returns (bytes32) {
+    function get_deposit_root() external view returns (bytes32) {
         bytes32 node;
         uint256 size = deposit_count;
         for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
@@ -233,7 +236,6 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
     function get_deposit_count() external view returns (bytes memory) {
         return _to_little_endian_64(uint64(deposit_count));
     }
-
 
     /**
      * @dev Processes a deposit and updates the Merkle tree.
@@ -284,7 +286,10 @@ contract LUKSOGenesisValidatorsDepositContract is  IERC165 {
         );
 
         // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(deposit_count < MAX_DEPOSIT_COUNT, "LUKSOGenesisValidatorsDepositContract: merkle tree full");
+        require(
+            deposit_count < MAX_DEPOSIT_COUNT,
+            "LUKSOGenesisValidatorsDepositContract: merkle tree full"
+        );
 
         // Add deposit data root to Merkle tree (update a single `branch` node)
         deposit_count += 1;
