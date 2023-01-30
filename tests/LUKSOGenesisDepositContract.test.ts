@@ -731,21 +731,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
     });
   });
   describe("supplyVote", () => {
-    it("should not let you depsosit with vote with value 0", async () => {
-      const { depositDataHex } = generateDepositData();
-      const supplyVoteByte = "00";
-      const depositDataWithVote = depositDataHex + supplyVoteByte;
 
-      await expect(
-        context.LYXeContract.connect(validators[0]).send(
-          context.depositContract.address,
-          DEPOSIT_AMOUNT,
-          depositDataWithVote
-        )
-      ).to.be.revertedWith(
-        "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
-      );
-    });
     it("should not let you deposit with vote with value 100", async () => {
       const { depositDataHex } = generateDepositData();
       const supplyVoteByte = "ff";
@@ -762,16 +748,15 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       );
     });
     it("should return all supply vote for 100 deposits", async () => {
-      const numberOfDeposits = 100;
-      let supplyVotes = Array(numberOfDeposits).fill(BigNumber.from(0));
+      const numberOfDeposits = 250;
+      let supplyVotes = Array(101).fill(BigNumber.from(0));
 
       for (let i = 0; i < numberOfDeposits; i++) {
         const { depositDataHex } = generateDepositData();
         const supplyVoteByte = generateHexBetweenOneAndOneHundred();
 
-        // removing 1 to index because we start firt accepted supply value is 1 in the smart contract (and not 0)
-        supplyVotes[parseInt(supplyVoteByte, 16) - 1] =
-          supplyVotes[parseInt(supplyVoteByte, 16) - 1].add(1);
+        supplyVotes[parseInt(supplyVoteByte, 16)] =
+          supplyVotes[parseInt(supplyVoteByte, 16)].add(1);
         const depositDataWithVote = depositDataHex + supplyVoteByte;
 
         await context.LYXeContract.connect(validators[0]).send(
@@ -787,5 +772,38 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       expect(fetchedSupplyVotes[0]).to.deep.equal(supplyVotes);
       expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
     });
+    it('should be able to return the number of people not wishing to vote', async () => {
+      const numberOfDeposits = 250;
+      let supplyVotes = Array(101).fill(BigNumber.from(0));
+
+      let numberOf0Votes = 0;
+
+      for (let i = 0; i < numberOfDeposits; i++) {
+        const { depositDataHex } = generateDepositData();
+        const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+
+        if(supplyVoteByte === '00') {
+          numberOf0Votes += 1;
+        }
+
+        supplyVotes[parseInt(supplyVoteByte, 16)] =
+          supplyVotes[parseInt(supplyVoteByte, 16)].add(1);
+        const depositDataWithVote = depositDataHex + supplyVoteByte;
+
+        await context.LYXeContract.connect(validators[0]).send(
+          context.depositContract.address,
+          DEPOSIT_AMOUNT,
+          depositDataWithVote
+        );
+      }
+
+      const fetchedSupplyVotes =
+        await context.depositContract.getsVotesPerSupply();
+
+      expect(fetchedSupplyVotes[0]).to.deep.equal(supplyVotes);
+      expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
+
+      expect(fetchedSupplyVotes[0][0]).to.equal(numberOf0Votes);
+    })
   });
 });
