@@ -1,9 +1,9 @@
-// ╔╗   ╔╗ ╔╗╔╗╔═╗╔═══╗╔═══╗    ╔═══╗                          ╔╗  ╔╗     ╔╗     ╔╗      ╔╗                ╔═══╗                   ╔╗
-// ║║   ║║ ║║║║║╔╝║╔═╗║║╔═╗║    ║╔═╗║                          ║╚╗╔╝║     ║║     ║║     ╔╝╚╗               ╚╗╔╗║                  ╔╝╚╗
-// ║║   ║║ ║║║╚╝╝ ║╚══╗║║ ║║    ║║ ╚╝╔══╗╔═╗ ╔══╗╔══╗╔╗╔══╗    ╚╗║║╔╝╔══╗ ║║ ╔╗╔═╝║╔══╗ ╚╗╔╝╔══╗╔═╗╔══╗     ║║║║╔══╗╔══╗╔══╗╔══╗╔╗╚╗╔╝
-// ║║ ╔╗║║ ║║║╔╗║ ╚══╗║║║ ║║    ║║╔═╗║╔╗║║╔╗╗║╔╗║║══╣╠╣║══╣     ║╚╝║ ╚ ╗║ ║║ ╠╣║╔╗║╚ ╗║  ║║ ║╔╗║║╔╝║══╣     ║║║║║╔╗║║╔╗║║╔╗║║══╣╠╣ ║║
-// ║╚═╝║║╚═╝║║║║╚╗║╚═╝║║╚═╝║    ║╚╩═║║║═╣║║║║║║═╣╠══║║║╠══║     ╚╗╔╝ ║╚╝╚╗║╚╗║║║╚╝║║╚╝╚╗ ║╚╗║╚╝║║║ ╠══║    ╔╝╚╝║║║═╣║╚╝║║╚╝║╠══║║║ ║╚╗
-// ╚═══╝╚═══╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚══╝╚╝╚╝╚══╝╚══╝╚╝╚══╝      ╚╝  ╚═══╝╚═╝╚╝╚══╝╚═══╝ ╚═╝╚══╝╚╝ ╚══╝    ╚═══╝╚══╝║╔═╝╚══╝╚══╝╚╝ ╚═╝
+// ╔╗   ╔╗ ╔╗╔╗╔═╗╔═══╗╔═══╗    ╔═══╗                          ╔╗  ╔╗     ╔╗     ╔╗      ╔╗
+// ║║   ║║ ║║║║║╔╝║╔═╗║║╔═╗║    ║╔═╗║                          ║╚╗╔╝║     ║║     ║║     ╔╝╚╗
+// ║║   ║║ ║║║╚╝╝ ║╚══╗║║ ║║    ║║ ╚╝╔══╗╔═╗ ╔══╗╔══╗╔╗╔══╗    ╚╗║║╔╝╔══╗ ║║ ╔╗╔═╝║╔══╗ ╚╗╔╝╔══╗╔═╗╔══╗
+// ║║ ╔╗║║ ║║║╔╗║ ╚══╗║║║ ║║    ║║╔═╗║╔╗║║╔╗╗║╔╗║║══╣╠╣║══╣     ║╚╝║ ╚ ╗║ ║║ ╠╣║╔╗║╚ ╗║  ║║ ║╔╗║║╔╝║══╣
+// ║╚═╝║║╚═╝║║║║╚╗║╚═╝║║╚═╝║    ║╚╩═║║║═╣║║║║║║═╣╠══║║║╠══║     ╚╗╔╝ ║╚╝╚╗║╚╗║║║╚╝║║╚╝╚╗ ║╚╗║╚╝║║║ ╠══║
+// ╚═══╝╚═══╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚══╝╚╝╚╝╚══╝╚══╝╚╝╚══╝      ╚╝  ╚═══╝╚═╝╚╝╚══╝╚═══╝ ╚═╝╚══╝╚╝ ╚══╝
 
 // SPDX-License-Identifier: CC0-1.0
 
@@ -136,10 +136,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
 
         uint8 supply = uint8(depositData[208]);
-        require(
-            supply >= 1 && supply <= 100,
-            "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
-        );
+        require(supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
         supplyVoteCounter[supply]++;
 
         // Store the deposit data in the contract state.
@@ -175,10 +172,13 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Retrieves an array of votes per supply and the total number of votes
      */
 
-    function getsVotesPerSupply() external view returns (uint256[100] memory, uint256 totalVotes) {
-        uint256[100] memory votesPerSupply;
-        for (uint256 i = 0; i < 100; i++) {
-            votesPerSupply[i] = supplyVoteCounter[i + 1];
+    function getsVotesPerSupply()
+        external
+        view
+        returns (uint256[101] memory votesPerSupply, uint256 totalVotes)
+    {
+        for (uint256 i = 0; i <= 100; i++) {
+            votesPerSupply[i] = supplyVoteCounter[i];
         }
         return (votesPerSupply, deposit_count);
     }
