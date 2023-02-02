@@ -150,6 +150,16 @@ function getDepositDataByIndex(uint256 index) external view returns (bytes memor
 
 The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.
 
+
+### `getsVotesPerSupply` function
+
+```js
+function getsVotesPerSupply() external view returns (uint256[101] memory votesPerSupply, uint256 totalVotes);
+```
+
+The getsVotesPerSupply function retrieves essential information about LYX initial supply votes. It gathers the number of votes per supply and the total number of deposits, which will be used to determine LUKSO's blockchain initial supply voted for by the Genesis Validators.
+
+
 ### `supportsInterface` function
 
 ```js
