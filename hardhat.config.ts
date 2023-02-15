@@ -29,7 +29,7 @@ const config: HardhatUserConfig = {
     },
     l14: {
       url: `https://rpc.l14.lukso.network/`,
-      // url: `http://35.204.226.114:8545`,
+
       accounts: [
         `0xb5da010fdf1766f750ac2e9975b4cc2845131d873dc07ae64c96af6aefc8aafc`,
       ],
@@ -37,7 +37,6 @@ const config: HardhatUserConfig = {
     },
     l2022: {
       url: `https://rpc.2022.l16.lukso.network/`,
-      // url: `http://35.204.226.114:8545`,
       accounts: [
         `0xb5da010fdf1766f750ac2e9975b4cc2845131d873dc07ae64c96af6aefc8aafc`,
       ],

@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
-import { generateDepositData } from "../tests/helpers";
-import { DEPOSIT_AMOUNT } from "../tests/constants";
+import fs from "fs";
 
 async function main() {
   const depositAddress = "0x6f5f4eD871D186B97ceAAeB6Ba250AD21f62B443";
@@ -12,7 +11,10 @@ async function main() {
 
   const depositDatas = await depositContract.getDepositData();
 
-  console.log(depositDatas);
+  // Write the deposit data to a file
+  fs.writeFileSync("depositData.json", JSON.stringify(depositDatas));
+
+  console.log("Deposit data written to depositData.json");
 }
 
 main().catch((error) => {
