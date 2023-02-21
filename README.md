@@ -82,7 +82,7 @@ function freezeContract() external;
 ```
 
 The `freezeContract` function is an external function that is only callable by the `owner` of the smart contract.
-Calling it will change the `contractFrozen` to true. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
+Calling it will freeze the contract 100 blocks after is has been called. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
 
 ### `_deposit` function
 
@@ -150,7 +150,6 @@ function getDepositDataByIndex(uint256 index) external view returns (bytes memor
 
 The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.
 
-
 ### `getsVotesPerSupply` function
 
 ```js
@@ -158,7 +157,6 @@ function getsVotesPerSupply() external view returns (uint256[101] memory votesPe
 ```
 
 The getsVotesPerSupply function retrieves essential information about LYX initial supply votes. It gathers the number of votes per supply and the total number of deposits, which will be used to determine LUKSO's blockchain initial supply voted for by the Genesis Validators.
-
 
 ### `supportsInterface` function
 
