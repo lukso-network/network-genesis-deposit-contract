@@ -118,8 +118,8 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       );
     });
 
-    it("should revert when data's length is smaller than 208", async () => {
-      const data = ethers.utils.hexlify(ethers.utils.randomBytes(207));
+    it("should revert when data's length is smaller than 209", async () => {
+      const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
 
       await expect(
         context.LYXeContract.connect(validators[0]).send(
@@ -676,18 +676,60 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         .freezeContract();
     });
 
-    it("should disallow depositing if contract is frozen", async () => {
-      for (let i = 0; i < validators.length; i++) {
-        await expect(
-          context.LYXeContract.connect(validators[i]).send(
-            context.depositContract.address,
-            DEPOSIT_AMOUNT,
-            validatorsData[i]
-          )
-        ).to.be.revertedWith(
-          "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
-        );
-      }
+    describe("when block.number < freezeBlockNumber", () => {
+      it("should still allow depositing", async () => {
+        const currentBlock = await ethers.provider.getBlockNumber();
+        const freezeBlockNumber =
+          await context.depositContract.freezeBlockNumber();
+        const numBlocksToMine =
+          freezeBlockNumber.toNumber() - currentBlock - 20;
+
+        for (let i = 0; i < numBlocksToMine; i++) {
+          await ethers.provider.send("evm_mine", []);
+        }
+
+        for (let i = 0; i < 10; i++) {
+          await expect(
+            context.LYXeContract.connect(validators[i]).send(
+              context.depositContract.address,
+              DEPOSIT_AMOUNT,
+              validatorsData[i]
+            )
+          ).to.emit(context.depositContract, "DepositEvent");
+        }
+      });
+      describe("when block.number > freezeBlockNumber", () => {
+        it("should disallow depositing if contract is frozen", async () => {
+          const numBlocksToMine = 100;
+
+          for (let i = 0; i < numBlocksToMine; i++) {
+            await ethers.provider.send("evm_mine", []);
+          }
+
+          for (let i = 0; i < validators.length; i++) {
+            await expect(
+              context.LYXeContract.connect(validators[i]).send(
+                context.depositContract.address,
+                DEPOSIT_AMOUNT,
+                validatorsData[i]
+              )
+            ).to.be.revertedWith(
+              "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
+            );
+          }
+        });
+      });
+      describe("should not be able to call `freezeContract(..)` again", () => {
+        it("should revert", async () => {
+          await expect(
+            context.depositContract
+              .connect(context.depositContractOwner)
+              .freezeContract()
+          ).to.be.revertedWith(
+            "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
+          );
+        });
+      });
     });
   });
   describe("supportsInterface", () => {
@@ -731,7 +773,6 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
     });
   });
   describe("supplyVote", () => {
-
     it("should not let you deposit with vote with value 100", async () => {
       const { depositDataHex } = generateDepositData();
       const supplyVoteByte = "ff";
@@ -772,7 +813,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       expect(fetchedSupplyVotes[0]).to.deep.equal(supplyVotes);
       expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
     });
-    it('should be able to return the number of people not wishing to vote', async () => {
+    it("should be able to return the number of people not wishing to vote", async () => {
       const numberOfDeposits = 250;
       let supplyVotes = Array(101).fill(BigNumber.from(0));
 
@@ -782,7 +823,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         const { depositDataHex } = generateDepositData();
         const supplyVoteByte = generateHexBetweenOneAndOneHundred();
 
-        if(supplyVoteByte === '00') {
+        if (supplyVoteByte === "00") {
           numberOf0Votes += 1;
         }
 
@@ -804,6 +845,6 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
 
       expect(fetchedSupplyVotes[0][0]).to.equal(numberOf0Votes);
-    })
+    });
   });
 });
