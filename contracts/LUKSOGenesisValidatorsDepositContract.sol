@@ -42,6 +42,12 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // The current number of deposits in the contract.
     uint256 internal deposit_count;
 
+    // The delay in blocks for the contract to be frozen.
+    uint256 public constant FREEZE_DELAY = 100;
+
+    // The block number when the contract will be frozen.
+    uint256 public freezeBlockNumber;
+
     event DepositEvent(
         bytes pubkey,
         bytes withdrawal_credentials,
@@ -110,7 +116,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      *   • pubkey - the first 48 bytes
      *   • withdrawal_credentials - the following 32 bytes
      *   • signature - the following 96 bytes
-     *   • deposit_data_root - last 32 bytes
+     *   • deposit_data_root - the following 32 bytes
+     *   • supply - that last byte is the initial supply of LYX in million where 0 means non-vote
      */
     function tokensReceived(
         address, /* operator */
@@ -120,7 +127,11 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
-        require(!isContractFrozen, "LUKSOGenesisValidatorsDepositContract: Contract is frozen");
+        uint256 freezeBlockNumberValue = freezeBlockNumber;
+        require(
+            freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
+            "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
+        );
         require(
             msg.sender == LYXeAddress,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
@@ -129,7 +140,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
-        // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
+        // 209 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root + 1 byte for supply
         require(
             depositData.length == (209),
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
@@ -152,11 +163,15 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Freze the LUKSO Genesis Deposit Contract
+     * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
+        require(
+            freezeBlockNumber == 0,
+            "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
+        );
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
-        isContractFrozen = true;
+        freezeBlockNumber = block.number + FREEZE_DELAY;
     }
 
     /**

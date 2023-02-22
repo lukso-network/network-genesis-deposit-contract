@@ -63,17 +63,19 @@ The LYXe token contract is sending `depositData` which will be sliced and passed
 - `withdrawal_credentials` of 32 bytes
 - `signature` of 96 bytes
 - `deposit_data_root` of 32 bytes
+- `supply` of 1 byte
 
 > _Note_: The following checks are performed to ensure a successful deposit:
 
 - the contract should not be _"frozen"_. [See below for more details](#freezeContract-function)
 - `tokensReceived` function MUST be called by the LYXe token contract
 - `amount` value MUST be equal to `32 ether`
-- `depositData.length` MUST be equal to `208`:
+- `depositData.length` MUST be equal to `209`:
   - `pubkey` of 48 bytes
   - `withdrawal_credentials` of 32 bytes
   - `signature` of 96 bytes
   - `deposit_data_root` of 32 bytes
+  - `supply` of 1 byte (value between 0 and 100 where 0 means non-vote)
 
 ### `freezeContract` function
 
@@ -82,7 +84,7 @@ function freezeContract() external;
 ```
 
 The `freezeContract` function is an external function that is only callable by the `owner` of the smart contract.
-Calling it will change the `contractFrozen` to true. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
+Calling it will freeze the contract 100 blocks after is has been called. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
 
 ### `_deposit` function
 
@@ -150,7 +152,6 @@ function getDepositDataByIndex(uint256 index) external view returns (bytes memor
 
 The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.
 
-
 ### `getsVotesPerSupply` function
 
 ```js
@@ -158,7 +159,6 @@ function getsVotesPerSupply() external view returns (uint256[101] memory votesPe
 ```
 
 The getsVotesPerSupply function retrieves essential information about LYX initial supply votes. It gathers the number of votes per supply and the total number of deposits, which will be used to determine LUKSO's blockchain initial supply voted for by the Genesis Validators.
-
 
 ### `supportsInterface` function
 
