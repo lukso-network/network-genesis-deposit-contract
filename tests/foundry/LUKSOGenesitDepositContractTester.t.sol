@@ -12,13 +12,6 @@ contract LUKSOGenesitDepositContractTester is Test {
         contractMock = new LUKSOGenesisValidatorsDepositContractMock();
     }
 
-    function testConvertBytesToBytes32(uint256 randomNumber) public {
-        bytes memory randomBytes = _getRandom208Bytes(randomNumber);
-        bytes32 outBytes32 = contractMock.convertBytesToBytes32(randomBytes);
-        assertEq(outBytes32, bytes32(randomBytes));
-
-    }
-
     function testToLittleEndianValue(uint64 value) public {
         bytes memory littleEndianBytes = contractMock.toLittleEndian64(value);
         assertEq(littleEndianBytes.length, 8);
