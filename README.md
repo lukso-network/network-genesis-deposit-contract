@@ -63,17 +63,19 @@ The LYXe token contract is sending `depositData` which will be sliced and passed
 - `withdrawal_credentials` of 32 bytes
 - `signature` of 96 bytes
 - `deposit_data_root` of 32 bytes
+- `supply` of 1 byte
 
 > _Note_: The following checks are performed to ensure a successful deposit:
 
 - the contract should not be _"frozen"_. [See below for more details](#freezeContract-function)
 - `tokensReceived` function MUST be called by the LYXe token contract
 - `amount` value MUST be equal to `32 ether`
-- `depositData.length` MUST be equal to `208`:
+- `depositData.length` MUST be equal to `209`:
   - `pubkey` of 48 bytes
   - `withdrawal_credentials` of 32 bytes
   - `signature` of 96 bytes
   - `deposit_data_root` of 32 bytes
+  - `supply` of 1 byte (value between 0 and 100 where 0 means non-vote)
 
 ### `freezeContract` function
 

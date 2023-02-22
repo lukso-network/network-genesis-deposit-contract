@@ -118,8 +118,8 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       );
     });
 
-    it("should revert when data's length is smaller than 208", async () => {
-      const data = ethers.utils.hexlify(ethers.utils.randomBytes(207));
+    it("should revert when data's length is smaller than 209", async () => {
+      const data = ethers.utils.hexlify(ethers.utils.randomBytes(208));
 
       await expect(
         context.LYXeContract.connect(validators[0]).send(

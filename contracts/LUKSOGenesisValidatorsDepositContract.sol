@@ -116,7 +116,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      *   • pubkey - the first 48 bytes
      *   • withdrawal_credentials - the following 32 bytes
      *   • signature - the following 96 bytes
-     *   • deposit_data_root - last 32 bytes
+     *   • deposit_data_root - the following 32 bytes
+     *   • supply - that last byte is the initial supply of LYX in million where 0 means non-vote
      */
     function tokensReceived(
         address, /* operator */
@@ -139,7 +140,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
-        // 208 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root
+        // 209 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root + 1 byte for supply
         require(
             depositData.length == (209),
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
