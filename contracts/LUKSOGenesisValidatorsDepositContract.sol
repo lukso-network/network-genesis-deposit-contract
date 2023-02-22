@@ -30,7 +30,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
     uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
-
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant amount_to_little_endian_64 = hex"0040597307000000";
 
@@ -127,7 +126,11 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
-        require(freezeBlockNumber == 0 || block.number < freezeBlockNumber, "LUKSOGenesisValidatorsDepositContract: Contract is frozen");
+        uint256 freezeBlockNumberValue = freezeBlockNumber;
+        require(
+            freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
+            "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
+        );
         require(
             msg.sender == LYXeAddress,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
@@ -162,7 +165,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
-        require(freezeBlockNumber == 0, "LUKSOGenesisValidatorsDepositContract: Contract is already frozen");
+        require(
+            freezeBlockNumber == 0,
+            "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
+        );
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
         freezeBlockNumber = block.number + FREEZE_DELAY;
     }
