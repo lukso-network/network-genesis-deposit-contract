@@ -142,7 +142,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
         // 209 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root + 1 byte for supply
         require(
-            depositData.length == (209),
+            depositData.length == 209,
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
         );
 
@@ -158,7 +158,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             depositData[:48], // pubkey
             depositData[48:80], // withdrawal_credentials
             depositData[80:176], // signature
-            _convertBytesToBytes32(depositData[176:208]) // deposit_data_root
+            bytes32(depositData[176:208]) // deposit_data_root
         );
     }
 
@@ -342,20 +342,4 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         ret[7] = bytesValue[0];
     }
 
-    /**
-     * @dev Converts the first 32 bytes of a byte array to a bytes32 value.
-     *
-     * @param inBytes The byte array to convert.
-     * @return outBytes32 The bytes32 value.
-     */
-    function _convertBytesToBytes32(bytes calldata inBytes)
-        internal
-        pure
-        returns (bytes32 outBytes32)
-    {
-        bytes memory memoryInBytes = inBytes;
-        assembly {
-            outBytes32 := mload(add(memoryInBytes, 32))
-        }
-    }
 }
