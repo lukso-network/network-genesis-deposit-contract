@@ -1,6 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-This document represents the specification for the LUKSO genesis deposit contract.
+This document represents the specification for the LUKSO genesis deposit contract. Modified from [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
 ## Constants
 
@@ -28,7 +28,11 @@ These configurations are updated for releases and may be out of sync during `dev
 
 ## LUKSO genesis deposit contract
 
-The genesis deposit contract will accept LYXe (0xA8b919680258d369114910511cc87595aec0be6D) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+The genesis deposit contract will accept LYXe Tokens (0xA8b919680258d369114910511cc87595aec0be6D) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below. 
+
+People wishing to deposit needs to call the [`send(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function or have an operator call the [`operatorSend(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-operatorSend-address-address-uint256-bytes-bytes-) with passing **[depositData](#depositdata)** as `data` parameter.
+
+> Calling via `transfer(..)` or `transferFrom(..)` will result in a revert of the transaction.
 
 This contract will be used to make deposit in order to become validator on LUKSO's Mainnet chain. Once enough validators have deposited, contract will be frozen and the chain will start.
 
@@ -166,7 +170,7 @@ The getsVotesPerSupply function retrieves essential information about LYX initia
 function supportsInterface(bytes4 interfaceId) external pure returns (bool);
 ```
 
-The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is either the interface ID for ERC165 or the interface ID for the IDepositContract
+The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is either the interface ID for ERC165 or the interface ID for the `IDepositContract` interface. The interfaceId represent the interfaceId of the ETH2 deposit contract to keep all ETH2 deposit tools compatible. 
 
 ### `deposit_count` public state variable
 
