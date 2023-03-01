@@ -62,7 +62,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - pubkey - the first 48 bytes
      * - withdrawal_credentials - the following 32 bytes
      * - signature - the following 96 bytes
-     * - deposit_data_root - last 32 bytes
+     * - deposit_data_root - the following 32 bytes
+     * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote
      */
     mapping(uint256 => bytes) deposit_data;
 
@@ -341,5 +342,4 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         ret[6] = bytesValue[1];
         ret[7] = bytesValue[0];
     }
-
 }
