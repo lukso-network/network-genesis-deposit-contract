@@ -3,8 +3,8 @@ import { generateDepositData } from "../tests/helpers";
 import { DEPOSIT_AMOUNT } from "../tests/constants";
 
 async function main() {
-  const lyxeContractAddress = "0x2e45693F85307A5e7AfB3aA91d53Bbf3324dF9FB";
-  const depositAddress = "0x6f5f4eD871D186B97ceAAeB6Ba250AD21f62B443";
+  const lyxeContractAddress = "0x7A2AC110202ebFdBB5dB15Ea994ba6bFbFcFc215";
+  const depositAddress = "0x75D1f4695Eb87d60eD4EAE2c0CF05e7428Fa4b5F";
 
   const makeDeposit = async (
     lyxeContractAddress: string,

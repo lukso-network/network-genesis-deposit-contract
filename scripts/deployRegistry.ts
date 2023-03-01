@@ -10,7 +10,7 @@ async function main() {
 
   console.log("registryContract deployed to:", registryContract.address);
 
-  // 0xFb1c796d4848Fa100E42507a7954358edFF852cf
+  // 0xa5594Cd0f68eDf204A49B62eaA19Acb6376FE8Ad
 }
 
 main().catch((error) => {
