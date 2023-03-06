@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import fs from "fs";
 
 async function main() {
-  const depositAddress = "0x6f5f4eD871D186B97ceAAeB6Ba250AD21f62B443";
+  const depositAddress = "0x75D1f4695Eb87d60eD4EAE2c0CF05e7428Fa4b5F";
 
   const depositContract = await ethers.getContractAt(
     "DepositMock",
