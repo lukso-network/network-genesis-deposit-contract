@@ -15,6 +15,8 @@ async function main() {
   fs.writeFileSync("depositData.json", JSON.stringify(depositDatas));
 
   console.log("Deposit data written to depositData.json");
+  const numberOfDeposits = await depositContract.depositCount();
+  console.log('number of deposit: ', numberOfDeposits.toString());
 }
 
 main().catch((error) => {
