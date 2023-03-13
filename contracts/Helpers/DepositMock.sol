@@ -18,7 +18,7 @@ contract DepositMock is IERC165 {
     address constant LYXeAddress = 0x7A2AC110202ebFdBB5dB15Ea994ba6bFbFcFc215;
 
     // The address of the registry contract (ERC1820 Registry).
-    address constant registryAddress = 0xa5594Cd0f68eDf204A49B62eaA19Acb6376FE8Ad;
+    address constant registryAddress = 0x03BB0cBbc9dd38b5e7dD32e42c89fB00B61fCCB1;
 
     // The hash of the interface of the contract that receives tokens.
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
@@ -28,7 +28,7 @@ contract DepositMock is IERC165 {
     uint256 constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
 
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
-    uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
+    uint256 constant MAX_DEPOSIT_COUNT = 2 ** DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant amount_to_little_endian_64 = hex"0040597307000000";
@@ -113,9 +113,9 @@ contract DepositMock is IERC165 {
      *   • deposit_data_root - last 32 bytes
      */
     function tokensReceived(
-        address, /* operator */
-        address, /* from */
-        address, /* to */
+        address /* operator */,
+        address /* from */,
+        address /* to */,
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
@@ -333,11 +333,9 @@ contract DepositMock is IERC165 {
      * @param inBytes The byte array to convert.
      * @return outBytes32 The bytes32 value.
      */
-    function _convertBytesToBytes32(bytes calldata inBytes)
-        internal
-        pure
-        returns (bytes32 outBytes32)
-    {
+    function _convertBytesToBytes32(
+        bytes calldata inBytes
+    ) internal pure returns (bytes32 outBytes32) {
         bytes memory memoryInBytes = inBytes;
         assembly {
             outBytes32 := mload(add(memoryInBytes, 32))

@@ -41,11 +41,7 @@ interface IERC777 {
 
     function balanceOf(address owner) external view returns (uint256);
 
-    function send(
-        address recipient,
-        uint256 amount,
-        bytes calldata data
-    ) external;
+    function send(address recipient, uint256 amount, bytes calldata data) external;
 
     function burn(uint256 amount, bytes calldata data) external;
 
@@ -212,24 +208,24 @@ interface IERC1820Registry {
         address implementer
     ) external;
 
-    function getInterfaceImplementer(address account, bytes32 interfaceHash)
-        external
-        view
-        returns (address);
+    function getInterfaceImplementer(
+        address account,
+        bytes32 interfaceHash
+    ) external view returns (address);
 
     function interfaceHash(string calldata interfaceName) external pure returns (bytes32);
 
     function updateERC165Cache(address account, bytes4 interfaceId) external;
 
-    function implementsERC165Interface(address account, bytes4 interfaceId)
-        external
-        view
-        returns (bool);
+    function implementsERC165Interface(
+        address account,
+        bytes4 interfaceId
+    ) external view returns (bool);
 
-    function implementsERC165InterfaceNoCache(address account, bytes4 interfaceId)
-        external
-        view
-        returns (bool);
+    function implementsERC165InterfaceNoCache(
+        address account,
+        bytes4 interfaceId
+    ) external view returns (bool);
 
     event InterfaceImplementerSet(
         address indexed account,
@@ -245,7 +241,7 @@ contract ERC777 is IERC777, IERC20 {
     using Address for address;
 
     IERC1820Registry private _erc1820 =
-        IERC1820Registry(0xa5594Cd0f68eDf204A49B62eaA19Acb6376FE8Ad);
+        IERC1820Registry(0x03BB0cBbc9dd38b5e7dD32e42c89fB00B61fCCB1);
 
     mapping(address => uint256) private _balances;
 
@@ -310,11 +306,7 @@ contract ERC777 is IERC777, IERC20 {
         return _balances[tokenHolder];
     }
 
-    function send(
-        address recipient,
-        uint256 amount,
-        bytes calldata data
-    ) external {
+    function send(address recipient, uint256 amount, bytes calldata data) external {
         _send(msg.sender, msg.sender, recipient, amount, data, "", true);
     }
 
@@ -500,11 +492,7 @@ contract ERC777 is IERC777, IERC20 {
         emit Transfer(from, to, amount);
     }
 
-    function _approve(
-        address holder,
-        address spender,
-        uint256 value
-    ) private {
+    function _approve(address holder, address spender, uint256 value) private {
         require(spender != address(0), "ERC777: approve to the zero address");
 
         _allowances[holder][spender] = value;

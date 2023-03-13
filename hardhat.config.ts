@@ -43,6 +43,13 @@ const config: HardhatUserConfig = {
       ],
       gasPrice: 30000,
     },
+    l3030: {
+      url: `https://rpc.execution.3030.devnet.lukso.dev`,
+      accounts: [
+        `0xbbc6703446945a0d6e1d40d50664da1c37bf51a1383ce165af96ccaa62c8f56e`,
+      ],
+      gasPrice: 30000,
+    },
     sepolia: {
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
       accounts: [
