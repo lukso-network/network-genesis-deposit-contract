@@ -11,6 +11,7 @@ async function main() {
   console.log("registryContract deployed to:", registryContract.address);
 
   // 0xa5594Cd0f68eDf204A49B62eaA19Acb6376FE8Ad
+  // devnet3030 0x03BB0cBbc9dd38b5e7dD32e42c89fB00B61fCCB1
 }
 
 main().catch((error) => {

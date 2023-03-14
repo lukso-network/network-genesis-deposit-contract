@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const lyxeContractAddress = "0x7A2AC110202ebFdBB5dB15Ea994ba6bFbFcFc215";
-  const lyxeReceiver = "0x0eCC079C20DaA9fDE0e26b6d745c0b38479ff200";
+  const lyxeContractAddress = "0x790c4379C82582F569899b3Ca71E78f19AeF82a5";
+  const lyxeReceiver = "0x2ae4B27f7Af291890Edb293D44E195A34B395c9A";
 
   const LYXeContract = await ethers.getContractFactory("ReversibleICOToken");
 
@@ -12,7 +12,7 @@ async function main() {
   console.log('balance before: ', balanceBefore)
 
   // mint 1000 LYXe to the receiver
-  const tx = await lyxeContract.send(lyxeReceiver, ethers.utils.parseEther('1000'), "0x");
+  const tx = await lyxeContract.send(lyxeReceiver, ethers.utils.parseEther('9600'), "0x");
   await tx.wait();
 
   const balance = await lyxeContract.balanceOf(lyxeReceiver);
