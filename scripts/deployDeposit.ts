@@ -24,7 +24,7 @@ async function main() {
     depositContract.address
   );
 
-  // 0xa5594Cd0f68eDf204A49B62eaA19Acb6376FE8Ad
+  // 0x9C2Ae5bC047Ca794d9388aB7A2Bf37778f9aBA73
 }
 
 main().catch((error) => {

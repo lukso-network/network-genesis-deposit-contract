@@ -15,7 +15,7 @@ import {IDepositContract} from "../interfaces/IDepositContract.sol";
 
 contract DepositMock is IERC165 {
     // The address of the LYXe token contract.
-    address constant LYXeAddress = 0x7A2AC110202ebFdBB5dB15Ea994ba6bFbFcFc215;
+    address constant LYXeAddress = 0x790c4379C82582F569899b3Ca71E78f19AeF82a5;
 
     // The address of the registry contract (ERC1820 Registry).
     address constant registryAddress = 0x03BB0cBbc9dd38b5e7dD32e42c89fB00B61fCCB1;

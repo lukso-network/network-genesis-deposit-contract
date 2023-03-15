@@ -39,7 +39,7 @@ const config: HardhatUserConfig = {
     l2022: {
       url: `https://rpc.2022.l16.lukso.network/`,
       accounts: [
-        `0xb5da010fdf1766f750ac2e9975b4cc2845131d873dc07ae64c96af6aefc8aafc`,
+        `0xbbc6703446945a0d6e1d40d50664da1c37bf51a1383ce165af96ccaa62c8f56e`,
       ],
       gasPrice: 30000,
     },
