@@ -28,7 +28,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     uint256 constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
 
     // NOTE: this also ensures `deposit_count` will fit into 64-bits
-    uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
+    uint256 constant MAX_DEPOSIT_COUNT = 2 ** DEPOSIT_CONTRACT_TREE_DEPTH - 1;
 
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant amount_to_little_endian_64 = hex"0040597307000000";
@@ -113,9 +113,9 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      *   • deposit_data_root - last 32 bytes
      */
     function tokensReceived(
-        address, /* operator */
-        address, /* from */
-        address, /* to */
+        address /* operator */,
+        address /* from */,
+        address /* to */,
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
@@ -333,11 +333,9 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @param inBytes The byte array to convert.
      * @return outBytes32 The bytes32 value.
      */
-    function _convertBytesToBytes32(bytes calldata inBytes)
-        internal
-        pure
-        returns (bytes32 outBytes32)
-    {
+    function _convertBytesToBytes32(
+        bytes calldata inBytes
+    ) internal pure returns (bytes32 outBytes32) {
         bytes memory memoryInBytes = inBytes;
         assembly {
             outBytes32 := mload(add(memoryInBytes, 32))

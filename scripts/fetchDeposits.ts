@@ -43,8 +43,12 @@ async function main() {
   );
 
   const depositDatas = await depositContract.getDepositData();
+  //consoel.log last value of depositDatas is the number of deposits
+  console.log(depositDatas[depositDatas.length - 1].toString());
   const jsonData = parseData(depositDatas);
-
+  // last array of depositData
+  const lastDepositData = jsonData[jsonData.length - 1];
+  console.log(lastDepositData);
   fs.writeFile('depositData.json', JSON.stringify(jsonData, null, 2), (err) => {
     if (err) {
       console.error('Error writing file:', err);
