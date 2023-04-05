@@ -115,25 +115,30 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
+
         uint256 freezeBlockNumberValue = freezeBlockNumber;
+
         require(
             freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
             "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
         );
+
         require(
             msg.sender == LYXeAddress,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
         );
+
         require(
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
+
         require(
             depositData.length == 209,
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
         );
 
-        uint8 supply = uint8(depositData[208]);
+        uint256 supply = uint256(uint8(depositData[208]));
         require(supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
         supplyVoteCounter[supply]++;
 
@@ -179,7 +184,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
         );
 
-                // Emit `DepositEvent` log
+        // Emit `DepositEvent` log
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
