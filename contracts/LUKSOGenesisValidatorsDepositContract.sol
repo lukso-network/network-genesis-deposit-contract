@@ -62,7 +62,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     /**
      * @dev Storing the hash of the public key in order to check if it is already registered
     */
-    mapping(bytes32 => bool) public isHashOfPubkeyRegistered;
+    mapping(bytes32 => bool) private _isHashOfPubkeyRegistered;
 
     /**
      * @dev Owner of the contract
@@ -149,14 +149,15 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata signature = depositData[80:176];
         bytes32 deposit_data_root = bytes32(depositData[176:208]);
 
+        bytes32 pubKeyHash = keccak256(pubkey);
+
         require(
-            !isHashOfPubkeyRegistered[keccak256(pubkey)],
+            !_isHashOfPubkeyRegistered[pubKeyHash],
             "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
         );
 
-
         // Mark the pubkey as registered
-        isHashOfPubkeyRegistered[keccak256(pubkey)] = true;
+        _isHashOfPubkeyRegistered[pubKeyHash] = true;
 
         // Compute deposit data root (`DepositData` hash tree root)
         bytes32 pubkey_root = keccak256(abi.encodePacked(pubkey, bytes16(0)));
@@ -215,7 +216,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @return bool Whether the pubkey is registered or not.
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
-        return isHashOfPubkeyRegistered[keccak256(pubkey)];
+        return _isHashOfPubkeyRegistered[keccak256(pubkey)];
     }
 
     /**
