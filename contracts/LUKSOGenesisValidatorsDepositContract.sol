@@ -11,7 +11,6 @@ pragma solidity 0.8.15;
 
 import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
-import {IDepositContract} from "./interfaces/IDepositContract.sol";
 
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // The address of the LYXe token contract.
