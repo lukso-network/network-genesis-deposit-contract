@@ -150,30 +150,30 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes32 deposit_data_root = bytes32(depositData[176:208]);
 
         require(
-            !isHashOfPubkeyRegistered[sha256(pubkey)],
+            !isHashOfPubkeyRegistered[keccak256(pubkey)],
             "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
         );
 
 
         // Mark the pubkey as registered
-        isHashOfPubkeyRegistered[sha256(pubkey)] = true;
+        isHashOfPubkeyRegistered[keccak256(pubkey)] = true;
 
         // Compute deposit data root (`DepositData` hash tree root)
-        bytes32 pubkey_root = sha256(abi.encodePacked(pubkey, bytes16(0)));
+        bytes32 pubkey_root = keccak256(abi.encodePacked(pubkey, bytes16(0)));
 
         // Compute the root of the signature data.
-        bytes32 signature_root = sha256(
+        bytes32 signature_root = keccak256(
             abi.encodePacked(
-                sha256(abi.encodePacked(signature[:64])),
-                sha256(abi.encodePacked(signature[64:], bytes32(0)))
+                keccak256(abi.encodePacked(signature[:64])),
+                keccak256(abi.encodePacked(signature[64:], bytes32(0)))
             )
         );
 
         // Compute the root of the deposit data.
-        bytes32 node = sha256(
+        bytes32 node = keccak256(
             abi.encodePacked(
-                sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                sha256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
+                keccak256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
+                keccak256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
             )
         );
 
@@ -215,7 +215,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @return bool Whether the pubkey is registered or not.
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
-        return isHashOfPubkeyRegistered[sha256(pubkey)];
+        return isHashOfPubkeyRegistered[keccak256(pubkey)];
     }
 
     /**
