@@ -26,7 +26,7 @@ These configurations are updated for releases and may be out of sync during `dev
 
 ## LUKSO genesis deposit contract
 
-The genesis deposit contract will accept LYXe Tokens (0xA8b919680258d369114910511cc87595aec0be6D) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+The genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
 
 People wishing to deposit needs to call the [`send(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function or have an operator call the [`operatorSend(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-operatorSend-address-address-uint256-bytes-bytes-) with passing **[depositData](#depositdata)** as `data` parameter.
 

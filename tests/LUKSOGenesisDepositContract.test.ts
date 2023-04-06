@@ -214,11 +214,9 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         validatorsData[0]
       );
 
-      await expect(secondDepositTx)
-        .to.emit(context.depositContract, "DepositEvent")
-        .to.be.revertedWith(
-          "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
-        );
+      await expect(secondDepositTx).to.be.revertedWith(
+        "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
+      );
     });
   });
 

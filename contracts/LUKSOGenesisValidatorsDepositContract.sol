@@ -52,7 +52,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - deposit_data_root - the following 32 bytes
      * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote
      */
-    mapping(uint256 => bytes) deposit_data;
+    mapping(uint256 => bytes) internal deposit_data;
 
     /**
      * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
@@ -80,6 +80,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Save the deployer as the owner of the contract
      */
     constructor(address owner_) {
+
+        require(owner_ != address(0), "LUKSOGenesisValidatorsDepositContract: owner cannot be zero address");
         owner = owner_;
 
         isContractFrozen = false;
