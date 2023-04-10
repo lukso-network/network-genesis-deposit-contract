@@ -1,6 +1,7 @@
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
+import { mine } from "@nomicfoundation/hardhat-network-helpers";
 
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -9,13 +10,11 @@ import {
   LUKSOGenesisValidatorsDepositContract,
   ReversibleICOToken,
   IERC165__factory,
-  IDepositContract__factory,
 } from "../types";
 
 // helpers
 import {
   generateDepositData,
-  getMerkleTreeRoot,
   getInterfaceID,
   toLittleEndian64,
   generateHexBetweenOneAndOneHundred,
@@ -559,9 +558,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         const numBlocksToMine =
           freezeBlockNumber.toNumber() - currentBlock - 20;
 
-        for (let i = 0; i < numBlocksToMine; i++) {
-          await ethers.provider.send("evm_mine", []);
-        }
+        await mine(numBlocksToMine);
 
         await expect(
           context.LYXeContract.connect(validators[1]).send(
@@ -583,9 +580,9 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         it("should disallow depositing if contract is frozen", async () => {
           const numBlocksToMine = 46523;
 
-          for (let i = 0; i < numBlocksToMine; i++) {
-            await ethers.provider.send("evm_mine", []);
-          }
+          await mine(numBlocksToMine);
+
+          network;
 
           for (let i = 0; i < validators.length; i++) {
             await expect(
