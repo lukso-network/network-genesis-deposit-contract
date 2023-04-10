@@ -187,7 +187,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           "0x" + validatorsData[0].substring(98, 162),
           amount_to_little_endian_64,
           "0x" + validatorsData[0].substring(162, 354),
-          toLittleEndian64(ethers.utils.hexlify(0))
+          0
         );
     });
 
@@ -205,7 +205,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           "0x" + validatorsData[0].substring(98, 162),
           amount_to_little_endian_64,
           "0x" + validatorsData[0].substring(162, 354),
-          toLittleEndian64(ethers.utils.hexlify(0))
+          0
         );
 
       const secondDepositTx = context.LYXeContract.connect(validators[0]).send(
@@ -235,7 +235,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           "0x" + validatorsData[0].substring(98, 162),
           amount_to_little_endian_64,
           "0x" + validatorsData[0].substring(162, 354),
-          toLittleEndian64(ethers.utils.hexlify(0))
+          0
         );
 
       expect(await context.depositContract.depositCount()).to.equal(1);
@@ -258,7 +258,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
 
         expect(await context.depositContract.depositCount()).to.equal(i + 1);
@@ -282,7 +282,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
 
         expect(await context.depositContract.depositCount()).to.equal(i + 1);
@@ -306,7 +306,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
 
         expect(await context.depositContract.depositCount()).to.equal(i + 1);
@@ -331,7 +331,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           "0x" + validatorsData[0].substring(98, 162),
           amount_to_little_endian_64,
           "0x" + validatorsData[0].substring(162, 354),
-          toLittleEndian64(ethers.utils.hexlify(0))
+          0
         );
 
       const expectedDepositedData = [validatorsData[0]];
@@ -359,7 +359,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -386,7 +386,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -413,7 +413,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -438,7 +438,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           "0x" + validatorsData[0].substring(98, 162),
           amount_to_little_endian_64,
           "0x" + validatorsData[0].substring(162, 354),
-          toLittleEndian64(ethers.utils.hexlify(0))
+          0
         );
 
       expect(
@@ -461,7 +461,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -488,7 +488,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -518,7 +518,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
             "0x" + validatorsData[i].substring(98, 162),
             amount_to_little_endian_64,
             "0x" + validatorsData[i].substring(162, 354),
-            toLittleEndian64(ethers.utils.hexlify(i))
+            i
           );
       }
 
@@ -539,9 +539,16 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
 
   describe("when using `freezeContract(..)`", () => {
     beforeEach(async () => {
-      await context.depositContract
-        .connect(context.depositContractOwner)
-        .freezeContract();
+      const currentBlock = await ethers.provider.getBlockNumber();
+      const freezeBlockNumber = currentBlock + 46523;
+
+      await expect(
+        await context.depositContract
+          .connect(context.depositContractOwner)
+          .freezeContract()
+      )
+        .to.emit(context.depositContract, "FreezeInitiated")
+        .withArgs(currentBlock + 1, freezeBlockNumber + 1); // +1 because of the block that will be mined after the tx
     });
 
     describe("when block.number < freezeBlockNumber", () => {
@@ -556,19 +563,25 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           await ethers.provider.send("evm_mine", []);
         }
 
-        for (let i = 0; i < 10; i++) {
-          await expect(
-            context.LYXeContract.connect(validators[i]).send(
-              context.depositContract.address,
-              DEPOSIT_AMOUNT,
-              validatorsData[i]
-            )
-          ).to.emit(context.depositContract, "DepositEvent");
-        }
+        await expect(
+          context.LYXeContract.connect(validators[1]).send(
+            context.depositContract.address,
+            DEPOSIT_AMOUNT,
+            validatorsData[1]
+          )
+        )
+          .to.emit(context.depositContract, "DepositEvent")
+          .withArgs(
+            "0x" + validatorsData[1].substring(2, 98),
+            "0x" + validatorsData[1].substring(98, 162),
+            amount_to_little_endian_64,
+            "0x" + validatorsData[1].substring(162, 354),
+            0
+          );
       });
       describe("when block.number > freezeBlockNumber", () => {
         it("should disallow depositing if contract is frozen", async () => {
-          const numBlocksToMine = 100;
+          const numBlocksToMine = 46523;
 
           for (let i = 0; i < numBlocksToMine; i++) {
             await ethers.provider.send("evm_mine", []);
@@ -631,7 +644,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
           depositDataWithVote
         )
       ).to.be.revertedWith(
-        "LUKSOGenesisValidatorsDepositContract: Invalid supply vote"
+        "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote"
       );
     });
     it("should return all supply vote for 100 deposits", async () => {
