@@ -1,6 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-This document represents the specification for the LUKSO genesis deposit contract.
+This document represents the specification for the LUKSO genesis deposit contract. Modified from [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
 ## Constants
 
@@ -8,8 +8,6 @@ The following values are (non-configurable) constants used throughout the specif
 
 | Name                                 | Value                                                                  |
 | ------------------------------------ | ---------------------------------------------------------------------- |
-| `DEPOSIT_CONTRACT_TREE_DEPTH`        | `2**5` (= 32)                                                          |
-| `MAX_DEPOSIT_COUNT`                  | `2**DEPOSIT_CONTRACT_TREE_DEPTH - 1`                                   |
 | `amount_to_little_endian_64`         | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei) |
 | `registryAddress` (ERC1820 Registry) | `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`                           |
 | `TOKENS_RECIPIENT_INTERFACE_HASH`    | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`   |
@@ -28,7 +26,11 @@ These configurations are updated for releases and may be out of sync during `dev
 
 ## LUKSO genesis deposit contract
 
-The genesis deposit contract will accept LYXe (0xA8b919680258d369114910511cc87595aec0be6D) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+The genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`) only. The contract is notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+
+People wishing to deposit needs to call the [`send(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function or have an operator call the [`operatorSend(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-operatorSend-address-address-uint256-bytes-bytes-) with passing **[depositData](#depositdata)** as `data` parameter.
+
+> Calling via `transfer(..)` or `transferFrom(..)` will result in a revert of the transaction.
 
 This contract will be used to make deposit in order to become validator on LUKSO's Mainnet chain. Once enough validators have deposited, contract will be frozen and the chain will start.
 
@@ -63,47 +65,19 @@ The LYXe token contract is sending `depositData` which will be sliced and passed
 - `withdrawal_credentials` of 32 bytes
 - `signature` of 96 bytes
 - `deposit_data_root` of 32 bytes
+- `supply` of 1 byte
 
 > _Note_: The following checks are performed to ensure a successful deposit:
 
 - the contract should not be _"frozen"_. [See below for more details](#freezeContract-function)
 - `tokensReceived` function MUST be called by the LYXe token contract
 - `amount` value MUST be equal to `32 ether`
-- `depositData.length` MUST be equal to `208`:
+- `depositData.length` MUST be equal to `209`:
   - `pubkey` of 48 bytes
   - `withdrawal_credentials` of 32 bytes
   - `signature` of 96 bytes
   - `deposit_data_root` of 32 bytes
-
-### `freezeContract` function
-
-```js
-function freezeContract() external;
-```
-
-The `freezeContract` function is an external function that is only callable by the `owner` of the smart contract.
-Calling it will change the `contractFrozen` to true. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
-
-### `_deposit` function
-
-```js
-function _deposit(
-        bytes calldata pubkey,
-        bytes calldata withdrawal_credentials,
-        bytes calldata signature,
-        bytes32 deposit_data_root
-    ) internal
-```
-
-The deposit contract has a internal `_deposit` function to make deposits.
-It takes as arguments:
-
-- `bytes calldata pubkey`
-- `bytes calldata withdrawal_credentials`
-- `bytes calldata signature`
-- `bytes32 deposit_data_root`
-
-The first three arguments are used to create an object called `DepositData`. The fourth argument, `deposit_data_root`, is the expected "root" of the DepositData object and is used as a way to protect against malformatted data being passed to the function.
+  - `supply` of 1 byte (value between 0 and 100 where 0 means non-vote)
 
 #### Public key
 
@@ -126,13 +100,14 @@ One of the `DepositData` fields is `signature`. It represents a `Bytes96` a BLS1
 
 Every deposit emits a `DepositEvent` log for consumption by LUKSO's mainnet chain. The LUKSO genesis deposit contract does little validation, pushing most of the validator onboarding logic to LUKSO's mainnet chain. In particular, the proof of possession (a BLS12-381 signature) is not verified by the deposit contract.
 
-### `get_deposit_count` function
+### `freezeContract` function
 
 ```js
-function get_deposit_count() external view returns (bytes memory);
+function freezeContract() external;
 ```
 
-The `get_deposit_count` function get the current deposit count and converts it to a little endian representation of 64-bit values.
+The `freezeContract` function is an external function that is only callable by the `owner` of the smart contract.
+Calling it will freeze the contract 100 blocks after is has been called. This cannot be reversed, it will prevent any further calls to the `tokensReceived` function and block any additional deposits.
 
 ### `getDepositData` function
 
@@ -150,7 +125,6 @@ function getDepositDataByIndex(uint256 index) external view returns (bytes memor
 
 The function returns the deposit data at the specified index which is then used to create a new validator in LUKSO's mainnet chain.
 
-
 ### `getsVotesPerSupply` function
 
 ```js
@@ -159,6 +133,13 @@ function getsVotesPerSupply() external view returns (uint256[101] memory votesPe
 
 The getsVotesPerSupply function retrieves essential information about LYX initial supply votes. It gathers the number of votes per supply and the total number of deposits, which will be used to determine LUKSO's blockchain initial supply voted for by the Genesis Validators.
 
+### `isPubkeyRegistered` public view function
+
+This public view function called isPubkeyRegistered accepts a public key as input and checks whether the given public key is registered or not. It calculates the hash of the provided public key and looks up the result in the isHashOfPubkeyRegistered mapping, which stores whether the hash of a public key is registered. The function returns a boolean value, where true indicates that the public key is registered, and false otherwise.
+
+### depositCount public view function
+
+This public view function called depositCount returns the current number of deposits made to the contract. It retrieves the value from the deposit_count state variable, which is incremented each time a new deposit is successfully processed. This function can be useful for querying the total number of deposits made to the contract.
 
 ### `supportsInterface` function
 
@@ -166,11 +147,7 @@ The getsVotesPerSupply function retrieves essential information about LYX initia
 function supportsInterface(bytes4 interfaceId) external pure returns (bool);
 ```
 
-The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is either the interface ID for ERC165 or the interface ID for the IDepositContract
-
-### `deposit_count` public state variable
-
-The `deposit_count` state variable is used to store the number of deposits that have been made. Since the variable is public, it comes with a getter that will return the number of deposits .
+The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is the interface ID for ERC165.
 
 ### `owner` public immutable variable
 

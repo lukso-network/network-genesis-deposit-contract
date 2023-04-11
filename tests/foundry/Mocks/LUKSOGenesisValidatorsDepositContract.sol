@@ -3,16 +3,6 @@ pragma solidity 0.8.15;
 
 
 contract LUKSOGenesisValidatorsDepositContractMock {
-    function convertBytesToBytes32(bytes memory inBytes)
-        public
-        pure
-        returns (bytes32 outBytes32)
-    {
-        bytes memory memoryInBytes = inBytes;
-        assembly {
-            outBytes32 := mload(add(memoryInBytes, 32))
-        }
-    }
 
     function toLittleEndian64(uint64 value) public pure returns (bytes memory ret) {
         ret = new bytes(8);

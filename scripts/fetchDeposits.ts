@@ -34,6 +34,7 @@ function parseData(data: string[]): DepositData[] {
 }
 
 async function main() {
+  // Todo: replace with LUKSOGenesisDeposit contract's address on Ethereum
   const depositAddress = "0x9C2Ae5bC047Ca794d9388aB7A2Bf37778f9aBA73";
 
   const depositContract = await ethers.getContractAt(
@@ -42,12 +43,9 @@ async function main() {
   );
 
   const depositDatas = await depositContract.getDepositData();
-  //consoel.log last value of depositDatas is the number of deposits
-  console.log(depositDatas[depositDatas.length - 1].toString());
+
   const jsonData = parseData(depositDatas);
-  // last array of depositData
-  const lastDepositData = jsonData[jsonData.length - 1];
-  console.log(lastDepositData);
+
   fs.writeFile("depositData.json", JSON.stringify(jsonData, null, 2), (err) => {
     if (err) {
       console.error("Error writing file:", err);
@@ -57,8 +55,6 @@ async function main() {
   });
 
   console.log("Deposit data written to depositData.json");
-  const numberOfDeposits = await depositContract.depositCount();
-  console.log("number of deposit: ", numberOfDeposits.toString());
 }
 
 main().catch((error) => {

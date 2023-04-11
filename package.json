@@ -13,6 +13,7 @@
     "typechain": "^8.1.1"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@typechain/ethers-v5": "^10.0.0",
     "@typechain/hardhat": "^6.1.4",
