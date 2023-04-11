@@ -4,7 +4,7 @@ import { DEPOSIT_AMOUNT } from "../tests/constants";
 
 async function main() {
   const lyxeContractAddress = "0x4455916E64552A0D20047b4F440ADACABAC190CD";
-  const depositAddress = "0xFE9B0927ADA6b1Bfaa0BF05dC271ba13B9047402";
+  const depositAddress = "0x62119e501fc410130F7a0dA51052f835993ce0fA";
 
   const makeDeposit = async (
     lyxeContractAddress: string,

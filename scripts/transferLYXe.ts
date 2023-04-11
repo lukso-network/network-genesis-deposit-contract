@@ -9,10 +9,14 @@ async function main() {
   const lyxeContract = LYXeContract.attach(lyxeContractAddress);
 
   const balanceBefore = await lyxeContract.balanceOf(lyxeReceiver);
-  console.log('balance before: ', balanceBefore)
+  console.log("balance before: ", balanceBefore);
 
   // mint 1000 LYXe to the receiver
-  const tx = await lyxeContract.send(lyxeReceiver, ethers.utils.parseEther('1000000'), "0x");
+  const tx = await lyxeContract.send(
+    lyxeReceiver,
+    ethers.utils.parseEther("1000000"),
+    "0x"
+  );
   await tx.wait();
 
   const balance = await lyxeContract.balanceOf(lyxeReceiver);
