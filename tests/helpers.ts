@@ -5,20 +5,20 @@ const generateDepositDataRoot = (
   withdrawal_credentials: string,
   signature: string
 ) => {
-  const pubkey_root = ethers.utils.sha256(
+  const pubkey_root = ethers.utils.keccak256(
     ethers.utils.solidityPack(
       ["bytes", "bytes16"],
       [pubkey, "0x" + "0".repeat(32)]
     )
   );
-  const signature_root = ethers.utils.sha256(
+  const signature_root = ethers.utils.keccak256(
     ethers.utils.solidityPack(
       ["bytes32", "bytes32"],
       [
-        ethers.utils.sha256(
+        ethers.utils.keccak256(
           ethers.utils.solidityPack(["bytes"], [signature.substring(0, 130)])
         ),
-        ethers.utils.sha256(
+        ethers.utils.keccak256(
           ethers.utils.solidityPack(
             ["bytes", "bytes32"],
             ["0x" + signature.substring(130, 194), "0x" + "0".repeat(64)]
@@ -27,17 +27,17 @@ const generateDepositDataRoot = (
       ]
     )
   );
-  const node = ethers.utils.sha256(
+  const node = ethers.utils.keccak256(
     ethers.utils.solidityPack(
       ["bytes32", "bytes32"],
       [
-        ethers.utils.sha256(
+        ethers.utils.keccak256(
           ethers.utils.solidityPack(
             ["bytes32", "bytes"],
             [pubkey_root, withdrawal_credentials]
           )
         ),
-        ethers.utils.sha256(
+        ethers.utils.keccak256(
           ethers.utils.solidityPack(
             ["bytes", "bytes24", "bytes32"],
             ["0x0040597307000000", "0x" + "0".repeat(48), signature_root]
@@ -85,7 +85,7 @@ export const generateMerkleTreeBranch = (orderedDataAdded: string[]) => {
         branch[height] = node;
         break;
       }
-      node = ethers.utils.sha256(
+      node = ethers.utils.keccak256(
         ethers.utils.solidityPack(
           ["bytes32", "bytes32"],
           [branch[height], node]
@@ -110,7 +110,7 @@ export const getMerkleTreeRoot = (orderedDataArray: string[]) => {
     zero_hashes[height] = "0x" + "0".repeat(64);
   }
   for (let height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 1; height++) {
-    zero_hashes[height + 1] = ethers.utils.sha256(
+    zero_hashes[height + 1] = ethers.utils.keccak256(
       ethers.utils.solidityPack(
         ["bytes32", "bytes32"],
         [zero_hashes[height], zero_hashes[height]]
@@ -123,14 +123,14 @@ export const getMerkleTreeRoot = (orderedDataArray: string[]) => {
 
   for (let height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
     if ((size & 1) == 1) {
-      node = ethers.utils.sha256(
+      node = ethers.utils.keccak256(
         ethers.utils.solidityPack(
           ["bytes32", "bytes32"],
           [branch[height], node]
         )
       );
     } else {
-      node = ethers.utils.sha256(
+      node = ethers.utils.keccak256(
         ethers.utils.solidityPack(
           ["bytes32", "bytes32"],
           [node, zero_hashes[height]]
@@ -140,7 +140,7 @@ export const getMerkleTreeRoot = (orderedDataArray: string[]) => {
     size /= 2;
   }
 
-  return ethers.utils.sha256(
+  return ethers.utils.keccak256(
     ethers.utils.solidityPack(
       ["bytes32", "bytes", "bytes24"],
       [

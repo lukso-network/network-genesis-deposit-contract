@@ -1,9 +1,10 @@
-// ╔╗   ╔╗ ╔╗╔╗╔═╗╔═══╗╔═══╗    ╔═══╗                          ╔╗  ╔╗     ╔╗     ╔╗      ╔╗
-// ║║   ║║ ║║║║║╔╝║╔═╗║║╔═╗║    ║╔═╗║                          ║╚╗╔╝║     ║║     ║║     ╔╝╚╗
-// ║║   ║║ ║║║╚╝╝ ║╚══╗║║ ║║    ║║ ╚╝╔══╗╔═╗ ╔══╗╔══╗╔╗╔══╗    ╚╗║║╔╝╔══╗ ║║ ╔╗╔═╝║╔══╗ ╚╗╔╝╔══╗╔═╗╔══╗
-// ║║ ╔╗║║ ║║║╔╗║ ╚══╗║║║ ║║    ║║╔═╗║╔╗║║╔╗╗║╔╗║║══╣╠╣║══╣     ║╚╝║ ╚ ╗║ ║║ ╠╣║╔╗║╚ ╗║  ║║ ║╔╗║║╔╝║══╣
-// ║╚═╝║║╚═╝║║║║╚╗║╚═╝║║╚═╝║    ║╚╩═║║║═╣║║║║║║═╣╠══║║║╠══║     ╚╗╔╝ ║╚╝╚╗║╚╗║║║╚╝║║╚╝╚╗ ║╚╗║╚╝║║║ ╠══║
-// ╚═══╝╚═══╝╚╝╚═╝╚═══╝╚═══╝    ╚═══╝╚══╝╚╝╚╝╚══╝╚══╝╚╝╚══╝      ╚╝  ╚═══╝╚═╝╚╝╚══╝╚═══╝ ╚═╝╚══╝╚╝ ╚══╝
+ //  _    _   _ _  ______   ___     ____                      _      __     __    _ _     _       _
+ // | |  | | | | |/ / ___| / _ \   / ___| ___ _ __   ___  ___(_)___  \ \   / /_ _| (_) __| | __ _| |_ ___  _ __ ___
+ // | |  | | | | ' /\___ \| | | | | |  _ / _ \ '_ \ / _ \/ __| / __|  \ \ / / _` | | |/ _` |/ _` | __/ _ \| '__/ __|
+ // | |__| |_| | . \ ___) | |_| | | |_| |  __/ | | |  __/\__ \ \__ \   \ V / (_| | | | (_| | (_| | || (_) | |  \__ \
+ // |_____\___/|_|\_\____/ \___/   \____|\___|_| |_|\___||___/_|___/    \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|  |___/
+
+
 
 // SPDX-License-Identifier: CC0-1.0
 
@@ -11,7 +12,6 @@ pragma solidity 0.8.15;
 
 import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
-import {IDepositContract} from "./interfaces/IDepositContract.sol";
 
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // The address of the LYXe token contract.
@@ -24,26 +24,14 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
-    // The depth of the Merkle tree of deposits.
-    uint256 constant DEPOSIT_CONTRACT_TREE_DEPTH = 32;
-
-    // NOTE: this also ensures `deposit_count` will fit into 64-bits
-    uint256 constant MAX_DEPOSIT_COUNT = 2**DEPOSIT_CONTRACT_TREE_DEPTH - 1;
-
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant amount_to_little_endian_64 = hex"0040597307000000";
-
-    // The current state of the Merkle tree of deposits.
-    bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] branch;
-
-    // A pre-computed array of zero hashes for use in computing the Merkle root.
-    bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
     // The current number of deposits in the contract.
     uint256 internal deposit_count;
 
-    // The delay in blocks for the contract to be frozen.
-    uint256 public constant FREEZE_DELAY = 100;
+    // The delay in blocks for the contract to be frozen (46 523 blocks ~ 1 week)
+    uint256 public constant FREEZE_DELAY = 46_523;
 
     // The block number when the contract will be frozen.
     uint256 public freezeBlockNumber;
@@ -53,8 +41,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes withdrawal_credentials,
         bytes amount,
         bytes signature,
-        bytes index
+        uint256 index
     );
+
+    event FreezeInitiated(uint256 initiatedAt, uint256 freezeAt);
 
     /**
      * @dev Storing all the deposit data which should be sliced
@@ -65,12 +55,17 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - deposit_data_root - the following 32 bytes
      * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote
      */
-    mapping(uint256 => bytes) deposit_data;
+    mapping(uint256 => bytes) internal deposit_data;
 
     /**
      * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
      */
     mapping(uint256 => uint256) public supplyVoteCounter;
+
+    /**
+     * @dev Storing the hash of the public key in order to check if it is already registered
+    */
+    mapping(bytes32 => bool) private _registeredPubKeyHash;
 
     /**
      * @dev Owner of the contract
@@ -88,6 +83,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Save the deployer as the owner of the contract
      */
     constructor(address owner_) {
+
+        require(owner_ != address(0), "LUKSOGenesisValidatorsDepositContract: owner cannot be zero address");
         owner = owner_;
 
         isContractFrozen = false;
@@ -98,12 +95,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             TOKENS_RECIPIENT_INTERFACE_HASH,
             address(this)
         );
-
-        // Compute hashes in empty sparse Merkle tree
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH - 1; height++)
-            zero_hashes[height + 1] = sha256(
-                abi.encodePacked(zero_hashes[height], zero_hashes[height])
-            );
     }
 
     /**
@@ -128,51 +119,122 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
+
         uint256 freezeBlockNumberValue = freezeBlockNumber;
+
+        // Check if the contract is frozen
         require(
             freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
             "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
         );
+        // Check is the caller is the LYXe token contract
         require(
             msg.sender == LYXeAddress,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
         );
+        // Check if the amount is 32 LYXe
         require(
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
-        // 209 = 48 bytes pubkey + 32 bytes withdrawal_credentials + 96 bytes signature + 32 bytes deposit_data_root + 1 byte for supply
+        /*Check if the deposit data has the correct length (209 bytes)
+          - 48 bytes for the pubkey
+          - 32 bytes for the withdrawal_credentials
+          - 96 bytes for the signature
+          - 32 bytes for the deposit_data_root
+          - 1 byte for the initialSupplyVote
+        */
         require(
             depositData.length == 209,
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
         );
 
-        uint8 supply = uint8(depositData[208]);
-        require(supply <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid supply vote");
-        supplyVoteCounter[supply]++;
+        uint256 initialSupplyVote = uint256(uint8(depositData[208]));
+        require(initialSupplyVote <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote");
+        supplyVoteCounter[initialSupplyVote]++;
 
         // Store the deposit data in the contract state.
         deposit_data[deposit_count] = depositData;
 
-        // Process the deposit and update the Merkle tree.
-        _deposit(
-            depositData[:48], // pubkey
-            depositData[48:80], // withdrawal_credentials
-            depositData[80:176], // signature
-            bytes32(depositData[176:208]) // deposit_data_root
+        bytes calldata pubkey = depositData[:48];
+        bytes calldata withdrawal_credentials = depositData[48:80];
+        bytes calldata signature = depositData[80:176];
+        bytes32 deposit_data_root = bytes32(depositData[176:208]);
+
+        bytes32 pubKeyHash = keccak256(pubkey);
+        // Prevent deposits twice for the same pubkey
+        require(
+            !_registeredPubKeyHash[pubKeyHash],
+            "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
         );
+
+        // Mark the pubkey as registered
+        _registeredPubKeyHash[pubKeyHash] = true;
+
+        // Compute deposit data root (`DepositData` hash tree root)
+        bytes32 pubkey_root = keccak256(abi.encodePacked(pubkey, bytes16(0)));
+
+        // Compute the root of the signature data.
+        bytes32 signature_root = keccak256(
+            abi.encodePacked(
+                keccak256(abi.encodePacked(signature[:64])),
+                keccak256(abi.encodePacked(signature[64:], bytes32(0)))
+            )
+        );
+
+        // Compute the root of the deposit data.
+        bytes32 computedDataRoot = keccak256(
+            abi.encodePacked(
+                keccak256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
+                keccak256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
+            )
+        );
+
+        // Verify computed and expected deposit data roots match
+        require(
+            computedDataRoot == deposit_data_root,
+            "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
+        );
+
+        // Emit `DepositEvent` log
+        emit DepositEvent(
+            pubkey,
+            withdrawal_credentials,
+            amount_to_little_endian_64,
+            signature,
+            deposit_count
+        );
+
+        deposit_count++;
+
     }
 
     /**
      * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
+         uint256 freezeInitiatedAt = freezeBlockNumber;
+        // Check if the contract is already frozen
         require(
-            freezeBlockNumber == 0,
+            freezeInitiatedAt == 0,
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
         );
+        // Check if the caller is the owner
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
-        freezeBlockNumber = block.number + FREEZE_DELAY;
+        // Set the freeze block number to the current block number + FREEZE_DELAY
+        uint256 freezeAt = block.number + FREEZE_DELAY;
+        freezeBlockNumber = freezeAt;
+        emit FreezeInitiated(block.number, freezeAt);
+    }
+
+    /**
+     * @dev Returns wether the pubkey is registered or not.
+     *
+     * @param pubkey The public key of the validator.
+     * @return bool Whether the pubkey is registered or not.
+     */
+    function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
+        return _registeredPubKeyHash[keccak256(pubkey)];
     }
 
     /**
@@ -222,124 +284,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return
-            interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IDepositContract).interfaceId;
-    }
-
-    /**
-     * @dev Returns the current root of the Merkle tree of deposits.
-     *
-     * @return The Merkle root of the deposit data.
-     */
-    function get_deposit_root() external view returns (bytes32) {
-        bytes32 node;
-        uint256 size = deposit_count;
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
-            if ((size & 1) == 1) node = sha256(abi.encodePacked(branch[height], node));
-            else node = sha256(abi.encodePacked(node, zero_hashes[height]));
-            size /= 2;
-        }
-
-        return
-            sha256(abi.encodePacked(node, _to_little_endian_64(uint64(deposit_count)), bytes24(0)));
-    }
-
-    /**
-     * @dev Returns the current number of deposits in the contract.
-     *
-     * @return The number of deposits in little-endian order.
-     */
-    function get_deposit_count() external view returns (bytes memory) {
-        return _to_little_endian_64(uint64(deposit_count));
-    }
-
-    /**
-     * @dev Processes a deposit and updates the Merkle tree.
-     *
-     * @param pubkey The public key of the depositor.
-     * @param withdrawal_credentials The withdrawal credentials of the depositor.
-     * @param signature The deposit signature of the depositor.
-     * @param deposit_data_root The root of the deposit data.
-     */
-    function _deposit(
-        bytes calldata pubkey,
-        bytes calldata withdrawal_credentials,
-        bytes calldata signature,
-        bytes32 deposit_data_root
-    ) internal {
-        // Emit `DepositEvent` log
-        emit DepositEvent(
-            pubkey,
-            withdrawal_credentials,
-            amount_to_little_endian_64,
-            signature,
-            _to_little_endian_64(uint64(deposit_count))
-        );
-
-        // Compute deposit data root (`DepositData` hash tree root)
-        bytes32 pubkey_root = sha256(abi.encodePacked(pubkey, bytes16(0)));
-
-        // Compute the root of the signature data.
-        bytes32 signature_root = sha256(
-            abi.encodePacked(
-                sha256(abi.encodePacked(signature[:64])),
-                sha256(abi.encodePacked(signature[64:], bytes32(0)))
-            )
-        );
-
-        // Compute the root of the deposit data.
-        bytes32 node = sha256(
-            abi.encodePacked(
-                sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                sha256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
-            )
-        );
-
-        // Verify computed and expected deposit data roots match
-        require(
-            node == deposit_data_root,
-            "LUKSOGenesisValidatorsDepositContract: reconstructed DepositData does not match supplied deposit_data_root"
-        );
-
-        // Avoid overflowing the Merkle tree (and prevent edge case in computing `branch`)
-        require(
-            deposit_count < MAX_DEPOSIT_COUNT,
-            "LUKSOGenesisValidatorsDepositContract: merkle tree full"
-        );
-
-        // Add deposit data root to Merkle tree (update a single `branch` node)
-        deposit_count += 1;
-        uint256 size = deposit_count;
-        for (uint256 height = 0; height < DEPOSIT_CONTRACT_TREE_DEPTH; height++) {
-            if ((size & 1) == 1) {
-                branch[height] = node;
-                return;
-            }
-            node = sha256(abi.encodePacked(branch[height], node));
-            size /= 2;
-        }
-        // As the loop should always end prematurely with the `return` statement,
-        // this code should be unreachable. We assert `false` just to be safe.
-        assert(false);
-    }
-
-    /**
-     * @dev Converts a uint64 value to a byte array in little-endian order.
-     *
-     * @param value The uint64 value to convert.
-     * @return ret The byte array in little-endian order.
-     */
-    function _to_little_endian_64(uint64 value) internal pure returns (bytes memory ret) {
-        ret = new bytes(8);
-        bytes8 bytesValue = bytes8(value);
-        // Byteswapping during copying to bytes.
-        ret[0] = bytesValue[7];
-        ret[1] = bytesValue[6];
-        ret[2] = bytesValue[5];
-        ret[3] = bytesValue[4];
-        ret[4] = bytesValue[3];
-        ret[5] = bytesValue[2];
-        ret[6] = bytesValue[1];
-        ret[7] = bytesValue[0];
+            interfaceId == type(IERC165).interfaceId;
     }
 }

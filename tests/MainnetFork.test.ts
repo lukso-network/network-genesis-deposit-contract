@@ -74,15 +74,23 @@ describe("Testing on Mainnet Fork", async function () {
     });
 
     it("should deposit for multiple depositors", async function () {
-      const { depositDataHex } = generateDepositData();
       const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
-      const depositDataWithVote = depositDataHex + supplyVoteBytes;
       // get balance of depositAddress before deposit
       const depositBalanceBefore = await LYXeContract.balanceOf(depositAddress);
 
       expect(depositBalanceBefore).to.equal(0);
 
+      // Create an array to store depositDataWithVote values
+      const depositDataWithVotes = [];
+
       for (let i = 0; i < LYXeHolders.length; i++) {
+        // Generate deposit data for each deposit
+        const { depositDataHex } = generateDepositData();
+        const depositDataWithVote = depositDataHex + supplyVoteBytes;
+
+        // Store the depositDataWithVote value in the array
+        depositDataWithVotes.push(depositDataWithVote);
+
         const LYXeHolder = LYXeHolders[i];
         const signer = await ethers.getImpersonatedSigner(LYXeHolder);
         await LYXeContract.connect(signer).send(
@@ -99,9 +107,10 @@ describe("Testing on Mainnet Fork", async function () {
         BigInt(LYXeHolders.length) * BigInt(DEPOSIT_AMOUNT);
       expect(depositBalanceAfter).to.equal(expectedBalance);
 
+      // Update the loop to use the stored depositDataWithVote values
       for (let i = 0; i < LYXeHolders.length; i++) {
         expect(await depositContract.getDepositDataByIndex(i)).to.equal(
-          depositDataWithVote
+          depositDataWithVotes[i]
         );
       }
 
