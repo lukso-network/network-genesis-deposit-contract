@@ -10,7 +10,6 @@ type DepositData = {
   withdrawal_credentials: string;
 };
 
-
 function parseData(data: string[]): DepositData[] {
   const result: DepositData[] = [];
 
@@ -49,17 +48,17 @@ async function main() {
   // last array of depositData
   const lastDepositData = jsonData[jsonData.length - 1];
   console.log(lastDepositData);
-  fs.writeFile('depositData.json', JSON.stringify(jsonData, null, 2), (err) => {
+  fs.writeFile("depositData.json", JSON.stringify(jsonData, null, 2), (err) => {
     if (err) {
-      console.error('Error writing file:', err);
+      console.error("Error writing file:", err);
     } else {
-      console.log('File written successfully');
+      console.log("File written successfully");
     }
   });
 
   console.log("Deposit data written to depositData.json");
   const numberOfDeposits = await depositContract.depositCount();
-  console.log('number of deposit: ', numberOfDeposits.toString());
+  console.log("number of deposit: ", numberOfDeposits.toString());
 }
 
 main().catch((error) => {
