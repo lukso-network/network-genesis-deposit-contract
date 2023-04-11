@@ -14,10 +14,10 @@ import {
 
 // helpers
 import {
-  generateDepositData,
   getInterfaceID,
   toLittleEndian64,
   generateHexBetweenOneAndOneHundred,
+  getDepositDataByIndex,
 } from "./helpers";
 import {
   LYXeHolders,
@@ -75,7 +75,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
     context = await buildContext();
 
     for (let i = 0; i < 4; i++) {
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(i);
       const supplyVoteByte = generateHexBetweenOneAndOneHundred();
       const dataWithSupplyVoteByte = depositDataHex + supplyVoteByte;
       validatorsData.push(dataWithSupplyVoteByte);
@@ -630,7 +630,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
   });
   describe("supplyVote", () => {
     it("should not let you deposit with vote with value 100", async () => {
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(0);
       const supplyVoteByte = "ff";
       const depositDataWithVote = depositDataHex + supplyVoteByte;
 
@@ -649,7 +649,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       let supplyVotes = Array(101).fill(BigNumber.from(0));
 
       for (let i = 0; i < numberOfDeposits; i++) {
-        const { depositDataHex } = generateDepositData();
+        const { depositDataHex } = getDepositDataByIndex(i);
         const supplyVoteByte = generateHexBetweenOneAndOneHundred();
 
         supplyVotes[parseInt(supplyVoteByte, 16)] =
@@ -676,7 +676,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       let numberOf0Votes = 0;
 
       for (let i = 0; i < numberOfDeposits; i++) {
-        const { depositDataHex } = generateDepositData();
+        const { depositDataHex } = getDepositDataByIndex(i);
         const supplyVoteByte = generateHexBetweenOneAndOneHundred();
 
         if (supplyVoteByte === "00") {
@@ -705,7 +705,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
   });
   describe("isPubkeyRegistered mapping tests", () => {
     it("should return true for a registered public key", async () => {
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(0);
       const supplyVoteByte = "00";
       const depositDataWithVote = depositDataHex + supplyVoteByte;
 
@@ -723,7 +723,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
       expect(result).to.equal(true);
     });
     it("should return false for a non-registered public key", async () => {
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(0);
       const supplyVoteByte = "00";
       const depositDataWithVote = depositDataHex + supplyVoteByte;
 

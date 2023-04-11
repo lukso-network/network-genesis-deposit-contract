@@ -161,7 +161,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata signature = depositData[80:176];
         bytes32 deposit_data_root = bytes32(depositData[176:208]);
 
-        bytes32 pubKeyHash = keccak256(pubkey);
+        bytes32 pubKeyHash = sha256(pubkey);
         // Prevent deposits twice for the same pubkey
         require(
             !_registeredPubKeyHash[pubKeyHash],
@@ -172,21 +172,21 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         _registeredPubKeyHash[pubKeyHash] = true;
 
         // Compute deposit data root (`DepositData` hash tree root)
-        bytes32 pubkey_root = keccak256(abi.encodePacked(pubkey, bytes16(0)));
+        bytes32 pubkey_root = sha256(abi.encodePacked(pubkey, bytes16(0)));
 
         // Compute the root of the signature data.
-        bytes32 signature_root = keccak256(
+        bytes32 signature_root = sha256(
             abi.encodePacked(
-                keccak256(abi.encodePacked(signature[:64])),
-                keccak256(abi.encodePacked(signature[64:], bytes32(0)))
+                sha256(abi.encodePacked(signature[:64])),
+                sha256(abi.encodePacked(signature[64:], bytes32(0)))
             )
         );
 
         // Compute the root of the deposit data.
-        bytes32 computedDataRoot = keccak256(
+        bytes32 computedDataRoot = sha256(
             abi.encodePacked(
-                keccak256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                keccak256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
+                sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
+                sha256(abi.encodePacked(amount_to_little_endian_64, bytes24(0), signature_root))
             )
         );
 
@@ -234,7 +234,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @return bool Whether the pubkey is registered or not.
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
-        return _registeredPubKeyHash[keccak256(pubkey)];
+        return _registeredPubKeyHash[sha256(pubkey)];
     }
 
     /**
