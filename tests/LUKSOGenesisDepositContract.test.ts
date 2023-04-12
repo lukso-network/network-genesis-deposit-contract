@@ -2,6 +2,7 @@ import { ethers, network } from "hardhat";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { mine } from "@nomicfoundation/hardhat-network-helpers";
+import depositDataJSON from "./deposit_data-test.json";
 
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -217,6 +218,45 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", () => {
         "LUKSOGenesisValidatorsDepositContract: Deposit already processed"
       );
     });
+  });
+
+  it("Should match the original JSON after reconstructing", async () => {
+    for (let i = 0; i < depositDataJSON.length; i++) {
+      const validatorData = getDepositDataByIndex(i);
+
+      const depositTx = context.LYXeContract.connect(validators[0]).send(
+        context.depositContract.address,
+        DEPOSIT_AMOUNT,
+        validatorData.depositDataWithSupplyVoteHex
+      );
+
+      await depositTx;
+    }
+
+    const depositedData = await context.depositContract.getDepositData();
+    const reconstructedJson = [];
+
+    for (let i = 0; i < depositedData.length; i++) {
+      const depositDataWithoutSupplyVote =
+        "0x" + depositedData[i].substring(2, depositedData[i].length - 2);
+      const originalValidator = depositDataJSON[i];
+
+      const reconstructedValidator = {
+        pubkey: depositDataWithoutSupplyVote.substring(2, 98),
+        withdrawal_credentials: depositDataWithoutSupplyVote.substring(98, 162),
+        amount: originalValidator.amount,
+        signature: depositDataWithoutSupplyVote.substring(162, 354),
+        deposit_message_root: originalValidator.deposit_message_root,
+        deposit_data_root: originalValidator.deposit_data_root,
+        fork_version: originalValidator.fork_version,
+        network_name: originalValidator.network_name,
+        deposit_cli_version: originalValidator.deposit_cli_version,
+      };
+
+      reconstructedJson.push(reconstructedValidator);
+    }
+
+    expect(reconstructedJson).to.deep.equal(depositDataJSON);
   });
 
   describe("when using `get_deposit_count(..)`", () => {

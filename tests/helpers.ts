@@ -49,6 +49,16 @@ export const getDepositDataByIndex = (index: number) => {
 
   const depositDataHex = ethers.utils.hexlify(depositData);
 
+  const supplyVoteByte = generateHexBetweenOneAndOneHundred();
+  const depositDataWithSupplyVote = ethers.utils.concat([
+    depositData,
+    ethers.utils.arrayify(`0x${supplyVoteByte}`),
+  ]);
+
+  const depositDataWithSupplyVoteHex = ethers.utils.hexlify(
+    depositDataWithSupplyVote
+  );
+
   return {
     pubkey,
     withdrawal_credentials,
@@ -60,6 +70,7 @@ export const getDepositDataByIndex = (index: number) => {
     network_name,
     deposit_cli_version,
     depositDataHex,
+    depositDataWithSupplyVoteHex,
   };
 };
 
