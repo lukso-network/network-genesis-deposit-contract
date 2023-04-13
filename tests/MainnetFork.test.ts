@@ -3,8 +3,8 @@ import { ethers } from "hardhat";
 import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import {
-  generateDepositData,
   generateHexBetweenOneAndOneHundred,
+  getDepositDataByIndex,
 } from "./helpers";
 import {
   LYXeHolders,
@@ -42,7 +42,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       const LYXeHolderSigner = await ethers.getImpersonatedSigner(LYXeHolder);
 
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(1);
 
       const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
 
@@ -85,7 +85,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       for (let i = 0; i < LYXeHolders.length; i++) {
         // Generate deposit data for each deposit
-        const { depositDataHex } = generateDepositData();
+        const { depositDataHex } = getDepositDataByIndex(i);
         const depositDataWithVote = depositDataHex + supplyVoteBytes;
 
         // Store the depositDataWithVote value in the array
@@ -133,7 +133,7 @@ describe("Testing on Mainnet Fork", async function () {
       // expect balance to be greater than 1 eth to pay for tx
       expect(balanceInETH).to.be.greaterThan(1);
 
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(0);
 
       await expect(
         LYXeContract.connect(LYXelessSigner).send(
