@@ -1,10 +1,8 @@
- //  _    _   _ _  ______   ___     ____                      _      __     __    _ _     _       _
- // | |  | | | | |/ / ___| / _ \   / ___| ___ _ __   ___  ___(_)___  \ \   / /_ _| (_) __| | __ _| |_ ___  _ __ ___
- // | |  | | | | ' /\___ \| | | | | |  _ / _ \ '_ \ / _ \/ __| / __|  \ \ / / _` | | |/ _` |/ _` | __/ _ \| '__/ __|
- // | |__| |_| | . \ ___) | |_| | | |_| |  __/ | | |  __/\__ \ \__ \   \ V / (_| | | | (_| | (_| | || (_) | |  \__ \
- // |_____\___/|_|\_\____/ \___/   \____|\___|_| |_|\___||___/_|___/    \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|  |___/
-
-
+//  _    _   _ _  ______   ___     ____                      _      __     __    _ _     _       _
+// | |  | | | | |/ / ___| / _ \   / ___| ___ _ __   ___  ___(_)___  \ \   / /_ _| (_) __| | __ _| |_ ___  _ __ ___
+// | |  | | | | ' /\___ \| | | | | |  _ / _ \ '_ \ / _ \/ __| / __|  \ \ / / _` | | |/ _` |/ _` | __/ _ \| '__/ __|
+// | |__| |_| | . \ ___) | |_| | | |_| |  __/ | | |  __/\__ \ \__ \   \ V / (_| | | | (_| | (_| | || (_) | |  \__ \
+// |_____\___/|_|\_\____/ \___/   \____|\___|_| |_|\___||___/_|___/    \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|  |___/
 
 // SPDX-License-Identifier: CC0-1.0
 
@@ -24,8 +22,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
-    // _to_little_endian_64(uint64(32 ether / 1 gwei))
-    bytes constant AMOUNT_TO_LITTLE_ENDIAN_64 = hex"0040597307000000";
+    // amoount to be deposited (32 LYXe)
+    uint256 constant AMOUNT_TO_DEPOSIT = 32 ether;
 
     // The current number of deposits in the contract.
     uint256 internal deposit_count;
@@ -39,7 +37,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     event DepositEvent(
         bytes pubkey,
         bytes withdrawal_credentials,
-        bytes amount,
+        uint256 amount,
         bytes signature,
         uint256 index
     );
@@ -64,7 +62,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
     /**
      * @dev Storing the hash of the public key in order to check if it is already registered
-    */
+     */
     mapping(bytes32 => bool) private _registeredPubKeyHash;
 
     /**
@@ -83,8 +81,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Save the deployer as the owner of the contract
      */
     constructor(address owner_) {
-
-        require(owner_ != address(0), "LUKSOGenesisValidatorsDepositContract: owner cannot be zero address");
+        require(
+            owner_ != address(0),
+            "LUKSOGenesisValidatorsDepositContract: owner cannot be zero address"
+        );
         owner = owner_;
 
         isContractFrozen = false;
@@ -112,14 +112,13 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      *   • supply - that last byte is the initial supply of LYX in million where 0 means non-vote
      */
     function tokensReceived(
-        address, /* operator */
-        address, /* from */
-        address, /* to */
+        address /* operator */,
+        address /* from */,
+        address /* to */,
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
-
         uint256 freezeBlockNumberValue = freezeBlockNumber;
 
         // Check if the contract is frozen
@@ -134,7 +133,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
         // Check if the amount is 32 LYXe
         require(
-            amount == 32 ether,
+            amount == AMOUNT_TO_DEPOSIT,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
         /*Check if the deposit data has the correct length (209 bytes)
@@ -150,7 +149,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
 
         uint256 initialSupplyVote = uint256(uint8(depositData[208]));
-        require(initialSupplyVote <= 100, "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote");
+        require(
+            initialSupplyVote <= 100,
+            "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote"
+        );
         supplyVoteCounter[initialSupplyVote]++;
 
         // Store the deposit data in the contract state.
@@ -186,7 +188,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes32 computedDataRoot = keccak256(
             abi.encodePacked(
                 keccak256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                keccak256(abi.encodePacked(AMOUNT_TO_LITTLE_ENDIAN_64, bytes24(0), signature_root))
+                keccak256(abi.encodePacked(AMOUNT_TO_DEPOSIT, bytes24(0), signature_root))
             )
         );
 
@@ -200,20 +202,19 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            AMOUNT_TO_LITTLE_ENDIAN_64,
+            AMOUNT_TO_DEPOSIT,
             signature,
             deposit_count
         );
 
         deposit_count++;
-
     }
 
     /**
      * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
-         uint256 freezeInitiatedAt = freezeBlockNumber;
+        uint256 freezeInitiatedAt = freezeBlockNumber;
         // Check if the contract is already frozen
         require(
             freezeInitiatedAt == 0,
@@ -283,7 +284,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @return True if the contract supports the interface, false otherwise.
      */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
-        return
-            interfaceId == type(IERC165).interfaceId;
+        return interfaceId == type(IERC165).interfaceId;
     }
 }
