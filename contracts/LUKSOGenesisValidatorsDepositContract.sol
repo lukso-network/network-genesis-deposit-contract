@@ -187,8 +187,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         // Compute the root of the deposit data.
         bytes32 computedDataRoot = sha256(
             abi.encodePacked(
-                keccak256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
-                keccak256(abi.encodePacked(AMOUNT_TO_LITTLE_ENDIAN_64, bytes24(0), signature_root))
+                sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
+                sha256(abi.encodePacked(AMOUNT_TO_LITTLE_ENDIAN_64, bytes24(0), signature_root))
             )
         );
 
