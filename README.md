@@ -8,7 +8,7 @@ The following values are (non-configurable) constants used throughout the specif
 
 | Name                                 | Value                                                                  |
 | ------------------------------------ | ---------------------------------------------------------------------- |
-| `amount_to_little_endian_64`         | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei) |
+| `AMOUNT_TO_DEPOSIT`                  | `32 ether`                                                             |
 | `registryAddress` (ERC1820 Registry) | `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`                           |
 | `TOKENS_RECIPIENT_INTERFACE_HASH`    | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`   |
 

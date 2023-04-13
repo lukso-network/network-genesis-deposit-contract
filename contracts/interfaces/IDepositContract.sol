@@ -33,7 +33,6 @@ interface IDepositContract {
     function get_deposit_root() external view returns (bytes32);
 
     /// @notice Query the current deposit count.
-    /// @return The deposit count encoded as a little endian 64-bit number.
+    /// @return The deposit count
     function get_deposit_count() external view returns (bytes memory);
-
 }
