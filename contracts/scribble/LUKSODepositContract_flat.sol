@@ -114,7 +114,7 @@ interface IERC1820Registry {
  // |_____\___/|_|\_\____/ \___/   \____|\___|_| |_|\___||___/_|___/    \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|  |___/
 
 
-contract LUKSOGenesisValidatorsDepositContract is IERC165 {
+contract LUKSOGenesisValidatorsDepositContract_Scribble is IERC165 {
     // The address of the LYXe token contract.
     address constant LYXeAddress = 0xA8b919680258d369114910511cc87595aec0be6D;
 
