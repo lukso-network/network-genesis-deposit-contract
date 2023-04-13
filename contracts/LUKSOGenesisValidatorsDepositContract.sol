@@ -22,7 +22,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
-    // amoount to be deposited (32 LYXe)
+    // amount to be deposited (32 LYXe)
     uint256 constant AMOUNT_TO_DEPOSIT = 32 ether;
 
     // The current number of deposits in the contract.
