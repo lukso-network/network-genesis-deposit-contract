@@ -21,8 +21,6 @@ export const getDepositDataByIndex = (index: number) => {
     throw new Error("Invalid index");
   }
 
-  const depositDataItem = depositDataJSON[index];
-
   const {
     pubkey,
     withdrawal_credentials,
@@ -33,27 +31,28 @@ export const getDepositDataByIndex = (index: number) => {
     fork_version,
     network_name,
     deposit_cli_version,
-  } = depositDataItem;
+  } = depositDataJSON[index];
 
   const prefixedPubkey = `0x${pubkey}`;
   const prefixedWithdrawalCredentials = `0x${withdrawal_credentials}`;
   const prefixedSignature = `0x${signature}`;
   const prefixedDepositDataRoot = `0x${deposit_data_root}`;
 
-  const depositData = ethers.utils.concat([
-    ethers.utils.arrayify(prefixedPubkey),
-    ethers.utils.arrayify(prefixedWithdrawalCredentials),
-    ethers.utils.arrayify(prefixedSignature),
-    ethers.utils.arrayify(prefixedDepositDataRoot),
-  ]);
+const depositData = ethers.utils.hexConcat([
+    prefixedPubkey,
+    prefixedWithdrawalCredentials,
+    prefixedSignature,
+    prefixedDepositDataRoot,
+])
 
   const depositDataHex = ethers.utils.hexlify(depositData);
 
   const supplyVoteByte = generateHexBetweenOneAndOneHundred();
-  const depositDataWithSupplyVote = ethers.utils.concat([
+
+  const depositDataWithSupplyVote = ethers.utils.hexConcat([
     depositData,
-    ethers.utils.arrayify(`0x${supplyVoteByte}`),
-  ]);
+    `0x${supplyVoteByte}`
+])
 
   const depositDataWithSupplyVoteHex = ethers.utils.hexlify(
     depositDataWithSupplyVote
