@@ -5,7 +5,6 @@
 // |_____\___/|_|\_\____/ \___/   \____|\___|_| |_|\___||___/_|___/    \_/ \__,_|_|_|\__,_|\__,_|\__\___/|_|  |___/
 
 // SPDX-License-Identifier: CC0-1.0
-
 pragma solidity 0.8.15;
 
 import {IERC165} from "./interfaces/IERC165.sol";
@@ -89,7 +88,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
         isContractFrozen = false;
 
-        // Set this contract as the implementer of the tokens recipient interface in the registry contract.
+        // Set this contract as the implementer of the tokens recipient interface in the registry contract
         IERC1820Registry(REGISTRY_ADDRESS).setInterfaceImplementer(
             address(this),
             TOKENS_RECIPIENT_INTERFACE_HASH,
@@ -126,23 +125,27 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
             "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
         );
+
         // Check is the caller is the LYXe token contract
         require(
             msg.sender == LYX_TOKEN_CONTRACT_ADDRESS,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
         );
+
         // Check if the amount is 32 LYXe
         require(
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
-        /*Check if the deposit data has the correct length (209 bytes)
-          - 48 bytes for the pubkey
-          - 32 bytes for the withdrawal_credentials
-          - 96 bytes for the signature
-          - 32 bytes for the deposit_data_root
-          - 1 byte for the initialSupplyVote
-        */
+
+        /**
+         * Check if the deposit data has the correct length (209 bytes)
+         *  - 48 bytes for the pubkey 
+         *  - 32 bytes for the withdrawal_credentials 
+         *  - 96 bytes for the BLS signature
+         *  - 32 bytes for the deposit_data_root 
+         *  - 1 byte for the initialSupplyVote 
+         */
         require(
             depositData.length == 209,
             "LUKSOGenesisValidatorsDepositContract: depositData not encoded properly"
@@ -155,7 +158,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
         supplyVoteCounter[initialSupplyVote]++;
 
-        // Store the deposit data in the contract state.
+        // Store the deposit data in the contract state
         deposit_data[deposit_count] = depositData;
 
         bytes calldata pubkey = depositData[:48];
@@ -164,6 +167,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes32 deposit_data_root = bytes32(depositData[176:208]);
 
         bytes32 pubKeyHash = sha256(pubkey);
+
         // Prevent deposits twice for the same pubkey
         require(
             !_registeredPubKeyHash[pubKeyHash],
@@ -176,7 +180,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         // Compute deposit data root (`DepositData` hash tree root)
         bytes32 pubkey_root = sha256(abi.encodePacked(pubkey, bytes16(0)));
 
-        // Compute the root of the signature data.
+        // Compute the root of the signature data
         bytes32 signature_root = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(signature[:64])),
@@ -184,7 +188,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             )
         );
 
-        // Compute the root of the deposit data.
+        // Compute the root of the deposit data
         bytes32 computedDataRoot = sha256(
             abi.encodePacked(
                 sha256(abi.encodePacked(pubkey_root, withdrawal_credentials)),
@@ -211,17 +215,20 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
+     * @dev Freeze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
         uint256 freezeInitiatedAt = freezeBlockNumber;
+
         // Check if the contract is already frozen
         require(
             freezeInitiatedAt == 0,
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
         );
+
         // Check if the caller is the owner
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
+
         // Set the freeze block number to the current block number + FREEZE_DELAY
         uint256 freezeAt = block.number + FREEZE_DELAY;
         freezeBlockNumber = freezeAt;
@@ -248,9 +255,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Retrieves an array of votes per supply and the total number of votes
+     * @dev Retrieves an array of votes per supply and the total number of votes.
      */
-
     function getsVotesPerSupply()
         external
         view
