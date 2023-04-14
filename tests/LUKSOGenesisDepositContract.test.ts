@@ -2,8 +2,7 @@ import { ethers, network } from "hardhat";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { mine } from "@nomicfoundation/hardhat-network-helpers";
-import depositDataJSON from "./deposit_data-test.json";
-import { JsonRpcProvider } from "@ethersproject/providers";
+import depositDataJSON from "./deposit_data-mainnet.json";
 
 // types
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
