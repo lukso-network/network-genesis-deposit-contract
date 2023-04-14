@@ -160,3 +160,27 @@ This immutable variable called `owner` is used to store the address of the smart
 ### `isContractFrozen` public state variable
 
 This state variable called `isContractFrozen` will store a boolean that state whether the contract is frozen. Since the variable is public, it it comes with a getter that will return the frozen's status of the contract.
+
+## Fetch all the deposit data
+
+The zfetchDepositsz script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
+
+Update the `hardhat.config.ts` file with your `Infura API key` in the networks section as follows:
+
+```js
+networks: {
+  ethereum: {
+    url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  },
+}
+```
+
+In your terminal, navigate to the root directory of the project.
+
+Run the following command to execute the `fetchDeposits` script:
+
+```js
+npx hardhat run scripts/fetchDeposits --network ethereum
+```
+
+Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
