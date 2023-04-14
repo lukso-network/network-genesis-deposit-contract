@@ -239,7 +239,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
         );
 
-        // Check this function can only be called by the owner
+        // Check this function can only be called by the `owner`
         require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
 
         // Set the freeze block number to the current block number + FREEZE_DELAY
