@@ -10,27 +10,41 @@ pragma solidity 0.8.15;
 import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 
+/**
+ * @title LUKSO Genesis Validators Deposit Contract
+ * @author LUKSO
+ * 
+ * @notice This contract allows users to register as Genesis Validators on the LUKSO Blockchain.
+ * To become a validator, a user must send 32 LYXe to this contract alongside its validator data 
+ * (public key, withdrawal credentials, signature, deposit data root and initial supply vote).
+ * 
+ * @dev The LUKSO Genesis Validators Deposit Contract will be deployed on the Ethereum network.
+ * The contract automatically registers deposits and their related deposit validator data when receiving 
+ * the callback from the LYXe token contract via the `tokensReceived` function.
+ * 
+ * Once the contract is frozen, no more deposits can be made.
+ */
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
-    // The address of the LYXe token contract.
+    // The address of the LYXe token contract
     address constant LYX_TOKEN_CONTRACT_ADDRESS = 0xA8b919680258d369114910511cc87595aec0be6D;
 
-    // The address of the registry contract (ERC1820 Registry).
+    // The address of the registry contract (ERC1820 Registry)
     address constant REGISTRY_ADDRESS = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
 
-    // The hash of the interface of the contract that receives tokens.
+    // The hash of the interface of the contract that receives tokens
     bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant AMOUNT_TO_LITTLE_ENDIAN_64 = hex"0040597307000000";
 
-    // The current number of deposits in the contract.
+    // The current number of deposits in the contract
     uint256 internal deposit_count;
 
-    // The delay in blocks for the contract to be frozen (46 523 blocks ~ 1 week).
+    // The delay in blocks for the contract to be frozen (46 523 blocks ~ 1 week)
     uint256 public constant FREEZE_DELAY = 46_523;
 
-    // The block number when the contract will be frozen.
+    // The block number when the contract will be frozen
     uint256 public freezeBlockNumber;
 
     /**
@@ -64,22 +78,22 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - withdrawal_credentials - the following 32 bytes
      * - signature - the following 96 bytes
      * - deposit_data_root - the following 32 bytes
-     * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote.
+     * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote
      */
     mapping(uint256 => bytes) internal deposit_data;
 
     /**
-     * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million.
+     * @dev Storing the amount of votes for each supply where the index is the initial supply of LYX in million
      */
     mapping(uint256 => uint256) public supplyVoteCounter;
 
     /**
-     * @dev Storing the hash of the public key in order to check if it is already registered.
+     * @dev Storing the hash of the public key in order to check if it is already registered
      */
     mapping(bytes32 => bool) private _registeredPubKeyHash;
 
     /**
-     * @dev The owner of the contract can freeze the contract via the `freezeContract()` function.
+     * @dev The owner of the contract can freeze the contract via the `freezeContract()` function
      */
     address public immutable owner;
 
@@ -90,7 +104,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     bool public isContractFrozen;
 
     /**
-     * @dev Set `owner_` as the contract owner + set the `TOKENS_RECIPIENT_INTERFACE_HASH` for the deposit contract.
+     * @dev Set `owner_` as the contract owner + set the `TOKENS_RECIPIENT_INTERFACE_HASH` for the deposit contract
      */
     constructor(address owner_) {
         require(
@@ -110,8 +124,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Whenever this contract receives LYXe tokens, it must be for the reason of
-     * being a Genesis Validator.
+     * @dev Whenever this contract receives LYXe tokens, it must be for the reason of becoming a Genesis Validator.
      *
      * Requirements:
      * - `amount` MUST be exactly 32 LYXe
@@ -165,6 +178,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
 
         uint256 initialSupplyVote = uint256(uint8(depositData[208]));
+
+        // Check the `initialSupplyVote` is between 0 and 100 where 0 is a non-vote
         require(
             initialSupplyVote <= 100,
             "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote"
@@ -174,11 +189,13 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         // Store the deposit data in the contract state
         deposit_data[deposit_count] = depositData;
 
+        // Extract the validator deposit data from the `depositData`
         bytes calldata pubkey = depositData[:48];
         bytes calldata withdrawal_credentials = depositData[48:80];
         bytes calldata signature = depositData[80:176];
         bytes32 deposit_data_root = bytes32(depositData[176:208]);
 
+        // Compute the SHA256 hash of the pubkey
         bytes32 pubKeyHash = sha256(pubkey);
 
         // Prevent depositing twice for the same pubkey
@@ -228,7 +245,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Freeze the LUKSO Genesis Deposit Contract 100 blocks after calling this function.
+     * @dev Freeze the LUKSO Genesis Deposit Contract 100 blocks after calling this function
      */
     function freezeContract() external {
         uint256 freezeInitiatedAt = freezeBlockNumber;
@@ -249,26 +266,26 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Returns whether the pubkey is registered or not.
+     * @dev Returns whether the pubkey is registered or not
      *
-     * @param pubkey The public key of the validator.
-     * @return bool `true` if the pubkey is registered, `false` otherwise.
+     * @param pubkey The public key of the validator
+     * @return bool `true` if the pubkey is registered, `false` otherwise
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
         return _registeredPubKeyHash[sha256(pubkey)];
     }
 
     /**
-     * @dev Returns the current number of deposits.
+     * @dev Returns the current number of deposits
      *
-     * @return The number of deposits at the time the function was called.
+     * @return The number of deposits at the time the function was called
      */
     function depositCount() external view returns (uint256) {
         return deposit_count;
     }
 
     /**
-     * @dev Retrieves an array of votes per supply and the total number of votes.
+     * @dev Retrieves an array of votes per supply and the total number of votes
      */
     function getsVotesPerSupply()
         external
@@ -282,7 +299,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Get an array of all encoded deposit data.
+     * @dev Get an array of all encoded deposit data
      */
     function getDepositData() external view returns (bytes[] memory returnedArray) {
         returnedArray = new bytes[](deposit_count);
@@ -290,17 +307,17 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Get the encoded deposit data at a given `index`.
+     * @dev Get the encoded deposit data at a given `index`
      */
     function getDepositDataByIndex(uint256 index) external view returns (bytes memory) {
         return deposit_data[index];
     }
 
     /**
-     * @dev Determines whether the contract supports a given interface.
+     * @dev Determines whether the contract supports a given interface
      *
-     * @param interfaceId The interface ID to check.
-     * @return `true` if the contract supports the interface, `false` otherwise.
+     * @param interfaceId The interface ID to check
+     * @return `true` if the contract supports the interface, `false` otherwise
      */
     function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
         return interfaceId == type(IERC165).interfaceId;
