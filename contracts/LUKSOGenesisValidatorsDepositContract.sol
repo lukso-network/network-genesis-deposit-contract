@@ -146,26 +146,26 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     ) external {
         uint256 freezeBlockNumberValue = freezeBlockNumber;
 
-        // Check that the contract is not frozen
+        // Check the contract is not frozen
         require(
             freezeBlockNumberValue == 0 || block.number < freezeBlockNumberValue,
             "LUKSOGenesisValidatorsDepositContract: Contract is frozen"
         );
 
-        // Check that calls can only come from the LYXe token contract
+        // Check the calls can only come from the LYXe token contract
         require(
             msg.sender == LYX_TOKEN_CONTRACT_ADDRESS,
             "LUKSOGenesisValidatorsDepositContract: Not called on LYXe transfer"
         );
 
-        // Check we are receiving exactly 32 LYXe
+        // Check the amount received is exactly 32 LYXe
         require(
             amount == 32 ether,
             "LUKSOGenesisValidatorsDepositContract: Cannot send an amount different from 32 LYXe"
         );
 
         /**
-         * Check if the deposit data has the correct length (209 bytes)
+         * Check the deposit data has the correct length (209 bytes)
          *  - 48 bytes for the pubkey 
          *  - 32 bytes for the withdrawal_credentials 
          *  - 96 bytes for the BLS signature
@@ -250,7 +250,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     function freezeContract() external {
         uint256 freezeInitiatedAt = freezeBlockNumber;
 
-        // Check if the contract is not already frozen
+        // Check the contract is not already frozen
         require(
             freezeInitiatedAt == 0,
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
