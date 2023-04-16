@@ -30,7 +30,7 @@ These configurations are updated for releases and may be out of sync during `dev
 
 ## LUKSO genesis deposit contract
 
-Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`). Depositing will allow you to become validator on LUKSO's Mainnet chain. The contract will be notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`). Depositing will allow you to become validator on LUKSO's Mainnet blockchain. The contract will be notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
 
 People wishing to deposit needs to call the [`send(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function or have an operator call the [`operatorSend(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-operatorSend-address-address-uint256-bytes-bytes-) with passing **[depositData](#depositdata)** as `data` parameter.
 
@@ -160,3 +160,27 @@ This immutable variable called `owner` is used to store the address of the smart
 ### `isContractFrozen` public state variable
 
 This state variable called `isContractFrozen` will store a boolean that state whether the contract is frozen. Since the variable is public, it it comes with a getter that will return the frozen's status of the contract.
+
+## Fetch all the deposit data
+
+The `fetchDeposits` script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
+
+Update the `hardhat.config.ts` file with your `Infura API key` in the networks section as follows:
+
+```js
+networks: {
+  ethereum: {
+    url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+  },
+}
+```
+
+In your terminal, navigate to the root directory of the project.
+
+Run the following command to execute the `fetchDeposits` script:
+
+```js
+npx hardhat run scripts/fetchDeposits --network ethereum
+```
+
+Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
