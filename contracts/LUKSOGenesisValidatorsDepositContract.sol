@@ -12,6 +12,13 @@ import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
+
+    /**
+     * @dev Owner of the contract
+     * Has access to `freezeContract()`
+     */
+    address constant OWNER = 0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7;
+
     // The address of the LYXe token contract.
     address constant LYX_TOKEN_CONTRACT_ADDRESS = 0xA8b919680258d369114910511cc87595aec0be6D;
 
@@ -25,6 +32,9 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant AMOUNT_TO_LITTLE_ENDIAN_64 = hex"0040597307000000";
 
+    // Timestamp from which the deposits are accepted (2023-04-20 04:20PM UTC)
+    uint256 constant DEPOSIT_START_TIMESTAMP = 1682007600;
+
     // The current number of deposits in the contract.
     uint256 internal deposit_count;
 
@@ -37,7 +47,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     event DepositEvent(
         bytes pubkey,
         bytes withdrawal_credentials,
-        bytes amount,
+        uint256 amount,
         bytes signature,
         uint256 index
     );
@@ -66,12 +76,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     mapping(bytes32 => bool) private _registeredPubKeyHash;
 
     /**
-     * @dev Owner of the contract
-     * Has access to `freezeContract()`
-     */
-    address public immutable owner;
-
-    /**
      * @dev Default value is false which allows people to send 32 LYXe
      * to this contract with valid data in order to register as Genesis Validator
      */
@@ -80,13 +84,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     /**
      * @dev Save the deployer as the owner of the contract
      */
-    constructor(address owner_) {
-        require(
-            owner_ != address(0),
-            "LUKSOGenesisValidatorsDepositContract: owner cannot be zero address"
-        );
-        owner = owner_;
-
+    constructor() {
         isContractFrozen = false;
 
         // Set this contract as the implementer of the tokens recipient interface in the registry contract.
@@ -119,6 +117,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
+
+        // Check that the current timestamp is after the deposit start timestamp (2023-04-20 04:20PM UTC)
+        require(block.timestamp >= DEPOSIT_START_TIMESTAMP, "LUKSOGenesisValidatorsDepositContract: Deposits not yet allowed");
+
         uint256 freezeBlockNumberValue = freezeBlockNumber;
 
         // Check if the contract is frozen
@@ -202,7 +204,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            AMOUNT_TO_LITTLE_ENDIAN_64,
+            32 ether,
             signature,
             deposit_count
         );
@@ -214,14 +216,13 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * @dev Freze the LUKSO Genesis Deposit Contract 100 blocks after the call
      */
     function freezeContract() external {
-        uint256 freezeInitiatedAt = freezeBlockNumber;
         // Check if the contract is already frozen
         require(
-            freezeInitiatedAt == 0,
+            freezeBlockNumber == 0,
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
         );
         // Check if the caller is the owner
-        require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
+        require(msg.sender == OWNER, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
         // Set the freeze block number to the current block number + FREEZE_DELAY
         uint256 freezeAt = block.number + FREEZE_DELAY;
         freezeBlockNumber = freezeAt;

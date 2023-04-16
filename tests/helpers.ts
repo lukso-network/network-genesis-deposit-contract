@@ -1,20 +1,5 @@
 import { ethers } from "ethers";
-import depositDataJSON from "./deposit_data-test.json";
-
-export const toLittleEndian64 = (bytes8Number: string) => {
-  if (bytes8Number.length < 18)
-    bytes8Number = ethers.utils.hexlify(ethers.utils.zeroPad(bytes8Number, 8));
-  else bytes8Number = bytes8Number.substring(0, 18);
-
-  let newBytes8Number: string = "0x";
-
-  for (let i = 0; i < 16; i += 2) {
-    newBytes8Number =
-      newBytes8Number + bytes8Number[18 - i - 2] + bytes8Number[18 - i - 1];
-  }
-
-  return newBytes8Number;
-};
+import depositDataJSON from "./deposit_data-mainnet.json";
 
 export const getDepositDataByIndex = (index: number) => {
   if (index < 0 || index >= depositDataJSON.length) {
@@ -38,12 +23,12 @@ export const getDepositDataByIndex = (index: number) => {
   const prefixedSignature = `0x${signature}`;
   const prefixedDepositDataRoot = `0x${deposit_data_root}`;
 
-const depositData = ethers.utils.hexConcat([
+  const depositData = ethers.utils.hexConcat([
     prefixedPubkey,
     prefixedWithdrawalCredentials,
     prefixedSignature,
     prefixedDepositDataRoot,
-])
+  ]);
 
   const depositDataHex = ethers.utils.hexlify(depositData);
 
@@ -51,8 +36,8 @@ const depositData = ethers.utils.hexConcat([
 
   const depositDataWithSupplyVote = ethers.utils.hexConcat([
     depositData,
-    `0x${supplyVoteByte}`
-])
+    `0x${supplyVoteByte}`,
+  ]);
 
   const depositDataWithSupplyVoteHex = ethers.utils.hexlify(
     depositDataWithSupplyVote
