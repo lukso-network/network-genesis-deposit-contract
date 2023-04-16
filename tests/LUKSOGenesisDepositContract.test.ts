@@ -16,7 +16,6 @@ import {
 // helpers
 import {
   getInterfaceID,
-  toLittleEndian64,
   generateHexBetweenOneAndOneHundred,
   getDepositDataByIndex,
 } from "./helpers";
@@ -69,10 +68,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
   let context: LUKSOGenesisValidatorsDepositContractContext;
   const validators: SignerWithAddress[] = [];
   const validatorsData: string[] = [];
-  const one_gwei = "1000000000";
-  const amount_to_little_endian_64 = toLittleEndian64(
-    ethers.utils.parseEther("32").div(one_gwei).toHexString()
-  );
+  const amount = ethers.utils.parseEther("32");
   const snapshotId = await network.provider.send("evm_snapshot");
 
   await network.provider.send("evm_setNextBlockTimestamp", [
@@ -193,7 +189,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           .withArgs(
             "0x" + validatorsData[0].substring(2, 98),
             "0x" + validatorsData[0].substring(98, 162),
-            amount_to_little_endian_64,
+            amount,
             "0x" + validatorsData[0].substring(162, 354),
             0
           );
@@ -211,7 +207,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           .withArgs(
             "0x" + validatorsData[0].substring(2, 98),
             "0x" + validatorsData[0].substring(98, 162),
-            amount_to_little_endian_64,
+            amount,
             "0x" + validatorsData[0].substring(162, 354),
             0
           );
@@ -285,7 +281,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           .withArgs(
             "0x" + validatorsData[0].substring(2, 98),
             "0x" + validatorsData[0].substring(98, 162),
-            amount_to_little_endian_64,
+            amount,
             "0x" + validatorsData[0].substring(162, 354),
             0
           );
@@ -308,7 +304,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -332,7 +328,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -356,7 +352,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -381,7 +377,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           .withArgs(
             "0x" + validatorsData[0].substring(2, 98),
             "0x" + validatorsData[0].substring(98, 162),
-            amount_to_little_endian_64,
+            amount,
             "0x" + validatorsData[0].substring(162, 354),
             0
           );
@@ -409,7 +405,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -436,7 +432,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -463,7 +459,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -488,7 +484,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           .withArgs(
             "0x" + validatorsData[0].substring(2, 98),
             "0x" + validatorsData[0].substring(98, 162),
-            amount_to_little_endian_64,
+            amount,
             "0x" + validatorsData[0].substring(162, 354),
             0
           );
@@ -511,7 +507,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -538,7 +534,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -568,7 +564,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[i].substring(2, 98),
               "0x" + validatorsData[i].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[i].substring(162, 354),
               i
             );
@@ -624,7 +620,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             .withArgs(
               "0x" + validatorsData[1].substring(2, 98),
               "0x" + validatorsData[1].substring(98, 162),
-              amount_to_little_endian_64,
+              amount,
               "0x" + validatorsData[1].substring(162, 354),
               0
             );

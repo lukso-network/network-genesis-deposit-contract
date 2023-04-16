@@ -47,7 +47,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     event DepositEvent(
         bytes pubkey,
         bytes withdrawal_credentials,
-        bytes amount,
+        uint256 amount,
         bytes signature,
         uint256 index
     );
@@ -204,7 +204,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         emit DepositEvent(
             pubkey,
             withdrawal_credentials,
-            AMOUNT_TO_LITTLE_ENDIAN_64,
+            32 ether,
             signature,
             deposit_count
         );

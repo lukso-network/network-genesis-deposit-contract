@@ -1,21 +1,6 @@
 import { ethers } from "ethers";
 import depositDataJSON from "./deposit_data-mainnet.json";
 
-export const toLittleEndian64 = (bytes8Number: string) => {
-  if (bytes8Number.length < 18)
-    bytes8Number = ethers.utils.hexlify(ethers.utils.zeroPad(bytes8Number, 8));
-  else bytes8Number = bytes8Number.substring(0, 18);
-
-  let newBytes8Number: string = "0x";
-
-  for (let i = 0; i < 16; i += 2) {
-    newBytes8Number =
-      newBytes8Number + bytes8Number[18 - i - 2] + bytes8Number[18 - i - 1];
-  }
-
-  return newBytes8Number;
-};
-
 export const getDepositDataByIndex = (index: number) => {
   if (index < 0 || index >= depositDataJSON.length) {
     throw new Error("Invalid index");
