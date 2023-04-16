@@ -13,7 +13,7 @@ The following values are (non-configurable) constants used throughout the specif
 | `REGISTRY_ADDRESS`                | `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`                           |
 | `TOKENS_RECIPIENT_INTERFACE_HASH` | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`   |
 | `AMOUNT_TO_LITTLE_ENDIAN_64`      | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei) |
-| `DEPOSIT_START_TIMESTAMP`         | `hex"1682007600"`                                                      |
+| `DEPOSIT_START_TIMESTAMP`         | `1682007600`                                                           |
 | `FREEZE_DELAY`                    | `46_523`                                                               |
 
 ## Configuration
@@ -30,7 +30,7 @@ These configurations are updated for releases and may be out of sync during `dev
 
 ## LUKSO genesis deposit contract
 
-Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`). Depositing will allow you to become validator on LUKSO's Mainnet chain. The contract will be notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
+Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`). Depositing will allow you to become validator on LUKSO's Mainnet blockchain. The contract will be notified by the ERC777 LYXe smart contract using the `tokensReceived()` function below.
 
 People wishing to deposit needs to call the [`send(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function or have an operator call the [`operatorSend(..)`](https://docs.openzeppelin.com/contracts/3.x/api/token/erc777#IERC777-operatorSend-address-address-uint256-bytes-bytes-) with passing **[depositData](#depositdata)** as `data` parameter.
 
@@ -163,7 +163,7 @@ This state variable called `isContractFrozen` will store a boolean that state wh
 
 ## Fetch all the deposit data
 
-The zfetchDepositsz script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
+The `fetchDeposits` script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
 
 Update the `hardhat.config.ts` file with your `Infura API key` in the networks section as follows:
 
