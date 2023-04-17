@@ -1,0 +1,14 @@
+# Run me by typing `mythx analyze` in the directory of the yml file.
+
+ci: true # make the workflow fail on high severity issues
+confirm: true #  automatic confirmation of multiple file submissions (equivalent to --yes)
+
+analyze:
+  mode: deep
+  async: true
+  create-group: true
+  group-name: "LUKSO/Genesis-Validator-Deposit-Contract"
+  solc: 0.8.15
+  targets:
+    - contracts/LUKSOGenesisValidatorsDepositContract.sol
+    - contracts/Helpers/LYXeMock.sol
