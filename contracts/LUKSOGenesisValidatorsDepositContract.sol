@@ -264,8 +264,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * This can only be called by the owner once!
      */
     function freezeContract() external {
-        uint256 freezeInitiatedAt = freezeBlockNumber;
-
         // Check the contract is not already frozen
         require(
             freezeBlockNumber == 0,
