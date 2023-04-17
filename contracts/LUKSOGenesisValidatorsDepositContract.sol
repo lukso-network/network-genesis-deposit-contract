@@ -7,15 +7,14 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity 0.8.15;
 
-import {IERC165} from "./interfaces/IERC165.sol";
 import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 
 /**
  * @title LUKSO Genesis Validators Deposit Contract
  * @author LUKSO
- * 
+ *
  * @notice This contract allows anyone to register as Genesis Validators for the LUKSO Blockchain.
- * To become a Genesis Validator, a participant must send 32 LYXe to this contract alongside its validator data 
+ * To become a Genesis Validator, a participant must send 32 LYXe to this contract alongside its validator data
  * (public key, withdrawal credentials, signature, deposit data root and initial supply vote).
  *
  * This smart contract allows deposits from 2023-04-20 at 04:20pm UTC on. They will revert before that time.
@@ -26,16 +25,15 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
  *
  * The `genesis.szz` for the LUKSO Blockchain, will be generated out of this smart contract using the `getDepositData()` function and
  * Genesis Validators will have their LYX balance on the LUKSO Blockchain after the network start.
- * 
+ *
  * @dev The LUKSO Genesis Validators Deposit Contract will be deployed on the Ethereum network.
- * The contract automatically registers deposits and their related deposit validator data when receiving 
+ * The contract automatically registers deposits and their related deposit validator data when receiving
  * the callback from the LYXe token contract via the `tokensReceived` function.
- * 
+ *
  * Once the contract is frozen, no more deposits can be made.
  *
  */
-contract LUKSOGenesisValidatorsDepositContract is IERC165 {
-
+contract LUKSOGenesisValidatorsDepositContract {
     /**
      * @dev The owner of the contract can freeze the contract via the `freezeContract()` function
      */
@@ -146,16 +144,18 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      *   • supply - that last byte is the initial supply of LYX in million where 0 means non-vote
      */
     function tokensReceived(
-        address /* operator */,
-        address /* from */,
-        address /* to */,
+        address, /* operator */
+        address, /* from */
+        address, /* to */
         uint256 amount,
         bytes calldata depositData,
         bytes calldata /* operatorData */
     ) external {
-
         // Check that the current timestamp is after the deposit start timestamp (2023-04-20 04:20PM UTC)
-        require(block.timestamp >= DEPOSIT_START_TIMESTAMP, "LUKSOGenesisValidatorsDepositContract: Deposits not yet allowed");
+        require(
+            block.timestamp >= DEPOSIT_START_TIMESTAMP,
+            "LUKSOGenesisValidatorsDepositContract: Deposits not yet allowed"
+        );
 
         uint256 freezeBlockNumberValue = freezeBlockNumber;
 
@@ -179,11 +179,11 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
         /**
          * Check the deposit data has the correct length (209 bytes)
-         *  - 48 bytes for the pubkey 
-         *  - 32 bytes for the withdrawal_credentials 
+         *  - 48 bytes for the pubkey
+         *  - 32 bytes for the withdrawal_credentials
          *  - 96 bytes for the BLS signature
-         *  - 32 bytes for the deposit_data_root 
-         *  - 1 byte for the initialSupplyVote 
+         *  - 32 bytes for the deposit_data_root
+         *  - 1 byte for the initialSupplyVote
          */
         require(
             depositData.length == 209,
@@ -248,13 +248,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
 
         // Emit `DepositEvent` log
-        emit DepositEvent(
-            pubkey,
-            withdrawal_credentials,
-            32 ether,
-            signature,
-            deposit_count
-        );
+        emit DepositEvent(pubkey, withdrawal_credentials, 32 ether, signature, deposit_count);
 
         deposit_count++;
     }
@@ -325,15 +319,5 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      */
     function getDepositDataByIndex(uint256 index) external view returns (bytes memory) {
         return deposit_data[index];
-    }
-
-    /**
-     * @dev Determines whether the contract supports a given interface
-     *
-     * @param interfaceId The interface ID to check
-     * @return `true` if the contract supports the interface, `false` otherwise
-     */
-    function supportsInterface(bytes4 interfaceId) external pure override returns (bool) {
-        return interfaceId == type(IERC165).interfaceId;
     }
 }

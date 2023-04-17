@@ -147,14 +147,6 @@ This public view function called isPubkeyRegistered accepts a public key as inpu
 
 This public view function called depositCount returns the current number of deposits made to the contract. It retrieves the value from the deposit_count state variable, which is incremented each time a new deposit is successfully processed. This function can be useful for querying the total number of deposits made to the contract.
 
-### `supportsInterface` function
-
-```js
-function supportsInterface(bytes4 interfaceId) external pure returns (bool);
-```
-
-The `supportsInterface` is required by the ERC165 standard. It checks if a given interface ID is the interface ID for ERC165.
-
 ### `owner` public immutable variable
 
 This immutable variable called `owner` is used to store the address of the smart contract's owner. Since the variable is public, it it comes with a getter that will return the owner of the smart contract.
