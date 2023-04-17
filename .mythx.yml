@@ -11,4 +11,3 @@ analyze:
   solc: 0.8.15
   targets:
     - contracts/LUKSOGenesisValidatorsDepositContract.sol
-    - contracts/Helpers/LYXeMock.sol
