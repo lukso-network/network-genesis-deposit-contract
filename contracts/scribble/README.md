@@ -9,7 +9,7 @@ mythx analyze --mode deep --scribble contracts/scribble/LUKSODepositContract_fla
 ## in Solidity
 
 ```
-scribble contracts/scribble/LUKSODepositContract_flat.sol --output-mode flat --output contracts/scribble/LUKSODepositContract.instrumented.sol
+scribble contracts/scribble/LUKSODepositContract_Scribble.sol --output-mode flat --output contracts/scribble/LUKSODepositContract.instrumented.sol
 ```
 
 ## in JSON
