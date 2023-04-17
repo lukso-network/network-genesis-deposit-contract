@@ -14,9 +14,14 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
  * @title LUKSO Genesis Validators Deposit Contract
  * @author LUKSO
  * 
- * @notice This contract allows users to register as Genesis Validators on the LUKSO Blockchain.
- * To become a validator, a user must send 32 LYXe to this contract alongside its validator data 
+ * @notice This contract allows users to register as Genesis Validators for the LUKSO Blockchain.
+ * To become a genesis validator, a user must send 32 LYXe to this contract alongside its validator data 
  * (public key, withdrawal credentials, signature, deposit data root and initial supply vote).
+ *
+ * This smart contract allows deposits from 2023-04-20 at 04:20pm UTC on. They will revert before.
+ *
+ * After the start of the LUKSO Blockchain, this contract will only function as a historical reference, and all LYXe in it will be forever frozen.
+ * Genesis Validators will have their LYX balance on the LUKSO Blockchain after the network start.
  * 
  * @dev The LUKSO Genesis Validators Deposit Contract will be deployed on the Ethereum network.
  * The contract automatically registers deposits and their related deposit validator data when receiving 
@@ -58,11 +63,11 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
     /**
      * @notice New LYXe deposit made
-     * @dev Emitted when an address made a deposit of 32 LYXe to become a validator on LUKSO
-     * @param pubkey the public key of the validator
-     * @param withdrawal_credentials the withdrawal credentials of the validator
+     * @dev Emitted when an address made a deposit of 32 LYXe to become a genesis validator on LUKSO
+     * @param pubkey the public key of the genesis validator
+     * @param withdrawal_credentials the withdrawal credentials of the genesis validator
      * @param amount the amount of LYXe deposited (32 LYXe)
-     * @param signature the BLS signature of the validator
+     * @param signature the BLS signature of the genesis validator
      * @param index the deposit number for this deposit
      */
     event DepositEvent(
@@ -88,7 +93,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - signature - the following 96 bytes
      * - deposit_data_root - the following 32 bytes
      * - initial_supply_vote - the last byte is the initial supply of LYX (in millions)
-     *   the validator voted for (0 means non-vote)
+     *   the genesis validator voted for (0 means non-vote)
      */
     mapping(uint256 => bytes) internal deposit_data;
 
@@ -273,7 +278,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     /**
      * @dev Returns whether the pubkey is registered or not
      *
-     * @param pubkey The public key of the validator
+     * @param pubkey The public key of the genesis validator
      * @return bool `true` if the pubkey is registered, `false` otherwise
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
