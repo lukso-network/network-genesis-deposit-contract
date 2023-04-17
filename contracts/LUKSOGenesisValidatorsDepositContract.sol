@@ -14,13 +14,17 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
  * @title LUKSO Genesis Validators Deposit Contract
  * @author LUKSO
  * 
- * @notice This contract allows users to register as Genesis Validators for the LUKSO Blockchain.
- * To become a genesis validator, a user must send 32 LYXe to this contract alongside its validator data 
+ * @notice This contract allows anyone to register as Genesis Validators for the LUKSO Blockchain.
+ * To become a Genesis Validator, a participant must send 32 LYXe to this contract alongside its validator data 
  * (public key, withdrawal credentials, signature, deposit data root and initial supply vote).
  *
- * This smart contract allows deposits from 2023-04-20 at 04:20pm UTC on. They will revert before.
+ * This smart contract allows deposits from 2023-04-20 at 04:20pm UTC on. They will revert before that time.
  *
- * After the start of the LUKSO Blockchain, this contract will only function as a historical reference, and all LYXe in it will be forever frozen.
+ * Once enough Genesis Validator keys are present, the owner can initiate the freeze of this contract,
+ * which will happen exactly 46,523 blocks after the initiation (~1 week).
+ * After this contract is frozen, it only functions as a historical reference and all LYXe in it will be forever locked.
+ *
+ * The `genesis.szz` for the LUKSO Blockchain, will be generated out of this smart contract using the `getDepositData()` function and
  * Genesis Validators will have their LYX balance on the LUKSO Blockchain after the network start.
  * 
  * @dev The LUKSO Genesis Validators Deposit Contract will be deployed on the Ethereum network.
@@ -28,6 +32,7 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
  * the callback from the LYXe token contract via the `tokensReceived` function.
  * 
  * Once the contract is frozen, no more deposits can be made.
+ *
  */
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
@@ -255,7 +260,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev This will freeze the LUKSO Genesis Deposit Contract after 46_523 blocks (~ 1 week) after calling this function.
+     * @dev This will freeze the LUKSO Genesis Deposit Contract after 46,523 blocks (~ 1 week) after calling this function.
      * This can only be called by the owner once!
      */
     function freezeContract() external {
