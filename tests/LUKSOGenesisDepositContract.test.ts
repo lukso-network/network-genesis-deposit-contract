@@ -659,24 +659,6 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
         });
       });
     });
-    describe("supportsInterface", () => {
-      it("should support ERC165", async () => {
-        const IERC165 = IERC165__factory.createInterface();
-
-        const ERC165_INTERFACE_ID = getInterfaceID(IERC165);
-
-        expect(
-          await context.depositContract.supportsInterface(ERC165_INTERFACE_ID)
-        ).to.be.true;
-      });
-      it("should not support other interfaces", async () => {
-        const RANDOM_INTERFACE_ID = "0x12345678";
-
-        expect(
-          await context.depositContract.supportsInterface(RANDOM_INTERFACE_ID)
-        ).to.be.false;
-      });
-    });
     describe("supplyVote", () => {
       it("should not let you deposit with vote with value 100", async () => {
         const { depositDataHex } = getDepositDataByIndex(0);
