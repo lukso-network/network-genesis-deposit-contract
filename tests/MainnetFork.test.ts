@@ -1,22 +1,28 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import {
-  generateDepositData,
   generateHexBetweenOneAndOneHundred,
+  getDepositDataByIndex,
 } from "./helpers";
 import {
   LYXeHolders,
   LYXE_ADDRESS,
   ETH_HOLDER_WITHOUT_LYXE,
   DEPOSIT_AMOUNT,
+  DEPOSIT_START_TIMESTAMP,
 } from "./constants";
 
 describe("Testing on Mainnet Fork", async function () {
   let LYXeContract: ReversibleICOToken;
   let depositContract: LUKSOGenesisValidatorsDepositContract;
   let depositAddress: string;
+
+  await network.provider.send("evm_setNextBlockTimestamp", [
+    DEPOSIT_START_TIMESTAMP,
+  ]);
+
   beforeEach(async () => {
     const depositContractDeployer = await ethers.getImpersonatedSigner(
       ETH_HOLDER_WITHOUT_LYXE
@@ -31,7 +37,7 @@ describe("Testing on Mainnet Fork", async function () {
     );
     depositContract = await DepositFactory.connect(
       depositContractDeployer
-    ).deploy(ETH_HOLDER_WITHOUT_LYXE);
+    ).deploy();
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });
@@ -42,7 +48,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       const LYXeHolderSigner = await ethers.getImpersonatedSigner(LYXeHolder);
 
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(1);
 
       const supplyVoteBytes = generateHexBetweenOneAndOneHundred();
 
@@ -85,7 +91,7 @@ describe("Testing on Mainnet Fork", async function () {
 
       for (let i = 0; i < LYXeHolders.length; i++) {
         // Generate deposit data for each deposit
-        const { depositDataHex } = generateDepositData();
+        const { depositDataHex } = getDepositDataByIndex(i);
         const depositDataWithVote = depositDataHex + supplyVoteBytes;
 
         // Store the depositDataWithVote value in the array
@@ -133,7 +139,7 @@ describe("Testing on Mainnet Fork", async function () {
       // expect balance to be greater than 1 eth to pay for tx
       expect(balanceInETH).to.be.greaterThan(1);
 
-      const { depositDataHex } = generateDepositData();
+      const { depositDataHex } = getDepositDataByIndex(0);
 
       await expect(
         LYXeContract.connect(LYXelessSigner).send(

@@ -38,7 +38,7 @@ async function main() {
   const depositAddress = "0x9C2Ae5bC047Ca794d9388aB7A2Bf37778f9aBA73";
 
   const depositContract = await ethers.getContractAt(
-    "DepositMock",
+    "LUKSOGenesisValidatorsDepositContract",
     depositAddress
   );
 
