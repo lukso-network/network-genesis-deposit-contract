@@ -625,6 +625,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
               0
             );
         });
+
         describe("when block.number > freezeBlockNumber", () => {
           it("should disallow depositing if contract is frozen", async () => {
             const numBlocksToMine = 46523;
@@ -646,6 +647,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
             }
           });
         });
+
         describe("should not be able to call `freezeContract(..)` again", () => {
           it("should revert", async () => {
             await expect(
@@ -659,6 +661,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
         });
       });
     });
+
     describe("supportsInterface", () => {
       it("should support ERC165", async () => {
         const IERC165 = IERC165__factory.createInterface();
@@ -677,6 +680,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
         ).to.be.false;
       });
     });
+
     describe("supplyVote", () => {
       it("should not let you deposit with vote with value 100", async () => {
         const { depositDataHex } = getDepositDataByIndex(0);
@@ -693,6 +697,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote"
         );
       });
+
       it("should return all supply vote for 100 deposits", async () => {
         const numberOfDeposits = 250;
         let supplyVotes = Array(101).fill(BigNumber.from(0));
@@ -718,6 +723,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
         expect(fetchedSupplyVotes[0]).to.deep.equal(supplyVotes);
         expect(fetchedSupplyVotes[1]).to.equal(numberOfDeposits);
       });
+
       it("should be able to return the number of people not wishing to vote", async () => {
         const numberOfDeposits = 250;
         let supplyVotes = Array(101).fill(BigNumber.from(0));
@@ -752,6 +758,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
         expect(fetchedSupplyVotes[0][0]).to.equal(numberOf0Votes);
       });
     });
+
     describe("isPubkeyRegistered mapping tests", () => {
       it("should return true for a registered public key", async () => {
         const { depositDataHex } = getDepositDataByIndex(0);
@@ -771,6 +778,7 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
           await context.depositContract.callStatic.isPubkeyRegistered(pubkey);
         expect(result).to.equal(true);
       });
+
       it("should return false for a non-registered public key", async () => {
         const { depositDataHex } = getDepositDataByIndex(0);
         const supplyVoteByte = "00";
