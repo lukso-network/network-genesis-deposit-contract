@@ -63,7 +63,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     /**
      * @notice New LYXe deposit made
      * @dev Emitted when an address made a deposit of 32 LYXe to become a validator on LUKSO
-     * @param pubkey the pubkey of the validator
+     * @param pubkey the public key of the validator
      * @param withdrawal_credentials the withdrawal credentials of the validator
      * @param amount the amount of LYXe deposited (32 LYXe)
      * @param signature the BLS signature of the validator
@@ -185,11 +185,13 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
         uint256 initialSupplyVote = uint256(uint8(depositData[208]));
 
-        // Check the `initialSupplyVote` is between 0 and 100 where 0 is a non-vote
+        // Check the `initialSupplyVote` is a value between 0 and 100 (inclusive), where 0 is a non-vote
         require(
             initialSupplyVote <= 100,
             "LUKSOGenesisValidatorsDepositContract: Invalid initialSupplyVote vote"
         );
+
+        // increment the counter for the given initial supply vote
         supplyVoteCounter[initialSupplyVote]++;
 
         // Store the deposit data in the contract state
