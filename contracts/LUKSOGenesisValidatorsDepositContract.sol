@@ -47,9 +47,6 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     // Timestamp from which the deposits are accepted (2023-04-20 04:20PM UTC)
     uint256 constant DEPOSIT_START_TIMESTAMP = 1682007600;
 
-    // Timestamp from which the deposits are accepted (2023-04-20 04:20PM UTC)
-    uint256 constant DEPOSIT_START_TIMESTAMP = 1682007600;
-
     // The current number of deposits in the contract
     uint256 internal deposit_count;
 
