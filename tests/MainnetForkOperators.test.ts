@@ -11,7 +11,6 @@ import {
 // constants for testing
 import {
   DEPOSIT_AMOUNT,
-  DEPOSIT_START_TIMESTAMP,
   ETH_HOLDER_WITHOUT_LYXE,
   LYXE_ADDRESS,
   LYXeHolders,
@@ -49,10 +48,6 @@ describe("experiment through mainnet fork", () => {
     depositContract = await depositContractFactory
       .connect(depositContractOwnerAndDeployer)
       .deploy();
-
-    await network.provider.send("evm_setNextBlockTimestamp", [
-      DEPOSIT_START_TIMESTAMP,
-    ]);
   });
 
   describe("test setup after deploying", () => {
