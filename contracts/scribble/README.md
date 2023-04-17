@@ -10,12 +10,18 @@ npm install -g eth-scribble
 
 **2 - Install MythX + Set `MYTHX_API_KEY`**
 
-[https://docs.mythx.io/](https://docs.mythx.io/)
+[https://mythx-cli.readthedocs.io/en/latest/installation.html#stable-release](https://mythx-cli.readthedocs.io/en/latest/installation.html#stable-release)
+
+```
+pip install mythx-cli
+```
+
+[https://docs.mythx.io/#using-your-account](https://docs.mythx.io/#using-your-account)
 
 # run Mythx with Scribble annotations
 
 ```
-mythx analyze --mode deep --scribble contracts/scribble/LUKSODepositContract_flat.sol
+mythx analyze --mode deep --scribble contracts/scribble/LUKSODepositContract_Scribble.sol
 ```
 
 # generate instrumented contract
@@ -29,7 +35,7 @@ scribble contracts/scribble/LUKSODepositContract_Scribble.sol --output-mode flat
 ## in JSON
 
 ```
-scribble contracts/scribble/LUKSODepositContract_flat.sol --output-mode json --output contracts/scribble/LUKSODepositContract.instrumented.json
+scribble contracts/scribble/LUKSODepositContract_Scribble.sol --output-mode json --output contracts/scribble/LUKSODepositContract.instrumented.json
 ```
 
 ## Properties tested
