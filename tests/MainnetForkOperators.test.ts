@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 import {
@@ -11,6 +11,7 @@ import {
 // constants for testing
 import {
   DEPOSIT_AMOUNT,
+  DEPOSIT_START_TIMESTAMP,
   ETH_HOLDER_WITHOUT_LYXE,
   LYXE_ADDRESS,
   LYXeHolders,
@@ -44,9 +45,14 @@ describe("experiment through mainnet fork", () => {
     const depositContractFactory = await ethers.getContractFactory(
       "LUKSOGenesisValidatorsDepositContract"
     );
+
     depositContract = await depositContractFactory
       .connect(depositContractOwnerAndDeployer)
       .deploy();
+
+    await network.provider.send("evm_setNextBlockTimestamp", [
+      DEPOSIT_START_TIMESTAMP,
+    ]);
   });
 
   describe("test setup after deploying", () => {
