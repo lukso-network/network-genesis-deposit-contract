@@ -11,6 +11,7 @@ import {
 // constants for testing
 import {
   DEPOSIT_AMOUNT,
+  DEPOSIT_START_TIMESTAMP,
   ETH_HOLDER_WITHOUT_LYXE,
   LYXE_ADDRESS,
   LYXeHolders,
@@ -48,6 +49,12 @@ describe("experiment through mainnet fork", () => {
     depositContract = await depositContractFactory
       .connect(depositContractOwnerAndDeployer)
       .deploy();
+
+    await network.provider.send("evm_setNextBlockTimestamp", [
+      // workaround to avoid:
+      // InvalidInputError: Timestamp 1682007600 is lower than or equal to previous block's timestamp 1682007600
+      DEPOSIT_START_TIMESTAMP + 100,
+    ]);
   });
 
   describe("test setup after deploying", () => {
