@@ -255,7 +255,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Freeze the LUKSO Genesis Deposit Contract 100 blocks after calling this function
+     * @dev This will freeze the LUKSO Genesis Deposit Contract after 46_523 blocks (~ 1 week) after calling this function.
+     * This can only be called by the owner once!
      */
     function freezeContract() external {
         uint256 freezeInitiatedAt = freezeBlockNumber;
