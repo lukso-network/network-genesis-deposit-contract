@@ -1,3 +1,17 @@
+# Installation
+
+**1 - Install Scribble**
+
+Follow the [installation instructions for Scribble](https://docs.scribble.codes/tool/installation)
+
+```
+npm install -g eth-scribble
+```
+
+**2 - Install MythX + Set `MYTHX_API_KEY`**
+
+[https://docs.mythx.io/](https://docs.mythx.io/)
+
 # run Mythx with Scribble annotations
 
 ```
@@ -18,7 +32,7 @@ scribble contracts/scribble/LUKSODepositContract_Scribble.sol --output-mode flat
 scribble contracts/scribble/LUKSODepositContract_flat.sol --output-mode json --output contracts/scribble/LUKSODepositContract.instrumented.json
 ```
 
-## Property tested
+## Properties tested
 
 ### `deposit_count`
 
