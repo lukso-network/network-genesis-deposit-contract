@@ -1,6 +1,8 @@
 # LUKSO Genesis Deposit Contract
 
-This document represents the specification for the LUKSO genesis deposit contract. Modified from [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
+**To use this smart contract go to <https://deposit.mainnet.lukso.network>**
+
+This document represents the specification for the LUKSO genesis deposit contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
 ## Constants
 
