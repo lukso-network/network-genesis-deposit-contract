@@ -15,4 +15,9 @@ export const LYXE_ADDRESS = "0xA8b919680258d369114910511cc87595aec0be6D";
 export const ETH_HOLDER_WITHOUT_LYXE =
   "0x189b9cbd4aff470af2c0102f365fc1823d857965";
 
+export const DEPOSIT_CONTRACT_OWNER =
+  "0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7";
+
+export const DEPOSIT_START_TIMESTAMP = 1682007600;
+
 export const DEPOSIT_AMOUNT = ethers.utils.parseEther("32").toString();

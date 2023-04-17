@@ -22,6 +22,9 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
+    ethereum: {
+      url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    },
     hardhat: {
       forking: {
         url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
