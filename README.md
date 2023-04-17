@@ -1,6 +1,8 @@
 # LUKSO Genesis Deposit Contract
 
-This document represents the specification for the LUKSO genesis deposit contract. Modified from [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
+**To use this smart contract go to <https://deposit.mainnet.lukso.network>**
+
+This document represents the specification for the LUKSO genesis deposit contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
 ## Constants
 
@@ -13,7 +15,7 @@ The following values are (non-configurable) constants used throughout the specif
 | `REGISTRY_ADDRESS`                | `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`                           |
 | `TOKENS_RECIPIENT_INTERFACE_HASH` | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`   |
 | `AMOUNT_TO_LITTLE_ENDIAN_64`      | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei) |
-| `DEPOSIT_START_TIMESTAMP`         | `1682007600`                                                           |
+| `DEPOSIT_START_TIMESTAMP`         | `1682007600` (2023-04-20 04:20pm UTC)                                                    |
 | `FREEZE_DELAY`                    | `46_523`                                                               |
 
 ## Configuration
