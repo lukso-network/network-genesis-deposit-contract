@@ -27,8 +27,7 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
     /**
-     * @dev Owner of the contract
-     * Has access to `freezeContract()`
+     * @dev The owner of the contract can freeze the contract via the `freezeContract()` function
      */
     address constant OWNER = 0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7;
 
@@ -91,7 +90,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      * - withdrawal_credentials - the following 32 bytes
      * - signature - the following 96 bytes
      * - deposit_data_root - the following 32 bytes
-     * - initial_supply_vote - the last byte is the initial supply of LYX in million where 0 means non-vote
+     * - initial_supply_vote - the last byte is the initial supply of LYX (in millions)
+     *   the validator voted for (0 means non-vote)
      */
     mapping(uint256 => bytes) internal deposit_data;
 
@@ -112,7 +112,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     bool public isContractFrozen;
 
     /**
-     * @dev Set `owner_` as the contract owner + set the `TOKENS_RECIPIENT_INTERFACE_HASH` for the deposit contract
+     * @dev Set the `TOKENS_RECIPIENT_INTERFACE_HASH` for the deposit contract
      */
     constructor() {
         isContractFrozen = false;
@@ -265,7 +265,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
         );
 
         // Check this function can only be called by the `owner`
-        require(msg.sender == owner, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
+        require(msg.sender == OWNER, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
 
         // Set the freeze block number to the current block number + FREEZE_DELAY
         uint256 freezeAt = block.number + FREEZE_DELAY;
