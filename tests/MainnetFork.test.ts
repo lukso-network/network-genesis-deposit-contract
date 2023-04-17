@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { LUKSOGenesisValidatorsDepositContract } from "../typechain-types";
 import { ReversibleICOToken } from "../types";
 import {
@@ -11,12 +11,18 @@ import {
   LYXE_ADDRESS,
   ETH_HOLDER_WITHOUT_LYXE,
   DEPOSIT_AMOUNT,
+  DEPOSIT_START_TIMESTAMP,
 } from "./constants";
 
 describe("Testing on Mainnet Fork", async function () {
   let LYXeContract: ReversibleICOToken;
   let depositContract: LUKSOGenesisValidatorsDepositContract;
   let depositAddress: string;
+
+  await network.provider.send("evm_setNextBlockTimestamp", [
+    DEPOSIT_START_TIMESTAMP,
+  ]);
+
   beforeEach(async () => {
     const depositContractDeployer = await ethers.getImpersonatedSigner(
       ETH_HOLDER_WITHOUT_LYXE
@@ -31,7 +37,7 @@ describe("Testing on Mainnet Fork", async function () {
     );
     depositContract = await DepositFactory.connect(
       depositContractDeployer
-    ).deploy(ETH_HOLDER_WITHOUT_LYXE);
+    ).deploy();
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });
