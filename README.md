@@ -1,8 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-> ## Deployed Address: [0x4200042742c62e4386ccfb1e2c895a4011b2773e](https://etherscan.io/address/0x4200042742c62e4386ccfb1e2c895a4011b2773e)
->
-> **To use this smart contract go to <https://deposit.mainnet.lukso.network>**
+## Deployed Address: [Coming later](https://etherscan.io/address/)
 
 ---
 
@@ -28,11 +26,11 @@ The following values are (non-configurable) constants used throughout the specif
 
 These configurations are updated for releases and may be out of sync during `dev` changes.
 
-| Name                       | Value                                        |
-| -------------------------- | -------------------------------------------- |
-| `DEPOSIT_CHAIN_ID`         | `1`                                          |
-| `DEPOSIT_NETWORK_ID`       | `1`                                          |
-| `DEPOSIT_CONTRACT_ADDRESS` | `0x4200042742c62e4386ccfb1e2c895a4011b2773e` |
+| Name                       | Value |
+| -------------------------- | ----- |
+| `DEPOSIT_CHAIN_ID`         | `1`   |
+| `DEPOSIT_NETWORK_ID`       | `1`   |
+| `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
 
 ## LUKSO genesis deposit contract
 

@@ -113,17 +113,9 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     mapping(bytes32 => bool) private _registeredPubKeyHash;
 
     /**
-     * @dev Default value is `false` which allows people to send 32 LYXe to this contract
-     * with valid data in order to register as Genesis Validator.
-     */
-    bool public isContractFrozen;
-
-    /**
      * @dev Set the `TOKENS_RECIPIENT_INTERFACE_HASH` for the deposit contract
      */
     constructor() {
-        isContractFrozen = false;
-
         // Set this contract as the implementer of the tokens recipient interface in the registry contract
         IERC1820Registry(REGISTRY_ADDRESS).setInterfaceImplementer(
             address(this),
