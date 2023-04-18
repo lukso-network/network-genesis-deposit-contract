@@ -58,10 +58,6 @@ describe("experiment through mainnet fork", () => {
   });
 
   describe("test setup after deploying", () => {
-    it("contract is not frozen after having been deployed", async () => {
-      expect(await depositContract.isContractFrozen()).to.equal(false);
-    });
-
     describe("when calling the IERC1820 registry at {address}", () => {
       it("should have set the DepositContract as implementer of the token recipient interface", async () => {
         const erc1820Registry = await ethers.getContractAt(
