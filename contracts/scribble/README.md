@@ -51,16 +51,15 @@ uint256 internal deposit_count;
 
 ```solidity
 /// #if_succeeds {:msg "Deposit increases the deposit count" } deposit_count == old(deposit_count) + 1;
-/// #if_succeeds {:msg "Was called by the LYX token contract" } msg.sender == LYXeAddress;
+/// #if_succeeds {:msg "Was called by the LYX token contract" } msg.sender == LYX_TOKEN_CONTRACT_ADDRESS;
 /// #if_succeeds {:msg "The `to` address must be the DepositContract (= this contract)" } to == address(this);
 /// #if_succeeds {:msg "The `amount` is 32 LYXe" } amount == 32 ether;
 /// #if_succeeds {:msg "The deposit data has the correct length" } depositData.length == 209;
 /// #if_succeeds {:msg "The data deposited has the correct length" } deposit_data[deposit_count].length == 209;
-/// #if_succeeds {:msg "The depositor had at least 32 LYXe in its balance" } old(IERC777(LYXeAddress).balanceOf(from) >= 32 ether);
-/// #if_succeeds {:msg "The DepositContract will have +32 LYXe added to its LYXe balance" } IERC777(LYXeAddress).balanceOf(address(this)) == old(IERC777(LYXeAddress).balanceOf(address(this))) + 32 ether;
-/// #if_succeeds {:msg "The depositor will have -32 LYXe substracted from its LYXe balance" } IERC777(LYXeAddress).balanceOf(msg.sender) == old(IERC777(LYXeAddress).balanceOf(msg.sender)) - 32 ether;
-/// #if_succeeds {:msg "The sum of depositor and DepositContract balance remains the same"} IERC777(LYXeAddress).balanceOf(address(this)) + IERC777(LYXeAddress).balanceOf(from) == old(IERC777(LYXeAddress).balanceOf(address(this))) + old(IERC777(LYXeAddress).balanceOf(from));
-/// #if_succeeds {:msg "The contract was not frozen" } old(isContractFrozen) == false;
+/// #if_succeeds {:msg "The depositor had at least 32 LYXe in its balance" } old(IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(from) >= 32 ether);
+/// #if_succeeds {:msg "The DepositContract will have +32 LYXe added to its LYXe balance" } IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(address(this)) == old(IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(address(this))) + 32 ether;
+/// #if_succeeds {:msg "The depositor will have -32 LYXe substracted from its LYXe balance" } IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(msg.sender) == old(IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(msg.sender)) - 32 ether;
+/// #if_succeeds {:msg "The sum of depositor and DepositContract balance remains the same"} IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(address(this)) + IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(from) == old(IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(address(this))) + old(IERC777(LYX_TOKEN_CONTRACT_ADDRESS).balanceOf(from));
 function tokensReceived(
     address, /* operator */
     address from,
