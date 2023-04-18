@@ -15,9 +15,16 @@ export const LYXE_ADDRESS = "0xA8b919680258d369114910511cc87595aec0be6D";
 export const ETH_HOLDER_WITHOUT_LYXE =
   "0x189b9cbd4aff470af2c0102f365fc1823d857965";
 
+// has some ETH but no LYXe
+// will be used to deposit LYXe on behalf of a LYXe holder
+export const OPERATOR = "0x90465fe1EA4d37161CB07BD3Cb0Fd6D7179D776B";
+
 export const DEPOSIT_CONTRACT_OWNER =
   "0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7";
 
 export const DEPOSIT_START_TIMESTAMP = 1682007600;
 
 export const DEPOSIT_AMOUNT = ethers.utils.parseEther("32").toString();
+
+export const TOKENS_RECIPIENT_INTERFACE_HASH =
+  "0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b";

@@ -27,20 +27,25 @@ describe("Testing on Mainnet Fork", async function () {
     const depositContractDeployer = await ethers.getImpersonatedSigner(
       ETH_HOLDER_WITHOUT_LYXE
     );
+
     // LYXe contract
     LYXeContract = await ethers.getContractAt(
       "ReversibleICOToken",
       LYXE_ADDRESS
     );
+
     const DepositFactory = await ethers.getContractFactory(
       "LUKSOGenesisValidatorsDepositContract"
     );
+
     depositContract = await DepositFactory.connect(
       depositContractDeployer
     ).deploy();
+
     await depositContract.deployed();
     depositAddress = depositContract.address;
   });
+
   describe("when depositor has LYXe and ETH to pay for tx", () => {
     it("should deposit for 1 depositor", async function () {
       // address with LYXe
