@@ -20,7 +20,7 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
  *
  * This smart contract allows deposits from 2023-04-20 at 04:20pm UTC on. They will revert before that time.
  *
- * Once enough Genesis Validator keys are present, the owner can initiate the freeze of this contract,
+ * Once enough Genesis Validator keys are present, the `FREEZER` can initiate the freeze of this contract,
  * which will happen exactly 46,523 blocks after the initiation (~1 week).
  * After this contract is frozen, it only functions as a historical reference and all LYXe in it will be forever locked.
  *
@@ -37,30 +37,30 @@ import {IERC1820Registry} from "./interfaces/IERC1820Registry.sol";
 contract LUKSOGenesisValidatorsDepositContract is IERC165 {
 
     /**
-     * @dev The owner of the contract can freeze the contract via the `freezeContract()` function
+     * @dev The `FREEZER` of the contract can freeze the contract via the `freezeContract()` function
      */
-    address constant OWNER = 0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7;
+    address public constant FREEZER = 0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7;
 
     // The address of the LYXe token contract.
-    address constant LYX_TOKEN_CONTRACT_ADDRESS = 0xA8b919680258d369114910511cc87595aec0be6D;
+    address public constant LYX_TOKEN_CONTRACT_ADDRESS = 0xA8b919680258d369114910511cc87595aec0be6D;
 
     // The address of the registry contract (ERC1820 Registry)
-    address constant REGISTRY_ADDRESS = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
+    address public constant ERC1820_REGISTRY_ADDRESS = 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24;
 
     // The hash of the interface of the contract that receives tokens
-    bytes32 constant TOKENS_RECIPIENT_INTERFACE_HASH =
+    bytes32 public constant TOKENS_RECIPIENT_INTERFACE_HASH =
         0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b;
 
     // _to_little_endian_64(uint64(32 ether / 1 gwei))
     bytes constant AMOUNT_TO_LITTLE_ENDIAN_64 = hex"0040597307000000";
 
     // Timestamp from which the deposits are accepted (2023-04-20 04:20PM UTC)
-    uint256 constant DEPOSIT_START_TIMESTAMP = 1682007600;
+    uint256 public constant DEPOSIT_START_TIMESTAMP = 1682007600;
 
     // The current number of deposits in the contract
     uint256 internal deposit_count;
 
-    // The delay in blocks for the contract to be frozen (46 523 blocks ~ 1 week)
+    // The delay in blocks for the contract to be frozen (46,523 blocks ~ 1 week)
     uint256 public constant FREEZE_DELAY = 46_523;
 
     // The block number when the contract will be frozen
@@ -84,7 +84,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     );
 
     /**
-     * @dev Emitted when the owner of the contract freezes the contract
+     * @dev Emitted when the `FREEZER` of the contract freezes the contract
      * @param initiatedAt the block number when freezing the contract was initiated
      * @param freezeAt the block number when the contract will be frozen
      */
@@ -117,7 +117,7 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
      */
     constructor() {
         // Set this contract as the implementer of the tokens recipient interface in the registry contract
-        IERC1820Registry(REGISTRY_ADDRESS).setInterfaceImplementer(
+        IERC1820Registry(ERC1820_REGISTRY_ADDRESS).setInterfaceImplementer(
             address(this),
             TOKENS_RECIPIENT_INTERFACE_HASH,
             address(this)
@@ -252,8 +252,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev This will freeze the LUKSO Genesis Deposit Contract after 46,523 blocks (~ 1 week) after calling this function.
-     * This can only be called by the owner once!
+     * @dev This function will freeze the LUKSO Genesis Deposit Contract after 46,523 blocks (~ 1 week).
+     * This function can only be called by the `FREEZER` once!
      */
     function freezeContract() external {
         // Check the contract is not already frozen
@@ -262,8 +262,8 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
             "LUKSOGenesisValidatorsDepositContract: Contract is already frozen"
         );
 
-        // Check this function can only be called by the `owner`
-        require(msg.sender == OWNER, "LUKSOGenesisValidatorsDepositContract: Caller not owner");
+        // Check this function can only be called by the `FREEZER`
+        require(msg.sender == FREEZER, "LUKSOGenesisValidatorsDepositContract: Caller is not the freezer");
 
         // Set the freeze block number to the current block number + FREEZE_DELAY
         uint256 freezeAt = block.number + FREEZE_DELAY;
@@ -272,10 +272,10 @@ contract LUKSOGenesisValidatorsDepositContract is IERC165 {
     }
 
     /**
-     * @dev Returns whether the pubkey is registered or not
+     * @dev Returns whether the public key is registered or not
      *
      * @param pubkey The public key of the genesis validator
-     * @return bool `true` if the pubkey is registered, `false` otherwise
+     * @return bool `true` if the public key is registered, `false` otherwise
      */
     function isPubkeyRegistered(bytes calldata pubkey) external view returns (bool) {
         return _registeredPubKeyHash[sha256(pubkey)];
