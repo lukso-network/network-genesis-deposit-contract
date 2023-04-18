@@ -585,6 +585,20 @@ describe("Testing LUKSOGenesisValidatorsDepositContract", async () => {
       });
     });
 
+    describe("when calling the `freezeContract(...)` function", () => {
+      it("should revert if called by an EOA that is not the `FREEZER`", async () => {
+        // use a LYXe holder address as an example (the last one)
+        const index = context.accounts.length - 1;
+        const randomCaller = context.accounts[index];
+
+        await expect(
+          context.depositContract.connect(randomCaller).freezeContract()
+        ).to.be.revertedWith(
+          "LUKSOGenesisValidatorsDepositContract: Caller is not the freezer"
+        );
+      });
+    });
+
     describe("when using `freezeContract(..)`", () => {
       beforeEach(async () => {
         const currentBlock = await ethers.provider.getBlockNumber();
