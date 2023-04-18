@@ -1,6 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-## Deployed Address: [0x4200042742c62e4386ccfb1e2c895a4011b2773e](https://etherscan.io/address/0x4200042742c62e4386ccfb1e2c895a4011b2773e)
+## Deployed Address: [Coming later](https://etherscan.io/address/)
 
 **To use this smart contract go to <https://deposit.mainnet.lukso.network>**
 
