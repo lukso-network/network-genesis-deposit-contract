@@ -1,5 +1,7 @@
 # LUKSO Genesis Deposit Contract
 
+## Deployed Address: [0x4200042742c62e4386ccfb1e2c895a4011b2773e](https://etherscan.io/address/0x4200042742c62e4386ccfb1e2c895a4011b2773e)
+
 **To use this smart contract go to <https://deposit.mainnet.lukso.network>**
 
 This document represents the specification for the LUKSO genesis deposit contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
