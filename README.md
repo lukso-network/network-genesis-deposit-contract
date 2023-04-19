@@ -115,6 +115,22 @@ event DepositEvent(
 
 Every deposit emits a `DepositEvent` log for consumption by LUKSO's mainnet chain. The LUKSO genesis deposit contract does little validation, pushing most of the validator onboarding logic to LUKSO's mainnet chain. In particular, the proof of possession (a BLS12-381 signature) is not verified by the deposit contract.
 
+### `FreezeInitiated` log
+
+```solidity
+event FreezeInitiated(
+    uint256 initiatedAt,
+    uint256 freezeAt
+);
+```
+
+Once the contract has been frozen by the [`FREEZER`](#constants) via [`freezeContract()`](#freezecontract) function, a `FreezeInitiated` event will be emitted to signal that the freezing of the LUKSO Genesis Deposit Contract has started.
+
+It contains two informations:
+
+1. `initiatedAt` **when the freezing started**. The block number at which the freezing of the deposit contract started.
+2. **when the deposit contract will be frozen**. The block number at which it will no longer be possible to deposit LYXe in the contract.
+
 ## Functions
 
 ### `freezeContract()`
