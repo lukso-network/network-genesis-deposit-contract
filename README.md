@@ -12,15 +12,15 @@ The following values are (non-configurable) constants used throughout the specif
 
 | Name                              | Value                                                                                                                        |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `OWNER`                           | `0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7`                                                                                 |
+| `FREEZER`                         | `0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7`                                                                                 |
 | `LYX_TOKEN_CONTRACT_ADDRESS`      | [`0xA8b919680258d369114910511cc87595aec0be6D`](https://etherscan.io/token/0xA8b919680258d369114910511cc87595aec0be6D)        |
-| `REGISTRY_ADDRESS`                | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://etherscan.io/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24#code) |
+| `ERC1820_REGISTRY_ADDRESS`        | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://etherscan.io/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24#code) |
 | `TOKENS_RECIPIENT_INTERFACE_HASH` | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`                                                         |
 | `AMOUNT_TO_LITTLE_ENDIAN_64`      | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei)                                                       |
 | `DEPOSIT_START_TIMESTAMP`         | `1682007600` (2023-04-20 04:20pm UTC)                                                                                        |
 | `FREEZE_DELAY`                    | `46_523` blocks (around 1 week)                                                                                              |
 
-## Configuration
+## Configurations
 
 > _Note_: The default mainnet configuration values are included here for spec-design purposes.
 
@@ -32,7 +32,7 @@ These configurations are updated for releases and may be out of sync during `dev
 | `DEPOSIT_NETWORK_ID`       | `1`   |
 | `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
 
-## LUKSO genesis deposit contract
+## How to deposit LYXe on the LUKSO Genesis Deposit Contract?
 
 Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`).
 
@@ -47,7 +47,7 @@ People wishing to deposit needs to:
 
 Once enough validators have deposited, contract will be frozen and the chain will start.
 
-### `tokensReceived(...)` function
+### Details on the `tokensReceived(...)` function
 
 ```solidity
 function tokensReceived(
@@ -68,22 +68,6 @@ The `tokensReceived(...)` function will be called by the LYXe token smart contra
 | [`uint256 amount`](#amount)                                                                 | the amount of LYXe sent by the sender (**32 LYXe**)                       |
 | [`bytes calldata depositData`](#depositdata)                                                | this parameter is used to send all the bytes data related to the deposit. |
 
-#### Amount
-
-The amount of LYXe sent to the deposit contract **MUST be 32 LYXe**.
-
-#### DepositData
-
-The LYXe token contract is sending `depositData` which will be sliced. This `depositData` is made up of five pieces of information:
-
-| `depositData` field                 | Description                                                                                                                                                                                                                                                                  |
-| :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| (48 bytes) `pubkey`                 | Represents a `Bytes48` BLS12-381 public key                                                                                                                                                                                                                                  |
-| (32 bytes) `withdrawal_credentials` | Constrains validator withdrawals. <br> The first byte of this 32-byte field is a withdrawal prefix which defines the semantics of the remaining 31 bytes. <br> The withdrawal prefixes currently supported are `BLS_WITHDRAWAL_PREFIX` and `ETH1_ADDRESS_WITHDRAWAL_PREFIX`. |
-| (96 bytes) `signature`              | Represents a `Bytes96` a BLS12-381 signature.                                                                                                                                                                                                                                |
-| (32 bytes) `deposit_data_root`      | The computed SHA256 deposit data root.                                                                                                                                                                                                                                       |
-| (1 byte) `initialSupplyVote`        | A value between `0` and `100` to describe the initial supply of LYX (in million) the validator voted for.                                                                                                                                                                    |
-
 The **following checks are performed to ensure a successful deposit**:
 
 - the contract should not be _"frozen"_. [See below for more details](#freezeContract-function)
@@ -96,6 +80,22 @@ The **following checks are performed to ensure a successful deposit**:
   - \+ `deposit_data_root` of 32 bytes
   - \+ `initialSupplyVote` of 1 byte
 
+#### LYXe Amount
+
+The amount of LYXe sent to the deposit contract **MUST be 32 LYXe**.
+
+#### Deposit Data
+
+The LYXe token contract is sending `depositData` which will be sliced. This `depositData` is made up of five pieces of information:
+
+| `depositData` field                 | Description                                                                                                                                                                                                                                                                  |
+| :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| (48 bytes) `pubkey`                 | Represents a `Bytes48` BLS12-381 public key                                                                                                                                                                                                                                  |
+| (32 bytes) `withdrawal_credentials` | Constrains validator withdrawals. <br> The first byte of this 32-byte field is a withdrawal prefix which defines the semantics of the remaining 31 bytes. <br> The withdrawal prefixes currently supported are `BLS_WITHDRAWAL_PREFIX` and `ETH1_ADDRESS_WITHDRAWAL_PREFIX`. |
+| (96 bytes) `signature`              | Represents a `Bytes96` a BLS12-381 signature.                                                                                                                                                                                                                                |
+| (32 bytes) `deposit_data_root`      | The computed SHA256 deposit data root.                                                                                                                                                                                                                                       |
+| (1 byte) `initialSupplyVote`        | A value between `0` and `100` to describe the initial supply of LYX (in million) the validator voted for.                                                                                                                                                                    |
+
 > _Note_: The deposit contract does not validate the `withdrawal_credentials` field.
 > Support for new withdrawal prefixes can be added without modifying the deposit contract.
 
@@ -103,7 +103,7 @@ The **following checks are performed to ensure a successful deposit**:
 
 ### `DepositEvent` log
 
-```
+```solidity
 event DepositEvent(
     bytes pubkey,
     bytes withdrawal_credentials,
@@ -127,7 +127,8 @@ The `freezeContract` function is an external function that is only callable by t
 
 Calling it will freeze the contract 46,523 blocks (around 1 week as defined by the [`FREEZE_DELAY`](#constants)) after is has been called.
 
-:warning: **This action cannot be reversed!** It will prevent any further calls to the `tokensReceived(...)` function coming from the LYXe token contract and block any future deposits once the `FREEZE_DELAY` has passed.
+> :warning: Warning :warning:: **This action cannot be reversed!**
+> It will prevent any further calls to the [`tokensReceived(...)`](#details-on-the-tokensreceived-function) function coming from the LYXe token contract and block any future deposits once the [`FREEZE_DELAY`](#constants) has passed.
 
 ### `getDepositData()`
 
@@ -178,7 +179,7 @@ This `depositCount()` function returns the current number of deposits made to th
 
 It retrieves the value from the `deposit_count` state variable, which is incremented each time a new deposit is successfully processed. This function can be useful for querying the total number of deposits made to the contract.
 
-### `supportsInterface` function
+### `supportsInterface`
 
 ```solidity
 function supportsInterface(bytes4 interfaceId) external pure returns (bool);
@@ -186,7 +187,7 @@ function supportsInterface(bytes4 interfaceId) external pure returns (bool);
 
 The `supportsInterface(bytes4)` is required by the ERC165 standard. It checks if a given interface ID is the interface ID for ERC165.
 
-## Fetch all the deposit data
+## Fetching all the deposit data
 
 The [`fetchDeposits.ts`](./scripts/fetchDeposits.ts) script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
 
