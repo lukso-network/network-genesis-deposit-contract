@@ -175,6 +175,10 @@ The function returns a boolean value of:
 
 ### `depositCount()`
 
+```solidity
+function depositCount() external view returns (uint256);
+```
+
 This `depositCount()` function returns the current number of deposits made to the LUKSO Genesis Deposit contract.
 
 It retrieves the value from the `deposit_count` state variable, which is incremented each time a new deposit is successfully processed. This function can be useful for querying the total number of deposits made to the contract.
