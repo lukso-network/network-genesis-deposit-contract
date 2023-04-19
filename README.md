@@ -197,7 +197,7 @@ The `freezeContract` function is an external function that is only callable by t
 
 Calling it will freeze the contract 46,523 blocks (around 1 week as defined by the [`FREEZE_DELAY`](#constants)) after is has been called.
 
-> :warning: **Warning** :warning: **This action cannot be reversed!**
+> :warning: <b>Warning</b> :warning: **This action cannot be reversed!**
 > It will prevent any further calls to the [`tokensReceived(...)`](#details-on-the-tokensreceived-function) function coming from the LYXe token contract and block any future deposits once the [`FREEZE_DELAY`](#constants) has passed.
 
 ### `getDepositData()`
