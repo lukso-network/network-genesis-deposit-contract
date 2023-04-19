@@ -54,11 +54,11 @@ The following values are (non-configurable) constants used throughout the specif
 
 These configurations are updated for releases and may be out of sync during `dev` changes.
 
-| Name                       | Value |
-| -------------------------- | ----- |
-| `DEPOSIT_CHAIN_ID`         | `1`   |
-| `DEPOSIT_NETWORK_ID`       | `1`   |
-| `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
+| Name                       | Value                                        |
+| -------------------------- | -------------------------------------------- |
+| `DEPOSIT_CHAIN_ID`         | `1`                                          |
+| `DEPOSIT_NETWORK_ID`       | `1`                                          |
+| `DEPOSIT_CONTRACT_ADDRESS` | `0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC` |
 
 &nbsp;
 
