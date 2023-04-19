@@ -2,11 +2,9 @@
 
 ## Deployed Address: [Coming later](https://etherscan.io/address/)
 
----
-
 This document represents the specification for the LUKSO Genesis Deposit Contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
-**Quick Links**
+**Table of Contents**
 
 - [Constants](#constants)
 - [Configurations](#configurations)
@@ -29,6 +27,8 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
   - [`depositCount()`](#-depositcount---)
   - [`supportsInterface`](#-supportsinterface-)
 - [Fetching all the deposit data](#fetching-all-the-deposit-data)
+
+---
 
 ## Constants
 
