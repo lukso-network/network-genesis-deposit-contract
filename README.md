@@ -10,15 +10,15 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 
 The following values are (non-configurable) constants used throughout the specification.
 
-| Name                              | Value                                                                                                                        |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `FREEZER`                         | `0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7`                                                                                 |
-| `LYX_TOKEN_CONTRACT_ADDRESS`      | [`0xA8b919680258d369114910511cc87595aec0be6D`](https://etherscan.io/token/0xA8b919680258d369114910511cc87595aec0be6D)        |
-| `ERC1820_REGISTRY_ADDRESS`        | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://etherscan.io/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24#code) |
-| `TOKENS_RECIPIENT_INTERFACE_HASH` | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`                                                         |
-| `AMOUNT_TO_LITTLE_ENDIAN_64`      | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei)                                                       |
-| `DEPOSIT_START_TIMESTAMP`         | `1682007600` (2023-04-20 04:20pm UTC)                                                                                        |
-| `FREEZE_DELAY`                    | `46_523` blocks (around 1 week)                                                                                              |
+| Name                                                                                               | Value                                                                                                                        |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [`FREEZER`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L39-L42)                         | `0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7`                                                                                 |
+| [`LYX_TOKEN_CONTRACT_ADDRESS`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L44-L45)      | [`0xA8b919680258d369114910511cc87595aec0be6D`](https://etherscan.io/token/0xA8b919680258d369114910511cc87595aec0be6D)        |
+| [`ERC1820_REGISTRY_ADDRESS`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L47-L48)        | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://etherscan.io/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24#code) |
+| [`TOKENS_RECIPIENT_INTERFACE_HASH`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L50-L52) | `0xb281fc8c12954d22544db45de3159a39272895b169a852b314f9cc762e44c53b`                                                         |
+| [`AMOUNT_TO_LITTLE_ENDIAN_64`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L54-L55)      | `hex"0040597307000000"` (little endian hex value of: 32 LYXe / 1 gwei)                                                       |
+| [`DEPOSIT_START_TIMESTAMP`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L57-L58)         | `1682007600` (2023-04-20 04:20pm UTC)                                                                                        |
+| [`FREEZE_DELAY`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L63-L64)                    | `46_523` blocks (around 1 week)                                                                                              |
 
 ## Configurations
 
