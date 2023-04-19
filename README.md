@@ -30,6 +30,8 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 
 ---
 
+&nbsp;
+
 ## Constants
 
 The following values are (non-configurable) constants used throughout the specification.
@@ -44,6 +46,8 @@ The following values are (non-configurable) constants used throughout the specif
 | [`DEPOSIT_START_TIMESTAMP`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L57-L58)         | `1682007600` (2023-04-20 04:20pm UTC)                                                                                        |
 | [`FREEZE_DELAY`](./contracts/LUKSOGenesisValidatorsDepositContract.sol#L63-L64)                    | `46_523` blocks (around 1 week)                                                                                              |
 
+&nbsp;
+
 ## Configurations
 
 > _Note_: The default mainnet configuration values are included here for spec-design purposes.
@@ -55,6 +59,8 @@ These configurations are updated for releases and may be out of sync during `dev
 | `DEPOSIT_CHAIN_ID`         | `1`   |
 | `DEPOSIT_NETWORK_ID`       | `1`   |
 | `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
+
+&nbsp;
 
 ## How to deposit LYXe on the LUKSO Genesis Deposit Contract?
 
@@ -123,6 +129,8 @@ The LYXe token contract is sending `depositData` which will be sliced. This `dep
 > _Note_: The deposit contract does not validate the `withdrawal_credentials` field.
 > Support for new withdrawal prefixes can be added without modifying the deposit contract.
 
+&nbsp;
+
 ## Events
 
 ### `DepositEvent` log
@@ -155,6 +163,8 @@ It contains two informations:
 1. `initiatedAt` **when the freezing started**. The block number at which the freezing of the deposit contract started.
 2. **when the deposit contract will be frozen**. The block number at which it will no longer be possible to deposit LYXe in the contract.
 
+&nbsp;
+
 ## Public state variables
 
 ### `freezeBlockNumber`
@@ -184,6 +194,8 @@ For the first index:
 - any other index can be between `1` and `100` (1 Million and 100 Millions LYX).
 
 The number of votes for a proposed initial supply can be retrieved by calling the function `supplyVoteCounter(uint256)`, passing the initial supply as argument to the function (this `public` getter function automatically added for this state variable).
+
+&nbsp;
 
 ## Functions
 
@@ -260,6 +272,8 @@ function supportsInterface(bytes4 interfaceId) external pure returns (bool);
 ```
 
 The `supportsInterface(bytes4)` is required by the ERC165 standard. It checks if a given interface ID is the interface ID for ERC165.
+
+&nbsp;
 
 ## Fetching all the deposit data
 
