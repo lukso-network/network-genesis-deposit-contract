@@ -1,6 +1,6 @@
 # LUKSO Genesis Deposit Contract
 
-> ## Deployed Address: [Coming later](https://etherscan.io/address/)
+> ## Deployed Address: [0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC](https://etherscan.io/address/0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC)
 
 This document represents the specification for the LUKSO Genesis Deposit Contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
