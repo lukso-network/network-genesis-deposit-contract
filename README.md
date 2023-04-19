@@ -8,24 +8,24 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 
 - [Constants](#constants)
 - [Configurations](#configurations)
-- [How to deposit LYXe on the LUKSO Genesis Deposit Contract?](#how-to-deposit-lyxe-on-the-lukso-genesis-deposit-contract-)
-  - [Details on the `tokensReceived(...)` function](#details-on-the--tokensreceived----function)
+- [How to deposit LYXe on the LUKSO Genesis Deposit Contract?](#how-to-deposit-lyxe-on-the-lukso-genesis-deposit-contract)
+  - [Details on the `tokensReceived(...)` function](#details-on-the-tokensreceived-function)
     - [LYXe Amount](#lyxe-amount)
     - [Deposit Data](#deposit-data)
 - [Events](#events)
-  - [`DepositEvent` log](#-depositevent--log)
-  - [`FreezeInitiated` log](#-freezeinitiated--log)
+  - [`DepositEvent` log](#depositevent-log)
+  - [`FreezeInitiated` log](#freezeinitiated-log)
 - [Public state variables](#public-state-variables)
-  - [`freezeBlockNumber`](#-freezeblocknumber-)
-  - [`supplyVoteCounter`](#-supplyvotecounter-)
+  - [`freezeBlockNumber`](#freezeblocknumber)
+  - [`supplyVoteCounter`](#supplyvotecounter)
 - [Functions](#functions)
-  - [`freezeContract()`](#-freezecontract---)
-  - [`getDepositData()`](#-getdepositdata---)
-  - [`getDepositDataByIndex(uint256)`](#-getdepositdatabyindex-uint256--)
-  - [`getsVotesPerSupply()`](#-getsvotespersupply---)
-  - [`isPubkeyRegistered(bytes)`](#-ispubkeyregistered-bytes--)
-  - [`depositCount()`](#-depositcount---)
-  - [`supportsInterface`](#-supportsinterface-)
+  - [`freezeContract()`](#freezecontract)
+  - [`getDepositData()`](#getdepositdata)
+  - [`getDepositDataByIndex(uint256)`](#getdepositdatabyindex-uint256)
+  - [`getsVotesPerSupply()`](#getsvotespersupply)
+  - [`isPubkeyRegistered(bytes)`](#ispubkeyregistered-bytes)
+  - [`depositCount()`](#depositcount)
+  - [`supportsInterface`](#supportsinterface)
 - [Fetching all the deposit data](#fetching-all-the-deposit-data)
 
 ---
@@ -157,7 +157,7 @@ It contains two informations:
 
 ## Public state variables
 
-### `freezeBlockNumber`
+### `freezeBlockNumber`
 
 ```solidity
 uint256 public freezeBlockNumber;
@@ -197,7 +197,7 @@ The `freezeContract` function is an external function that is only callable by t
 
 Calling it will freeze the contract 46,523 blocks (around 1 week as defined by the [`FREEZE_DELAY`](#constants)) after is has been called.
 
-> :warning: **Warning** :warning:: **This action cannot be reversed!**
+> :warning: **Warning** :warning: **This action cannot be reversed!**
 > It will prevent any further calls to the [`tokensReceived(...)`](#details-on-the-tokensreceived-function) function coming from the LYXe token contract and block any future deposits once the [`FREEZE_DELAY`](#constants) has passed.
 
 ### `getDepositData()`
