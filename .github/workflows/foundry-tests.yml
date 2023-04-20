@@ -1,4 +1,7 @@
-name: Foundry tests & Report gas diff
+# This workflow run the Solidity foundry tests from the folder `foundry/tests/**/*.t.sol`
+# Compare the gas costs of a PR with the `main` branch and upload the difference
+# in the PR as a comment.
+name: Foundry Tests
 
 on:
   pull_request:

@@ -1,11 +1,10 @@
-name: Run build + tests
+name: Build + Tests
 
 on: [push]
 
 env:
   INFURA_KEY: ${{ secrets.INFURA_KEY }}
   COINMARKETCAP_KEY: ${{ secrets.COINMARKETCAP_KEY}}
-
 
 jobs:
   build:

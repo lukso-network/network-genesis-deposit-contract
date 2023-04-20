@@ -1,7 +1,7 @@
 # This workflow runs the tests with code coverage to analyze how much
 # Solidity code in the smart contracts is covered by the tests.
 # It then submit the code coverage report to coveralls.io.
-name: Solidity Code coverage
+name: Solidity Coverage
 
 on: [push]
 
@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: "16.x"
           cache: "npm"
-      
+
       - name: Install dependencies
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: npm ci
