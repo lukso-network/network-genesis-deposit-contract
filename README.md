@@ -300,6 +300,8 @@ npx hardhat run scripts/fetchDeposits --network ethereum
 
 3. Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
 
+&nbsp;
+
 ## Audits
 
 The following audits were conducted.
