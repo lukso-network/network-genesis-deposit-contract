@@ -73,7 +73,7 @@ These configurations are updated for releases and may be out of sync during `dev
 
 Starting from the timestamp `1682007600`, which corresponds to April 20th, at 4:20 PM UTC, the genesis deposit contract will accept LYXe Tokens (`0xA8b919680258d369114910511cc87595aec0be6D`).
 
-Depositing LYXe tokens will allow you to become a validator on LUKSO's Mainnet blockchain. The contract will be notified by the ERC777 LYXe smart contract using the [`tokensReceived(...)`](#tokensreceived-function) function (see details below).
+Depositing LYXe tokens will allow you to become a genesis validator on LUKSO's Mainnet blockchain. The contract will be notified by the ERC777 LYXe smart contract using the [`tokensReceived(...)`](#tokensreceived-function) function (see details below).
 
 People wishing to deposit needs to:
 
@@ -212,7 +212,7 @@ The number of votes for a proposed initial supply can be retrieved by calling th
 function freezeContract() external;
 ```
 
-The `freezeContract` function is an external function that is only callable by the [`OWNER`](#constants) of the smart contract.
+The `freezeContract` function is an external function that is only callable by the [`FREEZER`](#constants) of the smart contract.
 
 Calling it will freeze the contract 46,523 blocks (around 1 week as defined by the [`FREEZE_DELAY`](#constants)) after is has been called.
 
