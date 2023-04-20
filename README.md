@@ -27,6 +27,7 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
   - [`depositCount()`](#depositcount)
   - [`supportsInterface`](#supportsinterface)
 - [Fetching all the deposit data](#fetching-all-the-deposit-data)
+- [Audits](#audits)
 
 ---
 
@@ -298,3 +299,10 @@ npx hardhat run scripts/fetchDeposits --network ethereum
 ```
 
 3. Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
+
+## Audits
+
+The following audits were conducted.
+
+- Watchpug Audit, 02-09-2023, Final Result: [Watchpug_audit_2023_02_09.pdf](./audits/Watchpug_audit_2023_02_09.pdf)
+- Trust Audit, 02-09-2023, Final Result: [Trust_audit_2023_02_09.pdf](./audits/Trust_audit_2023_02_09.pdf)
