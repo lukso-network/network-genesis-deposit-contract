@@ -27,7 +27,10 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
   - [`depositCount()`](#depositcount)
   - [`supportsInterface`](#supportsinterface)
 - [Fetching all the deposit data](#fetching-all-the-deposit-data)
-- [Make deposits in the LUKSOGenesisDepositContract](#make-Deposits-in-the-LUKSOGenesisDepositContract)
+  <<<<<<< HEAD
+- # [Make deposits in the LUKSOGenesisDepositContract](#make-Deposits-in-the-LUKSOGenesisDepositContract)
+- [Audits](#audits)
+  > > > > > > > bc71a707d3af5afc288f01f234f43a0d24fcf1fc
 
 ---
 
@@ -390,3 +393,10 @@ await connectedLYXeContract.send(
 ```
 
 After executing the above steps, the deposit transaction will be sent to the `LUKSOGenesisDepositContract`
+
+## Audits
+
+The following audits were conducted.
+
+- Watchpug Audit, 02-09-2023, Final Result: [Watchpug_audit_2023_02_09.pdf](./audits/Watchpug_audit_2023_02_09.pdf)
+- Trust Audit, 02-09-2023, Final Result: [Trust_audit_2023_02_09.pdf](./audits/Trust_audit_2023_02_09.pdf)
