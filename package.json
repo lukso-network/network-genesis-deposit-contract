@@ -4,8 +4,7 @@
     "build": "hardhat compile",
     "test": "hardhat test --no-compile",
     "clean": "hardhat clean",
-    "test:coverage": "hardhat coverage",
-    "test:foundry": "forge test --no-match-test Skip --gas-report > gasreport.ansi"
+    "test:coverage": "hardhat coverage"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",
