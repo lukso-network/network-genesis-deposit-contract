@@ -306,7 +306,7 @@ npx hardhat run scripts/fetchDeposits --network ethereum
 
 To make deposits in the `LUKSOGenesisDepositContract` smart contract, follow the steps outlined below. This guide assumes you have a basic understanding of Ethereum, smart contracts, and programming in JavaScript.
 
-1. Prepare `depositData`: The `depositData` is a 209-byte string containing the following fields:
+1. Prepare `depositData`: The `depositData` is a 209-bytes string containing the following fields:
 
 - `pubkey`: The first 48 bytes of the string
 - `withdrawal_credentials`: The following 32 bytes
@@ -327,15 +327,22 @@ const depositData = ethers.utils.hexConcat([
   signature,
   depositDataRoot,
   vote,
-]); // Must be 209 length string
+]); // `depositData` MUST be a 209 bytes string
 ```
 
 Ensure that you have constructed the `depositData` correctly based on these specifications.
 
-2. Instantiate the LYXeContract with a provider and its ABI: You will need a JSON-RPC provider (e.g., Infura, Alchemy, or a local Ethereum node) and the ABI (Application Binary Interface) of the `LYXeContract`.
+2. Instantiate the LYXeContract with a provider and its ABI: You will need:
+
+- a JSON-RPC provider (e.g., Infura, Alchemy, or a local Ethereum node)
+- the ABI (Application Binary Interface) of the `LYXeContract`
 
 ```js
-const provider = new ethers.providers.JsonRpcProvider("your-JSON-RPC-provider"); // Replace with your desired provider
+// Replace with your desired provider connected to Ethereum mainnet
+const provider = new ethers.providers.JsonRpcProvider(
+  "your-JSON-RPC-provider-for-Ethereum-mainnet"
+);
+
 const LYXeContractABI = [
   {
     inputs: [
@@ -361,9 +368,7 @@ const LYXeContractABI = [
     type: "function",
   },
 ];
-```
 
-```js
 const LYXeContract = new ethers.Contract(
   LYXeTokenAddress,
   LYXeContractABI,
@@ -371,22 +376,23 @@ const LYXeContract = new ethers.Contract(
 );
 ```
 
-3. Define the `LUKSOGenesisDepositContractAddresss` and `depositAmount`:
+3. Define the `LUKSOGenesisDepositContractAddress` and `depositAmount`:
 
 ```js
-const LUKSOGenesisDepositContractAddresss =
+const LUKSOGenesisDepositContractAddress =
   "0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC";
+
 const depositAmount = ethers.utils.parseEther("32"); // 32 LYXe
 ```
 
-4. Send the deposit transaction: Use the send function from `LYXeContract` to send the deposit transaction. This function takes the deposit contract address, deposit amount, and the depositData as arguments.
+4. Send the deposit transaction using the [`send(...)`](https://docs.openzeppelin.com/contracts/4.x/api/token/erc777#IERC777-send-address-uint256-bytes-) function from `LYXeContract` to send the deposit transaction. This function takes the deposit contract address (`LUKSOGenesisDepositContractAddress`), `depositAmount`, and the `depositData` as arguments.
 
 ```js
 await connectedLYXeContract.send(
-  LUKSOGenesisDepositContractAddresss,
+  LUKSOGenesisDepositContractAddress,
   depositAmount,
   depositData
 );
 ```
 
-After executing the above steps, the deposit transaction will be sent to the `LUKSOGenesisDepositContract`
+After executing the above steps, the deposit transaction will be sent to the `LUKSOGenesisDepositContract`.
