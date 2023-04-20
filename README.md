@@ -27,6 +27,7 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
   - [`depositCount()`](#depositcount)
   - [`supportsInterface`](#supportsinterface)
 - [Fetching all the deposit data](#fetching-all-the-deposit-data)
+- [Make deposits in the LUKSOGenesisDepositContract](#make-Deposits-in-the-LUKSOGenesisDepositContract)
 
 ---
 
@@ -54,11 +55,11 @@ The following values are (non-configurable) constants used throughout the specif
 
 These configurations are updated for releases and may be out of sync during `dev` changes.
 
-| Name                       | Value |
-| -------------------------- | ----- |
-| `DEPOSIT_CHAIN_ID`         | `1`   |
-| `DEPOSIT_NETWORK_ID`       | `1`   |
-| `DEPOSIT_CONTRACT_ADDRESS` | `TBD` |
+| Name                       | Value                                        |
+| -------------------------- | -------------------------------------------- |
+| `DEPOSIT_CHAIN_ID`         | `1`                                          |
+| `DEPOSIT_NETWORK_ID`       | `1`                                          |
+| `DEPOSIT_CONTRACT_ADDRESS` | `0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC` |
 
 &nbsp;
 
@@ -298,3 +299,94 @@ npx hardhat run scripts/fetchDeposits --network ethereum
 ```
 
 3. Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
+
+&nbsp;
+
+## Make deposits in the LUKSOGenesisDepositContract
+
+To make deposits in the `LUKSOGenesisDepositContract` smart contract, follow the steps outlined below. This guide assumes you have a basic understanding of Ethereum, smart contracts, and programming in JavaScript.
+
+1. Prepare `depositData`: The `depositData` is a 209-byte string containing the following fields:
+
+- `pubkey`: The first 48 bytes of the string
+- `withdrawal_credentials`: The following 32 bytes
+- `signature`: The following 96 bytes
+- `deposit_data_root`: The following 32 bytes
+- `initial_supply_vote`: The last byte, representing the initial supply of LYX (in millions) that the genesis validator voted for (should be a value between 0 and 100 where 0 means non-vote)
+
+```js
+const publicKey = "0x...";
+const withdrawalCredentials = "0x...";
+const signature = "0x...";
+const depositDataRoot = "0x..";
+const vote = "0x..";
+
+const depositData = ethers.utils.hexConcat([
+  publicKey,
+  withdrawalCredentials,
+  signature,
+  depositDataRoot,
+  vote,
+]); // Must be 209 length string
+```
+
+Ensure that you have constructed the `depositData` correctly based on these specifications.
+
+2. Instantiate the LYXeContract with a provider and its ABI: You will need a JSON-RPC provider (e.g., Infura, Alchemy, or a local Ethereum node) and the ABI (Application Binary Interface) of the `LYXeContract`.
+
+```js
+const provider = new ethers.providers.JsonRpcProvider("your-JSON-RPC-provider"); // Replace with your desired provider
+const LYXeContractABI = [
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_to",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_value",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "_data",
+        type: "bytes",
+      },
+    ],
+    name: "send",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+```
+
+```js
+const LYXeContract = new ethers.Contract(
+  LYXeTokenAddress,
+  LYXeContractABI,
+  provider
+);
+```
+
+3. Define the `LUKSOGenesisDepositContractAddresss` and `depositAmount`:
+
+```js
+const LUKSOGenesisDepositContractAddresss =
+  "0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC";
+const depositAmount = ethers.utils.parseEther("32"); // 32 LYXe
+```
+
+4. Send the deposit transaction: Use the send function from `LYXeContract` to send the deposit transaction. This function takes the deposit contract address, deposit amount, and the depositData as arguments.
+
+```js
+await connectedLYXeContract.send(
+  LUKSOGenesisDepositContractAddresss,
+  depositAmount,
+  depositData
+);
+```
+
+After executing the above steps, the deposit transaction will be sent to the `LUKSOGenesisDepositContract`
