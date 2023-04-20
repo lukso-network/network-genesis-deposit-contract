@@ -1,3 +1,5 @@
+[![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
+
 # LUKSO Genesis Deposit Contract
 
 > ## Deployed Address: [0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC](https://etherscan.io/address/0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC)
