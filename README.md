@@ -1,6 +1,11 @@
+![CI Tests](https://github.com/lukso-network/network-genesis-deposit-contract/actions/workflows/ci.yaml/badge.svg)
+![Foundry Tests](https://github.com/lukso-network/network-genesis-deposit-contract/actions/workflows/foundry-tests.yml/badge.svg)
+![MythX Analysis](https://github.com/lukso-network/network-genesis-deposit-contract/actions/workflows/mythx-analysis.yaml/badge.svg)
+[![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)
+
 # LUKSO Genesis Deposit Contract
 
-> ## Deployed Address: [0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC](https://etherscan.io/address/0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC)
+> ## Deployed Address: [`0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC`](https://etherscan.io/address/0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC)
 
 This document represents the specification for the LUKSO Genesis Deposit Contract. Inspired by the [ETH2 Deposit Contract](https://github.com/ethereum/consensus-specs/blob/dev/specs/phase0/deposit-contract.md).
 
@@ -175,9 +180,9 @@ It contains two informations:
 uint256 public freezeBlockNumber;
 ```
 
-This state variable defines the block number when the LUKSO Genesis Deposit Contract will be frozen and LYXe deposits will no longer be accepted.
+This state variable defines the block number when the LUKSO Genesis Deposit Contract is frozen and LYXe deposits are no longer be accepted.
 
-The value can be retrieved by calling the function `freezeBlockNumber()` on the contract (this `public` getter function automatically added for this state variable).
+The value can be retrieved by calling the function `freezeBlockNumber()` on the contract (this `public` getter function is automatically added for this state variable).
 
 ### `supplyVoteCounter`
 
@@ -185,17 +190,17 @@ The value can be retrieved by calling the function `freezeBlockNumber()` on the 
 mapping(uint256 => uint256) public supplyVoteCounter;
 ```
 
-This state variable maps the number of votes collected for each proposed initial supply of LYX.
+This state variable maps the votes collected for each proposed initial supply of LYX.
 
-- the first `uint256` index in the mapping corresponds to the initial supply of LYX (in million).
-- the second `uint256` in the mapping corresponds to total number of votes for this initial supply of LYX.
+- the first `uint256` index in the mapping corresponds to the initial supply of LYX (in millions).
+- the second `uint256` in the mapping corresponds to the total number of votes for this initial supply of LYX.
 
 For the first index:
 
 - `0` corresponds to non votes.
 - any other index can be between `1` and `100` (1 Million and 100 Millions LYX).
 
-The number of votes for a proposed initial supply can be retrieved by calling the function `supplyVoteCounter(uint256)`, passing the initial supply as argument to the function (this `public` getter function automatically added for this state variable).
+The number of votes for a proposed initial supply can be retrieved by calling the function `supplyVoteCounter(uint256)`, passing the initial supply as an argument to the function (this `public` getter function is automatically added for this state variable).
 
 &nbsp;
 
