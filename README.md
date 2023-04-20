@@ -175,9 +175,9 @@ It contains two informations:
 uint256 public freezeBlockNumber;
 ```
 
-This state variable defines the block number when the LUKSO Genesis Deposit Contract will be frozen and LYXe deposits will no longer be accepted.
+This state variable defines the block number when the LUKSO Genesis Deposit Contract is frozen and LYXe deposits are no longer be accepted.
 
-The value can be retrieved by calling the function `freezeBlockNumber()` on the contract (this `public` getter function automatically added for this state variable).
+The value can be retrieved by calling the function `freezeBlockNumber()` on the contract (this `public` getter function is automatically added for this state variable).
 
 ### `supplyVoteCounter`
 
@@ -185,17 +185,17 @@ The value can be retrieved by calling the function `freezeBlockNumber()` on the 
 mapping(uint256 => uint256) public supplyVoteCounter;
 ```
 
-This state variable maps the number of votes collected for each proposed initial supply of LYX.
+This state variable maps the votes collected for each proposed initial supply of LYX.
 
-- the first `uint256` index in the mapping corresponds to the initial supply of LYX (in million).
-- the second `uint256` in the mapping corresponds to total number of votes for this initial supply of LYX.
+- the first `uint256` index in the mapping corresponds to the initial supply of LYX (in millions).
+- the second `uint256` in the mapping corresponds to the total number of votes for this initial supply of LYX.
 
 For the first index:
 
 - `0` corresponds to non votes.
 - any other index can be between `1` and `100` (1 Million and 100 Millions LYX).
 
-The number of votes for a proposed initial supply can be retrieved by calling the function `supplyVoteCounter(uint256)`, passing the initial supply as argument to the function (this `public` getter function automatically added for this state variable).
+The number of votes for a proposed initial supply can be retrieved by calling the function `supplyVoteCounter(uint256)`, passing the initial supply as an argument to the function (this `public` getter function is automatically added for this state variable).
 
 &nbsp;
 
