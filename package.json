@@ -7,6 +7,7 @@
     "test:coverage": "hardhat coverage"
   },
   "dependencies": {
+    "@lukso/lsp-smart-contracts": "^0.9.0",
     "@openzeppelin/contracts": "^4.7.3",
     "dotenv": "^16.0.3",
     "typechain": "^8.1.1"
