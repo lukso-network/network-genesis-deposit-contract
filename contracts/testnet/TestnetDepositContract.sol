@@ -1,4 +1,14 @@
+//   _______        _              _     _____                       _ _      _____       __
+//  |__   __|      | |            | |   |  __ \                     (_) |    / ____|     / _|
+//     | | ___  ___| |_ _ __   ___| |_  | |  | | ___ _ __   ___  ___ _| |_  | |     __ _| |_ ___
+//     | |/ _ \/ __| __| '_ \ / _ \ __| | |  | |/ _ \ '_ \ / _ \/ __| | __| | |    / _` |  _/ _ \
+//     | |  __/\__ \ |_| | | |  __/ |_  | |__| |  __/ |_) | (_) \__ \ | |_  | |___| (_| | ||  __/
+//     |_|\___||___/\__|_| |_|\___|\__| |_____/ \___| .__/ \___/|___/_|\__|  \_____\__,_|_| \___|
+//                                                  | |
+//                                                  |_|
+
 // SPDX-License-Identifier: CC0-1.0
+
 pragma solidity 0.8.15;
 
 import {LSP14Ownable2Step} from '@lukso/lsp-smart-contracts/contracts/LSP14Ownable2Step/LSP14Ownable2Step.sol';
@@ -60,7 +70,9 @@ contract TestnetDepositContract is LSP14Ownable2Step, IDepositContract, ERC165 {
 
     bytes32[DEPOSIT_CONTRACT_TREE_DEPTH] zero_hashes;
 
-    mapping(address => bool) public isWhitelisted;
+    mapping(address => uint256) public allowedDeposits;
+
+    event Whitelisted(address addr, uint256 allowedDeposits);
 
     constructor(address owner_) {
         // Compute hashes in empty sparse Merkle tree
@@ -98,7 +110,8 @@ contract TestnetDepositContract is LSP14Ownable2Step, IDepositContract, ERC165 {
         bytes32 deposit_data_root
     ) override external payable {
 
-        require(isWhitelisted[msg.sender], "TestnetDepositContract: validator not whitelisted");
+        require(allowedDeposits[msg.sender] > 0, "TestnetDepositContract: address not allowed to deposit");
+        allowedDeposits[msg.sender]--;
 
         // Extended ABI length checks since dynamic types are used.
         require(pubkey.length == 48, "DepositContract: invalid pubkey length");
@@ -154,9 +167,12 @@ contract TestnetDepositContract is LSP14Ownable2Step, IDepositContract, ERC165 {
         assert(false);
     }
 
-    function whitelistAddress(address addr) external {
+    function whitelistAddress(address addr_, uint256 allowedDeposits_) external {
         require(msg.sender == owner(), "TestnetDepositContract: not owner");
-        isWhitelisted[addr] = true;
+
+        allowedDeposits[addr_] = allowedDeposits_;
+
+        emit Whitelisted(addr_, allowedDeposits_);
     }
 
     function supportsInterface(bytes4 interfaceId) override external pure returns (bool) {
