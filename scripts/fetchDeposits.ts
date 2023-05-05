@@ -34,12 +34,12 @@ function parseData(data: string[]): DepositData[] {
 }
 
 async function main() {
-  // Todo: replace with LUKSOGenesisDeposit contract's address on Ethereum
-  const depositAddress = "0x9C2Ae5bC047Ca794d9388aB7A2Bf37778f9aBA73";
+  const genesisDepositContractAddress =
+    "0x42000421dd80D1e90E56E87e6eE18D7770b9F8cC";
 
   const depositContract = await ethers.getContractAt(
     "LUKSOGenesisValidatorsDepositContract",
-    depositAddress
+    genesisDepositContractAddress
   );
 
   const depositDatas = await depositContract.getDepositData();
