@@ -290,7 +290,7 @@ The [`fetchDeposits.ts`](./scripts/fetchDeposits.ts) script is used to fetch all
 ```js
 networks: {
   ethereum: {
-    url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+    url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_KEY}`,
   },
 }
 ```
@@ -304,6 +304,8 @@ npx hardhat run scripts/fetchDeposits --network ethereum
 ```
 
 3. Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
+
+> Use [this script](https://github.com/lukso-network/tools-lodestar-genesis-szz-generator/blob/spike/pos-from-the-start/packages/beacon-node/test/utils/README.md) to generate the `genesis.szz` yourself.
 
 &nbsp;
 
