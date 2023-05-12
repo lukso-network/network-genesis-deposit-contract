@@ -44,8 +44,11 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 Clone the repository and install its dependencies to start using the smart contracts and scripts.
 
 ```bash
+# Clone the repo
 $ git clone https://github.com/lukso-network/network-genesis-deposit-contract.git
 $ cd ./network-genesis-deposit-contract
+
+# Install dependencies
 $ npm install
 ```
 
