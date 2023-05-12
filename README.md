@@ -10,6 +10,7 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 
 **Table of Contents**
 
+- [Installation](#installation)
 - [Constants](#constants)
 - [Configurations](#configurations)
 - [How to deposit LYXe on the LUKSO Genesis Deposit Contract?](#how-to-deposit-lyxe-on-the-lukso-genesis-deposit-contract)
@@ -35,6 +36,21 @@ This document represents the specification for the LUKSO Genesis Deposit Contrac
 - [Audits](#audits)
 
 ---
+
+&nbsp;
+
+## Installation
+
+Clone the repository and install its dependencies to start using the smart contracts and scripts.
+
+```bash
+# Clone the repo
+$ git clone https://github.com/lukso-network/network-genesis-deposit-contract.git
+$ cd ./network-genesis-deposit-contract
+
+# Install dependencies
+$ npm install
+```
 
 &nbsp;
 
