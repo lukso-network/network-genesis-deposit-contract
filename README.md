@@ -285,7 +285,7 @@ The `supportsInterface(bytes4)` is required by the ERC165 standard. It checks if
 
 The [`fetchDeposits.ts`](./scripts/fetchDeposits.ts) script is used to fetch all the deposit data from the `LUKSOGenesisDepositContract`. To use this script, follow these steps:
 
-1. Update the `hardhat.config.ts` file with your `INFURA API KEY` in the networks section as follows:
+1. Update the `hardhat.config.ts` file with your `ALCHEMY API KEY` in the networks section as follows:
 
 ```js
 networks: {
