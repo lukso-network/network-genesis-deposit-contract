@@ -316,7 +316,7 @@ networks: {
 Run the following command to execute the `fetchDeposits` script:
 
 ```bash
-npx hardhat run scripts/fetchDeposits --network ethereum
+npx hardhat run scripts/fetchDeposits.ts --network ethereum
 ```
 
 3. Wait for the script to complete, and then look for the `depositData.json` file in the project directory. This file will contain all the deposit data from the LUKSOGenesisDeposit contract.
